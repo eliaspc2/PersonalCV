@@ -20,6 +20,24 @@ let scrollTicking = false;
 const isPreviewMode = new URLSearchParams(window.location.search).get('preview') === '1';
 let previewSection = null;
 
+const BASE_SECTIONS = [
+    { id: 'overview', type: 'overview' },
+    { id: 'development', type: 'development' },
+    { id: 'foundation', type: 'foundation' },
+    { id: 'mindset', type: 'mindset' },
+    { id: 'now', type: 'now' },
+    { id: 'contact', type: 'contact' }
+];
+
+const NAV_TYPE_ICONS = {
+    overview: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+    development: `<svg class="nav-icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    foundation: `<svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`,
+    mindset: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+    now: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 12h7l2 3h9"/><path d="M3 12l2-3h6"/><circle cx="19" cy="12" r="2"/></svg>`,
+    contact: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`
+};
+
 function getContactHref(profile) {
     const email = profile?.social?.email || 'eliaspc2@gmail.com';
     return email ? `mailto:${email}` : '#contact';
@@ -68,6 +86,51 @@ function normalizeDownloads(profile, locale) {
         }));
     }
     return [];
+}
+
+function getCustomSections() {
+    if (!cvData?.meta?.custom_sections) return [];
+    return Array.isArray(cvData.meta.custom_sections) ? cvData.meta.custom_sections : [];
+}
+
+function getSectionMetaList() {
+    const custom = getCustomSections();
+    return [...BASE_SECTIONS, ...custom.map((section) => ({ id: section.id, type: section.type }))];
+}
+
+function ensureDynamicSections(locale) {
+    const nav = document.querySelector('.sidebar-nav');
+    const content = document.getElementById('dynamic-content');
+    if (!nav || !content) return;
+
+    const sectionList = getSectionMetaList();
+    sectionList.forEach((section) => {
+        const existingSection = document.getElementById(`section-${section.id}`);
+        if (!existingSection) {
+            const sectionEl = document.createElement('section');
+            sectionEl.id = `section-${section.id}`;
+            sectionEl.className = 'view-section';
+            sectionEl.dataset.section = section.id;
+            content.appendChild(sectionEl);
+        }
+
+        const existingNav = nav.querySelector(`.nav-item[data-section="${section.id}"]`);
+        if (!existingNav) {
+            const link = document.createElement('a');
+            link.href = `#${section.id}`;
+            link.className = 'nav-item';
+            link.dataset.section = section.id;
+            const icon = NAV_TYPE_ICONS[section.type] || NAV_TYPE_ICONS.overview;
+            link.innerHTML = `${icon}<span class="nav-label" data-nav="${section.id}">${section.id}</span>`;
+            nav.appendChild(link);
+        }
+    });
+}
+
+function getSectionType(sectionId) {
+    if (BASE_SECTIONS.some((section) => section.id === sectionId)) return sectionId;
+    const custom = getCustomSections().find((section) => section.id === sectionId);
+    return custom?.type || sectionId;
 }
 
 async function bootstrap() {
@@ -127,21 +190,22 @@ function setupGlobalEvents() {
         }
     };
 
-    // 1. Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.onclick = (e) => {
-            const sectionId = item.getAttribute('data-section');
+    // 1. Navigation (delegate for dynamic items)
+    const nav = document.querySelector('.sidebar-nav');
+    if (nav) {
+        nav.addEventListener('click', (e) => {
+            const target = e.target.closest('.nav-item');
+            if (!target) return;
+            const sectionId = target.getAttribute('data-section');
             if (!sectionId) return;
             e.preventDefault();
             if (isPreviewMode) return;
             navigateTo(sectionId);
-
-            // Close mobile sidebar on navigate
             if (window.innerWidth <= 768) {
                 setSidebarOpen(false);
             }
-        };
-    });
+        });
+    }
 
     // 2. Language
     const onLangChange = (value) => {
@@ -229,15 +293,29 @@ function navigateTo(sectionId) {
 function render() {
     if (!cvData) return;
     const locale = cvData.localized[currentLang];
+    ensureDynamicSections(locale);
     updateNavigationLabels(locale);
     updatePageMeta(locale);
 
-    renderOverview(locale.overview, document.getElementById('section-overview'));
-    renderDevelopment(locale.development, document.getElementById('section-development'));
-    renderFoundation(locale.foundation, document.getElementById('section-foundation'));
-    renderMindset(locale.mindset, document.getElementById('section-mindset'));
-    renderNow(locale.now, document.getElementById('section-now'));
-    renderContact(locale, document.getElementById('section-contact'));
+    const sectionList = getSectionMetaList();
+    sectionList.forEach((section) => {
+        const container = document.getElementById(`section-${section.id}`);
+        const data = locale[section.id] || locale[section.type];
+        if (!container || !data) return;
+        if (section.type === 'overview') {
+            renderOverview(data, container, section.id);
+        } else if (section.type === 'development') {
+            renderDevelopment(data, container, section.id);
+        } else if (section.type === 'foundation') {
+            renderFoundation(data, container, section.id);
+        } else if (section.type === 'mindset') {
+            renderMindset(data, container, section.id);
+        } else if (section.type === 'now') {
+            renderNow(data, container, section.id);
+        } else if (section.type === 'contact') {
+            renderContact(data, locale, container, section.id);
+        }
+    });
 
     if (isPreviewMode) {
         applyPreviewSection(previewSection);
@@ -408,12 +486,12 @@ function setupScrollNarrative() {
 
 /* --- Specific Section Renderers --- */
 
-function renderOverview(data, container) {
+function renderOverview(data, container, sectionId = 'overview') {
     const profile = cvData.profile;
     const ui = cvData.localized[currentLang].ui || {};
     const certifications = cvData.localized[currentLang].certifications || profile.certifications || [];
-    const ctaLabel = ui.cta_contact_label;
-    const ctaHref = getContactHref(profile);
+    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaHref = data.cta_link || getContactHref(profile);
     container.innerHTML = `
         <div class="hero-section">
             <div class="hero-header-flex" style="display:flex; align-items:center; gap:2.5rem; margin-bottom:4rem; flex-wrap:wrap;">
@@ -473,21 +551,21 @@ function renderOverview(data, container) {
                 </div>
             ` : ''}
             
-            ${(data.cta_label || ctaLabel) ? `
+            ${ctaLabel ? `
                 <div style="margin-top:4rem;">
-                   <a class="cta-btn" href="${ctaHref}">${data.cta_label || ctaLabel}</a>
+                   <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
                 </div>
             ` : ''}
         </div>
     `;
 }
 
-function renderDevelopment(data, container) {
+function renderDevelopment(data, container, sectionId = 'development') {
     const ui = cvData.localized[currentLang].ui || {};
-    const ctaLabel = ui.cta_contact_label;
-    const ctaHref = getContactHref(cvData.profile);
+    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaHref = data.cta_link || getContactHref(cvData.profile);
     const skillsHtml = data.skills.map((skill, index) => `
-        <div class="rich-card" onclick="app.showDetail('skill', ${index}, 'development')">
+        <div class="rich-card" onclick="app.showDetail('skill', ${index}, '${sectionId}')">
             <div class="card-tags">
                 <span class="focus-tag">${skill.focus_area}</span>
                 ${skill.progress_status ? `<span class="status-tag">${skill.progress_status}</span>` : ''}
@@ -532,10 +610,10 @@ function renderDevelopment(data, container) {
     `;
 }
 
-function renderFoundation(data, container) {
+function renderFoundation(data, container, sectionId = 'foundation') {
     const ui = cvData.localized[currentLang].ui || {};
-    const ctaLabel = ui.cta_contact_label;
-    const ctaHref = getContactHref(cvData.profile);
+    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaHref = data.cta_link || getContactHref(cvData.profile);
     container.innerHTML = `
         <div class="section-container">
             <div class="section-header foundation-header">
@@ -551,7 +629,7 @@ function renderFoundation(data, container) {
             </div>
             <div class="timeline-rich">
                 ${data.experience.map((exp, index) => `
-                    <div class="rich-card" style="margin-bottom: 2rem;" onclick="app.showDetail('exp', ${index}, 'foundation')">
+                    <div class="rich-card" style="margin-bottom: 2rem;" onclick="app.showDetail('exp', ${index}, '${sectionId}')">
                         <div style="display:flex; justify-content:space-between; margin-bottom:1rem; align-items:center;">
                            <span class="focus-tag">${exp.company_name}</span>
                            <span style="font-size:0.8rem; font-weight:700; color:var(--text-dim);">${exp.timeframe}</span>
@@ -577,10 +655,10 @@ function renderFoundation(data, container) {
     `;
 }
 
-function renderMindset(data, container) {
+function renderMindset(data, container, sectionId = 'mindset') {
     const ui = cvData.localized[currentLang].ui || {};
-    const ctaLabel = ui.cta_contact_label;
-    const ctaHref = getContactHref(cvData.profile);
+    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaHref = data.cta_link || getContactHref(cvData.profile);
     const adoptionBlock = data.adoption ? [data.adoption] : [];
     const allBlocks = [...adoptionBlock, ...data.blocks];
     container.innerHTML = `
@@ -594,7 +672,7 @@ function renderMindset(data, container) {
 
             <div class="mindset-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2.5rem;">
                 ${allBlocks.map((block, index) => `
-                    <div class="rich-card mindset-card ${block.id === 'adocao' || block.id === 'adopcion' || block.id === 'adoption' ? 'adoption-card' : ''}" onclick="app.showDetail('mindset', ${index}, 'mindset')" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+                    <div class="rich-card mindset-card ${block.id === 'adocao' || block.id === 'adopcion' || block.id === 'adoption' ? 'adoption-card' : ''}" onclick="app.showDetail('mindset', ${index}, '${sectionId}')" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="height: 200px; background: var(--border); overflow: hidden; position: relative;">
                             ${block.image ? `<img src="${block.image}" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover; object-position: ${block.image_position || 'center 20%'}; ${getImageTransform(block.image_zoom)} opacity: 0.8; transition: var(--transition);">` : `
                                 <div style="display:flex; align-items:center; justify-content:center; height:100%; font-size: 5rem;">${block.icon}</div>
@@ -631,12 +709,12 @@ function renderMindset(data, container) {
     `;
 }
 
-function renderContact(locale, container) {
-    const data = locale.contact;
+function renderContact(data, locale, container, sectionId = 'contact') {
     const profile = cvData.profile;
     const ui = locale.ui || {};
-    const ctaLabel = ui.cta_contact_label;
+    const ctaLabel = data.cta_label || ui.cta_contact_label;
     const downloads = normalizeDownloads(profile, locale);
+    const ctaHref = data.cta_link || `mailto:${profile.social.email}`;
     const downloadIcon = `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
     const certIcon = `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
     const renderDownloadIcon = (item, fallbackIcon) => {
@@ -704,7 +782,7 @@ function renderContact(locale, container) {
                 <p style="color:var(--text-muted); font-size:1.1rem; max-width:600px; margin-left:auto; margin-right:auto;">${data.description}</p>
                 ${ctaLabel ? `
                     <div style="margin-top:2rem;">
-                        <a class="cta-btn" href="mailto:${profile.social.email}">${ctaLabel}</a>
+                        <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
                     </div>
                 ` : ''}
             </div>
@@ -736,9 +814,9 @@ function renderContact(locale, container) {
     `;
 }
 
-function renderNow(data, container) {
+function renderNow(data, container, sectionId = 'now') {
     if (!data || !container) return;
-    const ctaHref = getContactHref(cvData.profile);
+    const ctaHref = data.cta_link || getContactHref(cvData.profile);
     container.innerHTML = `
         <div class="section-container">
             <h2 class="section-title">${data.title}</h2>

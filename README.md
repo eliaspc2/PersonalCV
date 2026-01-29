@@ -8,7 +8,7 @@ The project is built on the concept of **Static Frontend as Admin**.
 - **Persistence**: All data is stored in a `cv.json` file within the repository.
 - **Single Source of Truth**: The `data/cv.json` file is the ONLY place where CV content lives.
 - **Admin Flow**: A hidden configuration page (`config.html`) allows the user to edit the JSON data and commit changes back to GitHub using a Personal Access Token (PAT).
-- **Security**: Access to the config page is obscured, and write operations require a valid GitHub PAT (never stored permanently).
+- **Security**: Access to the config page is obscured (3-click trigger). Write operations require a valid GitHub PAT (stored encrypted in localStorage).
 
 ## 📁 Project Structure
 
@@ -18,8 +18,8 @@ The project is built on the concept of **Static Frontend as Admin**.
 ├── config.html             # Admin/Config Interface (Private)
 ├── SPEC.md                 # Project Specification (Source of Truth)
 ├── RULES.json              # Machine-readable invariants
-├── _sources/               # Immutable raw source documents (PDF/PNG)
-│   └── INDEX.md            # Mapping of source documents to data
+├── _sources/               # Optional archive (can be empty)
+│   └── INDEX.md            # Mapping of source documents to data (if used)
 ├── data/
 │   └── cv.json             # Content Source of Truth
 ├── js/
@@ -27,10 +27,14 @@ The project is built on the concept of **Static Frontend as Admin**.
 │   ├── config-ui.js        # Logic: Handles Form UI and Save triggers
 │   ├── github-api.js       # Logic: Communication with GitHub REST API
 │   ├── auth-gate.js        # Logic: Secret code verification & Token management
+│   ├── crypto-utils.js     # Logic: Encrypted storage helpers
 │   └── self-check.js       # Logic: Invariant validation for development
 ├── css/
 │   └── styles.css          # Shared aesthetics
-├── assets/                 # Static assets (images, icons)
+├── assets/                 # Static assets
+│   ├── photos/             # Section images
+│   ├── icons/              # Favicons/app icons
+│   └── downloads/          # Downloadable files
 └── README.md               # Main documentation
 ```
 
@@ -49,10 +53,16 @@ To ensure maintainability, modules follow strict rules defined in `SPEC.md`:
 Provenance mapping lives in `_sources/INDEX.md`. The renderer does not enforce visibility rules, so keep sensitive data out of `data/cv.json` unless you intend it to be public.
 
 ## 🛑 Limitations & Accepted Risks
-- **Security by Obscurity**: The "Secret Code" gate is a logic barrier, not cryptographic protection.
+- **Security by Obscurity**: The entry to `config.html` is hidden (3-click trigger), not fully protected.
 - **Public Logic**: All JavaScript logic is visible in the browser. Never hardcode sensitive tokens or passwords in the source.
-- **Browser-Only**: Persistence depends on the user providing a valid GitHub PAT in the session.
+- **Browser-Only**: Persistence depends on the user providing a valid GitHub PAT stored encrypted in localStorage.
 - **GitHub Delay**: Changes saved via the Admin UI take 1-3 minutes to reflect on the public site due to GitHub Pages' build process.
 
 ## 🚀 Usage
 See [WALKTHROUGH.md](./WALKTHROUGH.md) for detailed instructions on how to set up and use the CV.
+
+## ✨ Admin UI Highlights
+- Per‑section navigation (nome + ícone) with emoji picker.
+- Image crop/zoom tooling for photo framing.
+- Downloads managed inside Contacto with groups and links.
+- Add new sections using existing templates (visual picker).

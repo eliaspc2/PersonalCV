@@ -21,8 +21,8 @@ This structure is mandatory.
 ├── config.html             # Config Interface (Private)
 ├── SPEC.md                 # Project Specification (Source of Truth)
 ├── RULES.json              # Machine-readable rules
-├── _sources/               # Raw source files (immutable input)
-│   └── INDEX.md            # Map of source files to CV data
+├── _sources/               # Optional archive (may be empty)
+│   └── INDEX.md            # Map of source files to CV data (if used)
 ├── data/
 │   └── cv.json             # Single Source of Truth for CV content
 ├── js/
@@ -30,11 +30,14 @@ This structure is mandatory.
 │   ├── config-ui.js        # Config UI Logic
 │   ├── github-api.js       # GitHub REST API Interaction
 │   ├── auth-gate.js        # Access Gate (Secret Code + Token)
+│   ├── crypto-utils.js     # Encrypted storage helpers
 │   └── self-check.js       # Invariant validation script
 ├── css/
 │   └── styles.css
 ├── assets/
-│   └── certs/              # Certificates (PDFs/PNGs)
+│   ├── photos/             # Section images
+│   ├── icons/              # Favicons/app icons
+│   └── downloads/          # Downloadable files
 └── README.md               # Documentation
 ```
 
@@ -57,20 +60,25 @@ This structure is mandatory.
 
 **`cv.json` Schema (current)**:
 - `meta`: Versioning + language control (`version`, `lastUpdated`, `defaultLanguage`, `availableLanguages`).
+- `meta.custom_sections`: Optional array of `{ id, type }` to define extra sections based on existing templates.
 - `profile`: Assets and identity links (photos, social, downloads).
+- `profile.downloads`: Array of `{ label, icon, href, group }` items.
 - `localized`: Object keyed by language code, each with:
   - `navigation`: UI labels for sections.
+  - `navigation_icons`: Emoji overrides per section (optional).
   - `overview`, `development`, `foundation`, `mindset`, `now`, `contact`: Section content consumed by `cv-render.js`.
+  - `contact.download_groups`: Optional array of `{ id, label, open_in_new_tab, icon? }` for grouping downloads.
+  - Section-level CTA fields: `cta_label`, `cta_link`.
   - `ui`: Shared UI copy and labels used across renderers.
 - Provenance mapping lives in `_sources/INDEX.md`.
 
 ## 5. Authentication Model
 - **No real backend authentication.**
 - **Write Access**: Via GitHub Personal Access Token (PAT).
-- **Token Storage**: `sessionStorage` only, **encrypted** (no plain‑text tokens).
+- **Token Storage**: `localStorage`, **encrypted** (no plain‑text tokens).
 - **Access Gate**:
     - Access `config.html` via discrete trigger (3 clicks on the sidebar profile photo within 3 seconds).
-    - Prompt for Secret Code (verified via hash in JS).
+    - Secret Code check exists in `auth-gate.js` but is not exposed in the current UI.
     - GitHub PAT is entered inside the Admin UI panel.
 - **Flow**:
     - No Token -> Read-only (Public view).
@@ -90,7 +98,7 @@ This structure is mandatory.
 - **Conventions**: `camelCase` for JS variables/functions, `kebab-case` for filenames.
 - **Forbidden**:
     - Code duplication.
-    - Inline logic inside static HTML files.
+    - Inline logic inside static HTML files (except the minimal Service Worker registration in `index.html`).
     - Direct DOM manipulation without abstraction (in core logic).
     - Global variables (unnecessary ones).
 

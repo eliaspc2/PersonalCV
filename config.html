@@ -346,6 +346,16 @@
             border-radius: 8px;
         }
 
+        .panel-actions-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+
+        .panel-actions-row .panel-action {
+            text-align: center;
+        }
+
         .editor-main,
         .editor-preview {
             border: 1px solid #e2e8f0;
@@ -541,6 +551,105 @@
             margin-top: 0.75rem;
         }
 
+        .template-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .template-overlay.hidden {
+            display: none;
+        }
+
+        .template-modal {
+            width: min(820px, 94vw);
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        .template-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.9rem;
+        }
+
+        .template-card {
+            border: 1px solid #cbd5f5;
+            border-radius: 12px;
+            padding: 0.8rem;
+            background: #f8fafc;
+            cursor: pointer;
+            display: grid;
+            gap: 0.6rem;
+        }
+
+        .template-card.active {
+            border-color: #1f3a8a;
+            box-shadow: 0 0 0 2px rgba(31, 58, 138, 0.2);
+            background: #eef2ff;
+        }
+
+        .template-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1f2937;
+        }
+
+        .template-sketch {
+            border-radius: 10px;
+            background: white;
+            border: 1px dashed #cbd5f5;
+            height: 90px;
+            display: grid;
+            gap: 6px;
+            padding: 8px;
+        }
+
+        .sketch-line {
+            height: 8px;
+            border-radius: 6px;
+            background: #e2e8f0;
+        }
+
+        .sketch-circle {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e2e8f0;
+        }
+
+        .sketch-card {
+            height: 18px;
+            border-radius: 6px;
+            background: #e2e8f0;
+        }
+
+        .template-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: center;
+        }
+
+        .template-actions input {
+            flex: 1 1 auto;
+        }
+
         .nav-icon-hint {
             display: flex;
             align-items: center;
@@ -604,6 +713,7 @@
                         <div class="panel">
                             <h3>Secções</h3>
                             <div class="section-buttons" id="section-buttons"></div>
+                            <button id="add-section-btn" type="button" class="panel-action">+ Adicionar secção</button>
                         </div>
                         <div class="panel">
                             <h3>Idioma</h3>
@@ -612,6 +722,13 @@
                         </div>
                         <div class="panel">
                             <h3>Ligação & chaves</h3>
+                            <div class="form-group">
+                                <label>OpenAI API Key</label>
+                                <div class="inline-input">
+                                    <input type="password" id="openai-key" placeholder="sk-...">
+                                    <button type="button" class="toggle-visibility" data-toggle="openai-key">Ver</button>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label>GitHub PAT</label>
                                 <div class="inline-input">
@@ -627,14 +744,7 @@
                                 <label>Repo Name</label>
                                 <input type="text" id="repo-name" placeholder="ex: PersonalCV">
                             </div>
-                            <div class="form-group">
-                                <label>OpenAI API Key</label>
-                                <div class="inline-input">
-                                    <input type="password" id="openai-key" placeholder="sk-...">
-                                    <button type="button" class="toggle-visibility" data-toggle="openai-key">Ver</button>
-                                </div>
-                            </div>
-                            <div class="inline-input">
+                            <div class="panel-actions-row">
                                 <button id="load-btn" type="button" class="panel-action">Backup</button>
                                 <button id="restore-btn" type="button" class="panel-action">Restore</button>
                                 <input type="file" id="restore-file" accept="application/json" class="hidden">
@@ -680,6 +790,19 @@
             <div id="emoji-grid" class="emoji-grid"></div>
             <div class="emoji-actions">
                 <button id="emoji-clear" type="button" class="panel-action">Sem ícone</button>
+            </div>
+        </div>
+    </div>
+    <div id="section-template-overlay" class="template-overlay hidden" aria-hidden="true">
+        <div class="template-modal">
+            <div class="template-header">
+                <h3 style="margin:0;">Adicionar secção</h3>
+                <button id="section-template-close" type="button" class="panel-action">Fechar</button>
+            </div>
+            <div id="section-template-grid" class="template-grid"></div>
+            <div class="template-actions">
+                <input id="section-template-name" type="text" placeholder="Nome da nova secção">
+                <button id="section-template-create" type="button" class="panel-action">Criar</button>
             </div>
         </div>
     </div>

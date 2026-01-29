@@ -38,8 +38,7 @@ const SECTION_LABELS = {
     foundation: { pt: 'Fundação', es: 'Fundación', en: 'Foundation' },
     mindset: { pt: 'Mentalidade', es: 'Mentalidad', en: 'Mindset' },
     now: { pt: 'Agora', es: 'Ahora', en: 'Now' },
-    contact: { pt: 'Contacto', es: 'Contacto', en: 'Contact' },
-    downloads: { pt: 'Downloads', es: 'Descargas', en: 'Downloads' }
+    contact: { pt: 'Contacto', es: 'Contacto', en: 'Contact' }
 };
 
 const LANGS = ['pt', 'es', 'en'];
@@ -47,9 +46,7 @@ const OPENAI_KEY_STORAGE = 'openai_api_key';
 const REPO_OWNER_STORAGE = 'repo_owner';
 const REPO_NAME_STORAGE = 'repo_name';
 const PREVIEW_STORAGE = 'preview_cv';
-const PREVIEW_SECTION_MAP = {
-    downloads: 'contact'
-};
+const PREVIEW_SECTION_MAP = {};
 
 let currentCV = null;
 let currentSHA = null;
@@ -63,7 +60,8 @@ let cropperState = null;
 const pendingDownloadDeletes = new Set();
 let emojiPickerState = null;
 
-const NAV_SECTIONS = new Set(['overview', 'development', 'foundation', 'mindset', 'now', 'contact']);
+const BASE_SECTIONS = ['overview', 'development', 'foundation', 'mindset', 'now', 'contact'];
+const NAV_SECTIONS = new Set(BASE_SECTIONS);
 const EMOJI_CHOICES = [
     '🏠', '🧭', '🧠', '🧩', '🧱', '⚙️', '🛠️', '🧪', '🧰', '📚',
     '📌', '📍', '📎', '📝', '📄', '📂', '📁', '🗂️', '🧾', '🔖',
@@ -80,8 +78,67 @@ const NAV_DEFAULT_ICONS = {
     contact: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\"/><polyline points=\"22,6 12,13 2,6\"/></svg>`
 };
 
+const SECTION_TEMPLATES = [
+    { type: 'overview', name: { pt: 'Hero & Identidade', es: 'Hero & Identidad', en: 'Hero & Identity' } },
+    { type: 'development', name: { pt: 'Grelha de Competências', es: 'Malla de Competencias', en: 'Skill Grid' } },
+    { type: 'foundation', name: { pt: 'Timeline Técnica', es: 'Timeline Técnica', en: 'Technical Timeline' } },
+    { type: 'mindset', name: { pt: 'Cards & Filosofia', es: 'Cards & Filosofía', en: 'Cards & Philosophy' } },
+    { type: 'now', name: { pt: 'Imagem + Call-to-Action', es: 'Imagen + CTA', en: 'Image + Call-to-Action' } },
+    { type: 'contact', name: { pt: 'Contacto Central', es: 'Contacto Central', en: 'Centered Contact' } }
+];
+
 function normalizeFileName(name) {
     return name ? name.replace(/\s+/g, '-').toLowerCase() : 'image';
+}
+
+function slugifyLabel(label) {
+    return String(label || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') || 'secao';
+}
+
+function deepClone(value) {
+    return JSON.parse(JSON.stringify(value || {}));
+}
+
+function getCustomSections() {
+    if (!currentCV?.meta) return [];
+    if (!Array.isArray(currentCV.meta.custom_sections)) currentCV.meta.custom_sections = [];
+    return currentCV.meta.custom_sections;
+}
+
+function getSectionType(sectionKey) {
+    if (BASE_SECTIONS.includes(sectionKey)) return sectionKey;
+    const custom = getCustomSections().find((section) => section.id === sectionKey);
+    return custom?.type || null;
+}
+
+function getSectionList() {
+    const locale = currentCV?.localized?.[currentLang] || {};
+    const { nav } = ensureNavigationConfig(locale);
+    const list = BASE_SECTIONS.map((id) => ({
+        id,
+        type: id,
+        label: SECTION_LABELS[id]?.[currentLang] || id,
+        isCustom: false
+    }));
+    getCustomSections().forEach((section) => {
+        list.push({
+            id: section.id,
+            type: section.type,
+            label: nav[section.id] || section.id,
+            isCustom: true
+        });
+    });
+    return list;
+}
+
+function getDefaultCtaLink() {
+    const email = currentCV?.profile?.social?.email || '';
+    return email ? `mailto:${email}` : '#contact';
 }
 
 function getImageBaseFolder(sectionKey, key) {
@@ -157,8 +214,7 @@ function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭') {
     pickBtn.onclick = () => {
         openEmojiPicker((emoji) => {
             input.value = emoji;
-            targetObj[key] = emoji;
-            renderPreview();
+            input.dispatchEvent(new Event('input', { bubbles: true }));
         });
     };
     row.appendChild(input);
@@ -167,10 +223,169 @@ function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭') {
     return input;
 }
 
+function buildTemplateSketch(type) {
+    const sketch = document.createElement('div');
+    sketch.className = 'template-sketch';
+    if (type === 'overview') {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '8px';
+        row.style.alignItems = 'center';
+        const circle = document.createElement('div');
+        circle.className = 'sketch-circle';
+        const line = document.createElement('div');
+        line.className = 'sketch-line';
+        line.style.flex = '1';
+        row.appendChild(circle);
+        row.appendChild(line);
+        sketch.appendChild(row);
+        sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
+        sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
+    } else if (type === 'development') {
+        sketch.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        for (let i = 0; i < 4; i += 1) {
+            const card = document.createElement('div');
+            card.className = 'sketch-card';
+            sketch.appendChild(card);
+        }
+    } else if (type === 'foundation') {
+        sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-circle' }));
+        sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
+        sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
+    } else if (type === 'mindset') {
+        sketch.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        for (let i = 0; i < 2; i += 1) {
+            const card = document.createElement('div');
+            card.className = 'sketch-card';
+            card.style.height = '28px';
+            sketch.appendChild(card);
+        }
+        const line = document.createElement('div');
+        line.className = 'sketch-line';
+        line.style.gridColumn = '1 / -1';
+        sketch.appendChild(line);
+    } else if (type === 'now') {
+        sketch.style.gridTemplateColumns = '1fr 1fr';
+        const block = document.createElement('div');
+        block.className = 'sketch-card';
+        block.style.height = '60px';
+        const line = document.createElement('div');
+        line.className = 'sketch-line';
+        line.style.height = '12px';
+        sketch.appendChild(block);
+        sketch.appendChild(line);
+    } else if (type === 'contact') {
+        const circle = document.createElement('div');
+        circle.className = 'sketch-circle';
+        const line = document.createElement('div');
+        line.className = 'sketch-line';
+        const btn = document.createElement('div');
+        btn.className = 'sketch-card';
+        btn.style.height = '16px';
+        sketch.appendChild(circle);
+        sketch.appendChild(line);
+        sketch.appendChild(btn);
+    } else {
+        sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
+        sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
+    }
+    return sketch;
+}
+
+function openSectionTemplatePicker() {
+    const overlay = document.getElementById('section-template-overlay');
+    const grid = document.getElementById('section-template-grid');
+    const nameInput = document.getElementById('section-template-name');
+    const createBtn = document.getElementById('section-template-create');
+    if (!overlay || !grid || !nameInput || !createBtn) return;
+    grid.innerHTML = '';
+    let selectedType = null;
+
+    SECTION_TEMPLATES.forEach((template) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'template-card';
+        const title = document.createElement('div');
+        title.className = 'template-name';
+        title.textContent = template.name[currentLang] || template.type;
+        const sketch = buildTemplateSketch(template.type);
+        card.appendChild(title);
+        card.appendChild(sketch);
+        card.onclick = () => {
+            selectedType = template.type;
+            grid.querySelectorAll('.template-card').forEach((el) => el.classList.remove('active'));
+            card.classList.add('active');
+            createBtn.disabled = !(nameInput.value.trim() && selectedType);
+        };
+        grid.appendChild(card);
+    });
+
+    nameInput.value = '';
+    createBtn.disabled = true;
+    nameInput.oninput = () => {
+        createBtn.disabled = !(nameInput.value.trim() && selectedType);
+    };
+
+    createBtn.onclick = () => {
+        const label = nameInput.value.trim();
+        if (!label || !selectedType) return;
+        createCustomSection({ label, type: selectedType });
+        closeSectionTemplatePicker();
+    };
+
+    overlay.classList.remove('hidden');
+    overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeSectionTemplatePicker() {
+    const overlay = document.getElementById('section-template-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.setAttribute('aria-hidden', 'true');
+    }
+}
+
+function createCustomSection({ label, type }) {
+    if (!currentCV) return;
+    const customSections = getCustomSections();
+    const baseSlug = slugifyLabel(label);
+    const existing = new Set([...BASE_SECTIONS, ...customSections.map((s) => s.id)]);
+    let id = baseSlug;
+    let counter = 2;
+    while (existing.has(id)) {
+        id = `${baseSlug}-${counter}`;
+        counter += 1;
+    }
+    customSections.push({ id, type });
+
+    LANGS.forEach((lang) => {
+        if (!currentCV.localized[lang]) currentCV.localized[lang] = {};
+        const locale = currentCV.localized[lang];
+        const { nav, icons } = ensureNavigationConfig(locale);
+        nav[id] = nav[id] || label;
+        icons[id] = icons[id] || '';
+        if (!locale[id]) {
+            const template = locale[type] ? deepClone(locale[type]) : {};
+            if (Object.prototype.hasOwnProperty.call(template, 'title')) template.title = label;
+            if (Object.prototype.hasOwnProperty.call(template, 'headline')) template.headline = label;
+            locale[id] = template;
+        }
+    });
+
+    currentSection = id;
+    renderSidebar();
+    renderSectionEditor();
+    renderPreview();
+}
+
 function appendNavigationFields(sectionKey) {
     if (!currentCV?.localized?.[currentLang]) return;
-    if (!NAV_SECTIONS.has(sectionKey)) return;
+    const isNavSection = NAV_SECTIONS.has(sectionKey) || Boolean(getCustomSections().find((s) => s.id === sectionKey));
+    if (!isNavSection) return;
     const { nav, icons } = ensureNavigationConfig(currentCV.localized[currentLang]);
+    if (!nav[sectionKey]) {
+        nav[sectionKey] = SECTION_LABELS[sectionKey]?.[currentLang] || sectionKey;
+    }
     const fieldset = document.createElement('fieldset');
     const legend = document.createElement('legend');
     legend.textContent = 'Navegação';
@@ -210,6 +425,55 @@ function appendNavigationFields(sectionKey) {
     });
     hint.style.display = input.value ? 'none' : 'flex';
     fieldset.appendChild(iconWrapper);
+
+    uiNodes.editorForm.appendChild(fieldset);
+}
+
+function appendCtaFields(sectionKey, content) {
+    if (!content || !uiNodes.editorForm) return;
+    const uiConfig = getUiConfig();
+    if (!content.cta_label) {
+        content.cta_label = uiConfig?.cta_contact_label || '';
+    }
+    if (!content.cta_link) {
+        content.cta_link = getDefaultCtaLink();
+    }
+
+    const fieldset = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    legend.textContent = 'CTA';
+    fieldset.appendChild(legend);
+
+    const labelWrapper = document.createElement('div');
+    labelWrapper.className = 'form-group';
+    const labelLabel = document.createElement('label');
+    labelLabel.textContent = 'Texto do botão';
+    const labelInput = document.createElement('input');
+    labelInput.type = 'text';
+    labelInput.value = content.cta_label || '';
+    labelInput.oninput = (event) => {
+        content.cta_label = event.target.value;
+        renderPreview();
+    };
+    labelWrapper.appendChild(labelLabel);
+    labelWrapper.appendChild(labelInput);
+    fieldset.appendChild(labelWrapper);
+
+    const linkWrapper = document.createElement('div');
+    linkWrapper.className = 'form-group';
+    const linkLabel = document.createElement('label');
+    linkLabel.textContent = 'Link do botão';
+    const linkInput = document.createElement('input');
+    linkInput.type = 'text';
+    linkInput.placeholder = 'ex: mailto:..., https://github.com/..., tel:+351...';
+    linkInput.value = content.cta_link || '';
+    linkInput.oninput = (event) => {
+        content.cta_link = event.target.value;
+        renderPreview();
+    };
+    linkWrapper.appendChild(linkLabel);
+    linkWrapper.appendChild(linkInput);
+    fieldset.appendChild(linkWrapper);
 
     uiNodes.editorForm.appendChild(fieldset);
 }
@@ -766,16 +1030,20 @@ function renderSidebar() {
     });
 
     uiNodes.sectionButtons.innerHTML = '';
-    Object.keys(SECTION_LABELS).forEach(sectionKey => {
+    const sectionList = getSectionList();
+    if (!sectionList.find((section) => section.id === currentSection) && sectionList.length) {
+        currentSection = sectionList[0].id;
+    }
+    sectionList.forEach(section => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        const label = SECTION_LABELS[sectionKey][currentLang] || sectionKey;
+        const label = section.label || section.id;
         btn.textContent = label;
-        btn.className = sectionKey === currentSection ? 'active' : '';
+        btn.className = section.id === currentSection ? 'active' : '';
         btn.onclick = () => {
-            currentSection = sectionKey;
+            currentSection = section.id;
             currentStoryIndex = 0;
-            if (sectionKey === 'downloads') currentDownloadGroupIndex = 0;
+            currentDownloadGroupIndex = 0;
             renderSidebar();
             renderSectionEditor();
             renderPreview();
@@ -786,7 +1054,8 @@ function renderSidebar() {
     const activeSectionName = document.getElementById('active-section-name');
     const activeLangName = document.getElementById('active-lang-name');
     if (activeSectionName) {
-        activeSectionName.textContent = SECTION_LABELS[currentSection]?.[currentLang] || currentSection;
+        const navLabel = currentCV?.localized?.[currentLang]?.navigation?.[currentSection];
+        activeSectionName.textContent = navLabel || SECTION_LABELS[currentSection]?.[currentLang] || currentSection;
     }
     if (activeLangName) {
         activeLangName.textContent = currentLang.toUpperCase();
@@ -800,250 +1069,254 @@ function isLongText(key, value) {
     return value.length > 120;
 }
 
-function renderSectionEditor() {
-    if (!currentCV || !uiNodes.editorForm) return;
-    if (currentSection === 'downloads') {
-        uiNodes.editorForm.innerHTML = '';
-        if (!currentCV.profile) currentCV.profile = {};
-        if (!currentCV.localized?.[currentLang]?.contact) {
-            currentCV.localized[currentLang].contact = {};
-        }
-        const contact = currentCV.localized[currentLang].contact;
-        const downloads = getDownloadsList(currentCV.profile, currentCV.localized?.[currentLang]);
-        const downloadGroups = getDownloadGroups(contact, downloads);
-        const groupsList = document.createElement('div');
-        groupsList.className = 'story-list';
-        const groupEditor = document.createElement('div');
-        const linkList = document.createElement('div');
-        linkList.className = 'story-list';
+function renderDownloadsEditor() {
+    if (!uiNodes.editorForm || !currentCV) return;
+    if (!currentCV.profile) currentCV.profile = {};
+    if (!currentCV.localized?.[currentLang]?.contact) {
+        currentCV.localized[currentLang].contact = {};
+    }
+    const contact = currentCV.localized[currentLang].contact;
+    const downloads = getDownloadsList(currentCV.profile, currentCV.localized?.[currentLang]);
+    const downloadGroups = getDownloadGroups(contact, downloads);
+    const groupsList = document.createElement('div');
+    groupsList.className = 'story-list';
+    const groupEditor = document.createElement('div');
+    const linkList = document.createElement('div');
+    linkList.className = 'story-list';
 
-        const renderGroups = () => {
-            groupsList.innerHTML = '';
-            downloadGroups.forEach((group, index) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = `story-button ${index === currentDownloadGroupIndex ? 'active' : ''}`;
-                button.innerHTML = `
-                    <span>${group.label}</span>
-                    <div class="story-meta">${group.id}</div>
-                `;
-                button.onclick = () => {
-                    currentDownloadGroupIndex = index;
-                    renderAll();
-                };
-                groupsList.appendChild(button);
+    const renderGroups = () => {
+        groupsList.innerHTML = '';
+        downloadGroups.forEach((group, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `story-button ${index === currentDownloadGroupIndex ? 'active' : ''}`;
+            button.innerHTML = `
+                <span>${group.label}</span>
+                <div class=\"story-meta\">${group.id}</div>
+            `;
+            button.onclick = () => {
+                currentDownloadGroupIndex = index;
+                renderAll();
+            };
+            groupsList.appendChild(button);
+        });
+    };
+
+    const renderGroupEditor = (group) => {
+        groupEditor.innerHTML = '';
+        if (!group) return;
+
+        const idGroup = document.createElement('div');
+        idGroup.className = 'form-group';
+        const idLabel = document.createElement('label');
+        idLabel.textContent = 'ID do grupo';
+        const idInput = document.createElement('input');
+        idInput.type = 'text';
+        idInput.value = group.id || '';
+        idInput.oninput = (event) => {
+            const prevId = group.id;
+            group.id = event.target.value.trim() || prevId;
+            downloads.forEach((item) => {
+                if ((item.group || 'downloads') === prevId) item.group = group.id;
             });
+            renderAll();
+            renderPreview();
+        };
+        idGroup.appendChild(idLabel);
+        idGroup.appendChild(idInput);
+
+        const labelGroup = document.createElement('div');
+        labelGroup.className = 'form-group';
+        const labelLabel = document.createElement('label');
+        labelLabel.textContent = 'Nome do grupo';
+        const labelInput = document.createElement('input');
+        labelInput.type = 'text';
+        labelInput.value = group.label || '';
+        labelInput.oninput = (event) => {
+            group.label = event.target.value;
+            renderGroups();
+            renderPreview();
+        };
+        labelGroup.appendChild(labelLabel);
+        labelGroup.appendChild(labelInput);
+
+        const openGroup = document.createElement('div');
+        openGroup.className = 'form-group';
+        const openLabel = document.createElement('label');
+        openLabel.textContent = 'Abrir links em nova aba';
+        const openInput = document.createElement('input');
+        openInput.type = 'checkbox';
+        openInput.checked = Boolean(group.open_in_new_tab);
+        openInput.onchange = (event) => {
+            group.open_in_new_tab = event.target.checked;
+            renderPreview();
+        };
+        openGroup.appendChild(openLabel);
+        openGroup.appendChild(openInput);
+
+        const removeGroupBtn = document.createElement('button');
+        removeGroupBtn.type = 'button';
+        removeGroupBtn.className = 'toggle-visibility';
+        removeGroupBtn.textContent = 'Remover grupo';
+        removeGroupBtn.disabled = downloadGroups.length <= 1;
+        removeGroupBtn.onclick = () => {
+            const removedId = group.id;
+            for (let i = downloads.length - 1; i >= 0; i -= 1) {
+                if ((downloads[i].group || 'downloads') === removedId) {
+                    queueDownloadDeletion(downloads[i].href);
+                    downloads.splice(i, 1);
+                }
+            }
+            downloadGroups.splice(currentDownloadGroupIndex, 1);
+            if (currentDownloadGroupIndex > 0) currentDownloadGroupIndex -= 1;
+            renderAll();
+            renderPreview();
         };
 
-        const renderGroupEditor = (group) => {
-            groupEditor.innerHTML = '';
-            if (!group) return;
+        groupEditor.appendChild(idGroup);
+        groupEditor.appendChild(labelGroup);
+        groupEditor.appendChild(openGroup);
+        groupEditor.appendChild(removeGroupBtn);
+    };
 
-            const idGroup = document.createElement('div');
-            idGroup.className = 'form-group';
-            const idLabel = document.createElement('label');
-            idLabel.textContent = 'ID do grupo';
-            const idInput = document.createElement('input');
-            idInput.type = 'text';
-            idInput.value = group.id || '';
-            idInput.oninput = (event) => {
-                const prevId = group.id;
-                group.id = event.target.value.trim() || prevId;
-                downloads.forEach((item) => {
-                    if ((item.group || 'downloads') === prevId) item.group = group.id;
-                });
-                renderAll();
-                renderPreview();
-            };
-            idGroup.appendChild(idLabel);
-            idGroup.appendChild(idInput);
+    const renderLinks = (group) => {
+        linkList.innerHTML = '';
+        if (!group) return;
+        const groupLinks = downloads.filter((item) => (item.group || 'downloads') === group.id);
+        groupLinks.forEach((item, index) => {
+            const entry = createDownloadItem(item);
+            const downloadIndex = downloads.indexOf(item);
+            if (downloadIndex >= 0) downloads[downloadIndex] = entry;
+            const fieldset = document.createElement('fieldset');
+            const legend = document.createElement('legend');
+            legend.textContent = entry.label ? `Link — ${entry.label}` : `Link ${index + 1}`;
+            fieldset.appendChild(legend);
 
             const labelGroup = document.createElement('div');
             labelGroup.className = 'form-group';
             const labelLabel = document.createElement('label');
-            labelLabel.textContent = 'Nome do grupo';
+            labelLabel.textContent = 'Nome do link';
             const labelInput = document.createElement('input');
             labelInput.type = 'text';
-            labelInput.value = group.label || '';
+            labelInput.value = entry.label || '';
             labelInput.oninput = (event) => {
-                group.label = event.target.value;
-                renderGroups();
+                entry.label = event.target.value;
+                legend.textContent = entry.label ? `Link — ${entry.label}` : `Link ${index + 1}`;
                 renderPreview();
             };
             labelGroup.appendChild(labelLabel);
             labelGroup.appendChild(labelInput);
+            fieldset.appendChild(labelGroup);
 
-            const openGroup = document.createElement('div');
-            openGroup.className = 'form-group';
-            const openLabel = document.createElement('label');
-            openLabel.textContent = 'Abrir links em nova aba';
-            const openInput = document.createElement('input');
-            openInput.type = 'checkbox';
-            openInput.checked = Boolean(group.open_in_new_tab);
-            openInput.onchange = (event) => {
-                group.open_in_new_tab = event.target.checked;
-                renderPreview();
-            };
-            openGroup.appendChild(openLabel);
-            openGroup.appendChild(openInput);
+            const iconGroup = document.createElement('div');
+            iconGroup.className = 'form-group';
+            const iconLabel = document.createElement('label');
+            iconLabel.textContent = 'Ícone (emoji ou texto)';
+            iconGroup.appendChild(iconLabel);
+            makeEmojiField(iconGroup, entry, 'icon', 'ex: 📁');
+            fieldset.appendChild(iconGroup);
 
-            const removeGroupBtn = document.createElement('button');
-            removeGroupBtn.type = 'button';
-            removeGroupBtn.className = 'toggle-visibility';
-            removeGroupBtn.textContent = 'Remover grupo';
-            removeGroupBtn.disabled = downloadGroups.length <= 1;
-            removeGroupBtn.onclick = () => {
-                const removedId = group.id;
-                for (let i = downloads.length - 1; i >= 0; i -= 1) {
-                    if ((downloads[i].group || 'downloads') === removedId) {
-                        queueDownloadDeletion(downloads[i].href);
-                        downloads.splice(i, 1);
-                    }
-                }
-                downloadGroups.splice(currentDownloadGroupIndex, 1);
-                if (currentDownloadGroupIndex > 0) currentDownloadGroupIndex -= 1;
+            const groupWrapper = document.createElement('div');
+            groupWrapper.className = 'form-group';
+            const groupLabel = document.createElement('label');
+            groupLabel.textContent = 'Grupo';
+            const groupSelect = document.createElement('select');
+            const groupOptions = downloadGroups.map((opt) => ({
+                value: opt.id,
+                label: opt.label
+            }));
+            if (!groupOptions.some((opt) => opt.value === entry.group)) {
+                groupOptions.push({ value: entry.group, label: entry.group });
+            }
+            groupOptions.forEach((opt) => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.label;
+                if ((entry.group || group.id) === opt.value) option.selected = true;
+                groupSelect.appendChild(option);
+            });
+            groupSelect.onchange = (event) => {
+                entry.group = event.target.value;
                 renderAll();
                 renderPreview();
             };
+            groupWrapper.appendChild(groupLabel);
+            groupWrapper.appendChild(groupSelect);
+            fieldset.appendChild(groupWrapper);
 
-            groupEditor.appendChild(idGroup);
-            groupEditor.appendChild(labelGroup);
-            groupEditor.appendChild(openGroup);
-            groupEditor.appendChild(removeGroupBtn);
-        };
+            const fileWrapper = document.createElement('div');
+            fileWrapper.className = 'form-group';
+            makeFileField(fileWrapper, entry, 'href', 'Ficheiro (assets/downloads)', 'assets/downloads');
+            fieldset.appendChild(fileWrapper);
 
-        const renderLinks = (group) => {
-            linkList.innerHTML = '';
-            if (!group) return;
-            const groupLinks = downloads.filter((item) => (item.group || 'downloads') === group.id);
-            groupLinks.forEach((item, index) => {
-                const entry = createDownloadItem(item);
-                const downloadIndex = downloads.indexOf(item);
-                if (downloadIndex >= 0) downloads[downloadIndex] = entry;
-                const fieldset = document.createElement('fieldset');
-                const legend = document.createElement('legend');
-                legend.textContent = entry.label ? `Link — ${entry.label}` : `Link ${index + 1}`;
-                fieldset.appendChild(legend);
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'toggle-visibility';
+            removeBtn.textContent = 'Remover link';
+            removeBtn.onclick = () => {
+                queueDownloadDeletion(entry.href);
+                if (downloadIndex >= 0) downloads.splice(downloadIndex, 1);
+                renderAll();
+                renderPreview();
+            };
+            fieldset.appendChild(removeBtn);
 
-                const labelGroup = document.createElement('div');
-                labelGroup.className = 'form-group';
-                const labelLabel = document.createElement('label');
-                labelLabel.textContent = 'Nome do link';
-                const labelInput = document.createElement('input');
-                labelInput.type = 'text';
-                labelInput.value = entry.label || '';
-                labelInput.oninput = (event) => {
-                    entry.label = event.target.value;
-                    legend.textContent = entry.label ? `Link — ${entry.label}` : `Link ${index + 1}`;
-                    renderPreview();
-                };
-                labelGroup.appendChild(labelLabel);
-                labelGroup.appendChild(labelInput);
-                fieldset.appendChild(labelGroup);
+            linkList.appendChild(fieldset);
+        });
+    };
 
-                const iconGroup = document.createElement('div');
-                iconGroup.className = 'form-group';
-                const iconLabel = document.createElement('label');
-                iconLabel.textContent = 'Ícone (emoji ou texto)';
-                iconGroup.appendChild(iconLabel);
-                makeEmojiField(iconGroup, entry, 'icon', 'ex: 📁');
-                fieldset.appendChild(iconGroup);
+    const renderAll = () => {
+        if (currentDownloadGroupIndex >= downloadGroups.length) currentDownloadGroupIndex = 0;
+        const activeGroup = downloadGroups[currentDownloadGroupIndex];
+        renderGroups();
+        renderGroupEditor(activeGroup);
+        renderLinks(activeGroup);
+    };
 
-                const groupWrapper = document.createElement('div');
-                groupWrapper.className = 'form-group';
-                const groupLabel = document.createElement('label');
-                groupLabel.textContent = 'Grupo';
-                const groupSelect = document.createElement('select');
-                const groupOptions = downloadGroups.map((opt) => ({
-                    value: opt.id,
-                    label: opt.label
-                }));
-                if (!groupOptions.some((opt) => opt.value === entry.group)) {
-                    groupOptions.push({ value: entry.group, label: entry.group });
-                }
-                groupOptions.forEach((opt) => {
-                    const option = document.createElement('option');
-                    option.value = opt.value;
-                    option.textContent = opt.label;
-                    if ((entry.group || group.id) === opt.value) option.selected = true;
-                    groupSelect.appendChild(option);
-                });
-                groupSelect.onchange = (event) => {
-                    entry.group = event.target.value;
-                    renderAll();
-                    renderPreview();
-                };
-                groupWrapper.appendChild(groupLabel);
-                groupWrapper.appendChild(groupSelect);
-                fieldset.appendChild(groupWrapper);
-
-                const fileWrapper = document.createElement('div');
-                fileWrapper.className = 'form-group';
-                makeFileField(fileWrapper, entry, 'href', 'Ficheiro (assets/downloads)', 'assets/downloads');
-                fieldset.appendChild(fileWrapper);
-
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'toggle-visibility';
-                removeBtn.textContent = 'Remover link';
-                removeBtn.onclick = () => {
-                    queueDownloadDeletion(entry.href);
-                    if (downloadIndex >= 0) downloads.splice(downloadIndex, 1);
-                    renderAll();
-                    renderPreview();
-                };
-                fieldset.appendChild(removeBtn);
-
-                linkList.appendChild(fieldset);
-            });
-        };
-
-        const renderAll = () => {
-            if (currentDownloadGroupIndex >= downloadGroups.length) currentDownloadGroupIndex = 0;
-            const activeGroup = downloadGroups[currentDownloadGroupIndex];
-            renderGroups();
-            renderGroupEditor(activeGroup);
-            renderLinks(activeGroup);
-        };
-
-        const addGroupBtn = document.createElement('button');
-        addGroupBtn.type = 'button';
-        addGroupBtn.className = 'toggle-visibility';
-        addGroupBtn.textContent = '+ Adicionar grupo';
-        addGroupBtn.onclick = () => {
-            const nextIndex = downloadGroups.length + 1;
-            downloadGroups.push({
-                id: `grupo-${nextIndex}`,
-                label: `Grupo ${nextIndex}`,
-                open_in_new_tab: false
-            });
-            currentDownloadGroupIndex = downloadGroups.length - 1;
-            renderAll();
-            renderPreview();
-        };
-
-        const addLinkBtn = document.createElement('button');
-        addLinkBtn.type = 'button';
-        addLinkBtn.className = 'toggle-visibility';
-        addLinkBtn.textContent = '+ Adicionar link';
-        addLinkBtn.onclick = () => {
-            const group = downloadGroups[currentDownloadGroupIndex];
-            downloads.push(createDownloadItem({ group: group?.id || 'downloads' }));
-            renderAll();
-            renderPreview();
-        };
-
+    const addGroupBtn = document.createElement('button');
+    addGroupBtn.type = 'button';
+    addGroupBtn.className = 'toggle-visibility';
+    addGroupBtn.textContent = '+ Adicionar grupo';
+    addGroupBtn.onclick = () => {
+        const nextIndex = downloadGroups.length + 1;
+        downloadGroups.push({
+            id: `grupo-${nextIndex}`,
+            label: `Grupo ${nextIndex}`,
+            open_in_new_tab: false
+        });
+        currentDownloadGroupIndex = downloadGroups.length - 1;
         renderAll();
-        uiNodes.editorForm.appendChild(groupsList);
-        uiNodes.editorForm.appendChild(addGroupBtn);
-        uiNodes.editorForm.appendChild(groupEditor);
-        uiNodes.editorForm.appendChild(linkList);
-        uiNodes.editorForm.appendChild(addLinkBtn);
-        return;
-    }
+        renderPreview();
+    };
 
+    const addLinkBtn = document.createElement('button');
+    addLinkBtn.type = 'button';
+    addLinkBtn.className = 'toggle-visibility';
+    addLinkBtn.textContent = '+ Adicionar link';
+    addLinkBtn.onclick = () => {
+        const group = downloadGroups[currentDownloadGroupIndex];
+        downloads.push(createDownloadItem({ group: group?.id || 'downloads' }));
+        renderAll();
+        renderPreview();
+    };
+
+    renderAll();
+    uiNodes.editorForm.appendChild(groupsList);
+    uiNodes.editorForm.appendChild(addGroupBtn);
+    uiNodes.editorForm.appendChild(groupEditor);
+    uiNodes.editorForm.appendChild(linkList);
+    uiNodes.editorForm.appendChild(addLinkBtn);
+}
+
+function renderSectionEditor() {
+    if (!currentCV || !uiNodes.editorForm) return;
     uiNodes.editorForm.innerHTML = '';
     appendNavigationFields(currentSection);
+
+    const sectionContent = currentCV.localized?.[currentLang]?.[currentSection];
+    if (sectionContent) {
+        appendCtaFields(currentSection, sectionContent);
+    }
 
     if (currentSection === 'overview') {
         appendProfilePhotoField({
@@ -1092,6 +1365,7 @@ function renderSectionEditor() {
             linksFieldset.appendChild(wrapper);
         });
         uiNodes.editorForm.appendChild(linksFieldset);
+        renderDownloadsEditor();
     }
 
     const uiConfig = getUiConfig();
@@ -1133,10 +1407,10 @@ function renderSectionEditor() {
         metaLegend.textContent = 'Site (Meta)';
         metaFieldset.appendChild(metaLegend);
         const metaFields = [
-            { key: 'site_title', label: 'Título do site' },
-            { key: 'site_description', label: 'Descrição do site', multiline: true },
-            { key: 'favicon', label: 'Favicon (path)', isImage: true },
-            { key: 'apple_icon', label: 'Apple touch icon (path)', isImage: true }
+            { key: 'site_title', label: 'Título do site', defaultValue: currentCV.meta.site_title || document.title || '' },
+            { key: 'site_description', label: 'Descrição do site', multiline: true, defaultValue: currentCV.meta.site_description || (document.querySelector('meta[name="description"]')?.getAttribute('content') || '') },
+            { key: 'favicon', label: 'Favicon (path)', isImage: true, defaultValue: currentCV.meta.favicon || (document.getElementById('site-favicon')?.getAttribute('href') || 'assets/icons/favicon.ico') },
+            { key: 'apple_icon', label: 'Apple touch icon (path)', isImage: true, defaultValue: currentCV.meta.apple_icon || (document.getElementById('apple-touch-icon')?.getAttribute('href') || 'assets/icons/apple-touch-icon.png') }
         ];
         metaFields.forEach((field) => {
             const wrapper = document.createElement('div');
@@ -1145,9 +1419,11 @@ function renderSectionEditor() {
             label.textContent = field.label;
             wrapper.appendChild(label);
             if (field.isImage) {
+                if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
                 makeImageField(wrapper, currentCV.meta, field.key, 'meta');
             } else {
                 const input = field.multiline ? document.createElement('textarea') : document.createElement('input');
+                if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
                 input.value = currentCV.meta[field.key] || '';
                 input.oninput = (event) => {
                     currentCV.meta[field.key] = event.target.value;
@@ -1207,7 +1483,7 @@ function renderSectionEditor() {
         return;
     }
 
-    const content = currentCV.localized?.[currentLang]?.[currentSection];
+    const content = sectionContent;
     if (!content) {
         if (uiNodes.editorForm.children.length === 0) {
             uiNodes.editorForm.innerHTML = '<p>Sem dados para esta secção.</p>';
@@ -1224,6 +1500,7 @@ function renderSectionEditor() {
     Object.entries(content).forEach(([key, value]) => {
         if (currentSection === 'contact' && key === 'download_groups') return;
         if (handledImageKeys.has(key)) return;
+        if (key === 'cta_label' || key === 'cta_link') return;
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
 
@@ -1268,13 +1545,14 @@ function renderSectionEditor() {
 function getStoryConfig(sectionKey) {
     const content = currentCV?.localized?.[currentLang]?.[sectionKey];
     if (!content) return null;
-    if (sectionKey === 'development') {
+    const sectionType = getSectionType(sectionKey);
+    if (sectionType === 'development') {
         return { label: 'Sub-histórias', items: content.skills || [], type: 'skills', sourceRef: content.skills || [] };
     }
-    if (sectionKey === 'foundation') {
+    if (sectionType === 'foundation') {
         return { label: 'Sub-histórias', items: content.experience || [], type: 'experience', sourceRef: content.experience || [] };
     }
-    if (sectionKey === 'mindset') {
+    if (sectionType === 'mindset') {
         const items = [];
         if (content.adoption) {
             items.push({ source: 'adoption', item: content.adoption });
@@ -1459,20 +1737,6 @@ function renderStoryEditor(config, { append = false } = {}) {
 function renderPreview() {
     if (!currentCV || !uiNodes.previewPane) return;
     syncPreviewStorage();
-    if (currentSection === 'downloads') {
-        const downloads = getDownloadsList(currentCV.profile || {}, currentCV.localized?.[currentLang]);
-        const contact = currentCV.localized?.[currentLang]?.contact;
-        const groups = getDownloadGroups(contact, downloads);
-        const groupLabelMap = new Map(groups.map((group) => [group.id, group.label]));
-        uiNodes.previewPane.innerHTML = `
-            <div class="preview-title">Downloads</div>
-            ${downloads.map((item) => `
-                <div class="preview-block"><strong>${groupLabelMap.get(item.group || 'downloads') || (item.group || 'downloads')}:</strong> ${item.label || '(sem nome)'} — ${item.href || ''}</div>
-            `).join('')}
-        `;
-        return;
-    }
-
     const content = currentCV.localized?.[currentLang]?.[currentSection];
     if (!content && getStoryConfig(currentSection)) {
         const storyConfig = getStoryConfig(currentSection);
@@ -1495,7 +1759,8 @@ function renderPreview() {
     }
 
     const htmlParts = [];
-    const title = content.title || content.name || SECTION_LABELS[currentSection]?.[currentLang] || currentSection;
+    const navLabel = currentCV.localized?.[currentLang]?.navigation?.[currentSection];
+    const title = content.title || content.name || navLabel || SECTION_LABELS[currentSection]?.[currentLang] || currentSection;
 
     htmlParts.push(`<div class="preview-title">${title}</div>`);
 
@@ -1782,6 +2047,21 @@ function bindEvents() {
 
     if (uiNodes.translateBtn) {
         uiNodes.translateBtn.addEventListener('click', translateSection);
+    }
+
+    const addSectionBtn = document.getElementById('add-section-btn');
+    if (addSectionBtn) {
+        addSectionBtn.addEventListener('click', openSectionTemplatePicker);
+    }
+    const templateClose = document.getElementById('section-template-close');
+    const templateOverlay = document.getElementById('section-template-overlay');
+    if (templateClose) {
+        templateClose.addEventListener('click', closeSectionTemplatePicker);
+    }
+    if (templateOverlay) {
+        templateOverlay.addEventListener('click', (event) => {
+            if (event.target === templateOverlay) closeSectionTemplatePicker();
+        });
     }
 
     document.querySelectorAll('[data-toggle]').forEach((btn) => {

@@ -7,12 +7,12 @@ This document details the technical inner workings, security model, and module r
 ### 1. The Access Gate
 The project uses a two-tier access model for the Admin UI:
 - **Obscurity**: The entry point is hidden (3 clicks on the sidebar profile photo within 3 seconds). This prevents bots and casual visitors from finding the admin page.
-- **Secret Code**: A hash-based check (`js/auth-gate.js`) acts as a basic password. *Note: As client-side code, the hash is public, but it prevents 99% of accidental access.*
-- **Password Update**: The admin password can be updated in the Admin UI (hash stored encrypted in `localStorage`).
+- **Secret Code**: A hash-based check (`js/auth-gate.js`) exists, but is not exposed in the current UI.
+- **Password Update**: Hash update logic exists in `auth-gate.js`, but no UI flow currently exposes it.
 
 ### 2. Personal Access Token (PAT)
 The real security layer is the GitHub PAT.
-- **Memory-Only**: The token is stored in `sessionStorage` (encrypted). It is wiped as soon as the tab or browser is closed.
+- **Persistent (Encrypted)**: The token is stored in `localStorage` (encrypted).
 - **Scope**: Use **Fine‑grained PAT** with **Contents: Read and write** (plus Metadata).  
   If using classic PAT, scope must be **repo**.
 - **No Hardcoding**: The token is NEVER written to files or logged.
@@ -42,6 +42,6 @@ This project is designed for **maximum portability and zero cost**.
 
 ## ⚠️ What NOT to do
 - **Do not try to hide the JavaScript**: Ofuscation only makes debugging harder; it doesn't add real security.
-- **Do not save the PAT in LocalStorage**: `sessionStorage` is safer as it expires with the session.
+- **Token persistence**: Current implementation uses encrypted `localStorage` for PAT persistence. If you prefer session‑only behavior, adjust `auth-gate.js`.
 - **Encryption**: Sensitive storage (PAT, admin session flag, admin hash) is encrypted client‑side (AES‑GCM).
 - **Do not remove SPEC.md**: This file is the "Law" of the project. Any change in logic must first be reflected there.

@@ -25,11 +25,7 @@ The configuration page is hidden to prevent accidental access.
 
 ## 3. Authentication Flow
 
-### Step 1: Secret Code
-Enter the access code to unlock the Admin UI.
-- **Default Code**: `admin123` (defined in `js/auth-gate.js`).
-
-### Step 2: GitHub Personal Access Token (PAT)
+### GitHub Personal Access Token (PAT)
 To save changes, the app needs permission to read/write `data/cv.json` in your repo.
 1. Go to **GitHub → Settings → Developer settings → Personal access tokens**.
 2. Click **Fine-grained tokens** → **Generate new token** (recommended).
@@ -49,8 +45,12 @@ Alternative (classic token):
 ## 4. Editing the CV
 1. Once authenticated, the UI will load your current `data/cv.json`.
 2. Edit the fields in the form.
-3. If a field includes a `visibility` property, a Public/Private toggle appears.
-4. Click **Save Changes (Commit)**.
+3. The **Navegação** (nome/ícone) aparece no topo de cada secção.
+4. Os ícones podem ser escolhidos via **picker** (não é necessário escrever emojis).
+5. Os **Downloads** são editados dentro de **Contacto**.
+6. Cada secção tem **CTA label** + **CTA link** (podes apontar para mailto, tel, GitHub, etc.).
+7. Podes criar novas secções com **+ Adicionar secção** (usa templates existentes).
+8. Click **Guardar alterações**.
 
 ## 5. Verifying Changes
 - After clicking "Save", the app makes a commit to your repo.
