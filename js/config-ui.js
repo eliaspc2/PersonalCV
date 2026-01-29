@@ -71,6 +71,15 @@ const EMOJI_CHOICES = [
     '🏆', '🎓', '🧑‍🍳', '🍞', '🍕', '🗳️', '🛡️', '🧘', '📷', '👤'
 ];
 
+const NAV_DEFAULT_ICONS = {
+    overview: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/></svg>`,
+    development: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><polyline points=\"16 18 22 12 16 6\"/><polyline points=\"8 6 2 12 8 18\"/></svg>`,
+    foundation: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><rect x=\"2\" y=\"2\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"/><rect x=\"2\" y=\"14\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"/><line x1=\"6\" y1=\"6\" x2=\"6.01\" y2=\"6\"/><line x1=\"6\" y1=\"18\" x2=\"6.01\" y2=\"18\"/></svg>`,
+    mindset: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/></svg>`,
+    now: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M3 12h7l2 3h9\"/><path d=\"M3 12l2-3h6\"/><circle cx=\"19\" cy=\"12\" r=\"2\"/></svg>`,
+    contact: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\"/><polyline points=\"22,6 12,13 2,6\"/></svg>`
+};
+
 function normalizeFileName(name) {
     return name ? name.replace(/\s+/g, '-').toLowerCase() : 'image';
 }
@@ -188,7 +197,18 @@ function appendNavigationFields(sectionKey) {
     const iconLabel = document.createElement('label');
     iconLabel.textContent = 'Ícone do menu';
     iconWrapper.appendChild(iconLabel);
-    makeEmojiField(iconWrapper, icons, sectionKey, 'ex: 🧭');
+    const input = makeEmojiField(iconWrapper, icons, sectionKey, 'ex: 🧭');
+    const hint = document.createElement('div');
+    hint.className = 'nav-icon-hint';
+    const defaultIcon = NAV_DEFAULT_ICONS[sectionKey] || '';
+    hint.innerHTML = defaultIcon
+        ? `<span class=\"nav-default-icon\">${defaultIcon}</span><span>Sem emoji → usa ícone padrão</span>`
+        : 'Sem emoji → usa ícone padrão';
+    iconWrapper.appendChild(hint);
+    input.addEventListener('input', () => {
+        hint.style.display = input.value ? 'none' : 'flex';
+    });
+    hint.style.display = input.value ? 'none' : 'flex';
     fieldset.appendChild(iconWrapper);
 
     uiNodes.editorForm.appendChild(fieldset);
