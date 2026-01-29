@@ -659,10 +659,25 @@
             color: #64748b;
         }
 
-        .nav-default-icon svg {
+        .nav-icon-preview {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            color: var(--accent);
+        }
+
+        .nav-icon-preview .nav-emoji {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .nav-default-icon svg,
+        .nav-icon-preview svg {
             width: 18px;
             height: 18px;
-            stroke: #64748b;
+            stroke: currentColor;
             fill: none;
             stroke-width: 2;
         }

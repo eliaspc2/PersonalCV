@@ -415,15 +415,28 @@ function appendNavigationFields(sectionKey) {
     const input = makeEmojiField(iconWrapper, icons, sectionKey, 'ex: 🧭');
     const hint = document.createElement('div');
     hint.className = 'nav-icon-hint';
+    const preview = document.createElement('span');
+    preview.className = 'nav-icon-preview';
+    const hintText = document.createElement('span');
+    hint.appendChild(preview);
+    hint.appendChild(hintText);
     const defaultIcon = NAV_DEFAULT_ICONS[sectionKey] || '';
-    hint.innerHTML = defaultIcon
-        ? `<span class=\"nav-default-icon\">${defaultIcon}</span><span>Sem emoji → usa ícone padrão</span>`
-        : 'Sem emoji → usa ícone padrão';
+    const updateHint = () => {
+        const value = String(input.value || '').trim();
+        if (value) {
+            preview.innerHTML = `<span class="nav-emoji">${value}</span>`;
+            hintText.textContent = 'Emoji definido';
+        } else if (defaultIcon) {
+            preview.innerHTML = defaultIcon;
+            hintText.textContent = 'Sem emoji → usa ícone padrão';
+        } else {
+            preview.textContent = '';
+            hintText.textContent = 'Sem ícone definido';
+        }
+    };
+    updateHint();
+    input.addEventListener('input', updateHint);
     iconWrapper.appendChild(hint);
-    input.addEventListener('input', () => {
-        hint.style.display = input.value ? 'none' : 'flex';
-    });
-    hint.style.display = input.value ? 'none' : 'flex';
     fieldset.appendChild(iconWrapper);
 
     uiNodes.editorForm.appendChild(fieldset);
@@ -1314,9 +1327,6 @@ function renderSectionEditor() {
     appendNavigationFields(currentSection);
 
     const sectionContent = currentCV.localized?.[currentLang]?.[currentSection];
-    if (sectionContent) {
-        appendCtaFields(currentSection, sectionContent);
-    }
 
     if (currentSection === 'overview') {
         appendProfilePhotoField({
