@@ -1,0 +1,930 @@
+{
+    "meta": {
+        "version": "4.3.0",
+        "lastUpdated": "2026-01-28",
+        "defaultLanguage": "pt",
+        "availableLanguages": [
+            "pt",
+            "es",
+            "en"
+        ]
+    },
+    "profile": {
+        "photo": "assets/photos/identity/profile-main.png",
+        "contact_photo": "assets/photos/contact/portrait-casual-2.png",
+        "work_photo": "assets/photos/engineering/work-desk.png",
+        "social": {
+            "linkedin": "https://www.linkedin.com/in/eliaspc/",
+            "github": "https://github.com/eliaspc2",
+            "email": "eliaspc2@gmail.com"
+        },
+        "downloads": [
+            {
+                "label": "CV Standard",
+                "icon": "",
+                "href": "assets/downloads/cv-andre-camara.pdf",
+                "group": "downloads"
+            },
+            {
+                "label": "Extended CV",
+                "icon": "",
+                "href": "assets/downloads/cv-extended-andre-camara.pdf",
+                "group": "downloads"
+            },
+            {
+                "label": "Conteúdo Programático (EFA)",
+                "icon": "",
+                "href": "assets/downloads/efa-program-content.pdf",
+                "group": "downloads"
+            },
+            {
+                "label": "Python I (Helsinki)",
+                "icon": "",
+                "href": "assets/downloads/cert-python-intro-helsinki.png",
+                "group": "certs"
+            },
+            {
+                "label": "Python II (Helsinki)",
+                "icon": "",
+                "href": "assets/downloads/cert-python-adv-helsinki.png",
+                "group": "certs"
+            },
+            {
+                "label": "Marketing Digital",
+                "icon": "",
+                "href": "assets/downloads/cert-marketing-digital.pdf",
+                "group": "certs"
+            }
+        ],
+        "certifications": [
+            {
+                "label": "Python Programming I (University of Helsinki)",
+                "href": "assets/downloads/cert-python-intro-helsinki.png"
+            },
+            {
+                "label": "Python Programming II (University of Helsinki)",
+                "href": "assets/downloads/cert-python-adv-helsinki.png"
+            }
+        ]
+    },
+    "localized": {
+        "pt": {
+            "navigation": {
+                "overview": "Identidade",
+                "development": "Engenharia",
+                "foundation": "Fundação",
+                "mindset": "Mentalidade",
+                "now": "Agora",
+                "contact": "Contacto"
+            },
+            "ui": {
+                "marketing_label": "Estratégia de Produto",
+                "technologies_label": "Tecnologias utilizadas",
+                "cta_contact_label": "Vamos Conversar?",
+                "explore_skill_label": "Ver Contexto e Evolução →",
+                "explore_experience_label": "Ver Detalhes Estratégicos →",
+                "explore_mindset_label": "Explorar Princípio →",
+                "drawer_skill_context_label": "Contexto e Evolução",
+                "drawer_skill_competencies_label": "Competências Relevantes",
+                "drawer_skill_default_history": "Consolidação activa através de formação contínua e aplicação prática.",
+                "drawer_mindset_label": "Lógica Humana & Engenharia",
+                "drawer_mindset_story_label": "A Experiência Pessoal",
+                "exp_trace_label": "[ REGISTO: MINDSET_INFRA ]",
+                "exp_trace_status": "STATUS: Robustez_Verificada",
+                "exp_trace_mode_label": "MODO",
+                "mindset_trace_label": "",
+                "mindset_trace_text": "O que trago da minha vida pessoal para o trabalho é disciplina no processo, atenção ao detalhe e consistência. Isso mostra que valorizo o tempo certo, a prevenção e o cuidado contínuo — e aplico essa lógica todos os dias no software.",
+                "skill_tags": [
+                    "Algoritmos",
+                    "Robustez",
+                    "Código Limpo"
+                ]
+            },
+            "certifications": [
+                {
+                    "label": "Python Programming I (Universidade de Helsínquia)",
+                    "href": "assets/downloads/cert-python-intro-helsinki.png"
+                },
+                {
+                    "label": "Python Programming II (Universidade de Helsínquia)",
+                    "href": "assets/downloads/cert-python-adv-helsinki.png"
+                }
+            ],
+            "overview": {
+                "name": "André Câmara",
+                "languages_label": "Idiomas",
+                "languages": [
+                    "Português — nativo",
+                    "Espanhol — fluente",
+                    "Inglês — fluente"
+                ],
+                "education_label": "Formação escolar",
+                "education": [
+                    "12.º ano concluído",
+                    "EFA – Programador Informático (Nível 4, 1416h, em curso)"
+                ],
+                "cta_label": "Vamos Conversar?",
+                "location": "Quintanilha, Bragança PT",
+                "headline": "Software Developer & Systems Architect",
+                "intro_text": "Construo soluções onde a elegância do código encontra a robustez da infraestrutura. O meu foco é a estabilidade, a automação e a tradução de necessidades críticas em arquitectura sustentável.",
+                "bio": "O meu percurso com a tecnologia começou no final dos anos 90. Foi um início entusiasmante que seguiu um caminho não linear, com uma pausa significativa que me permitiu ganhar uma perspectiva de vida mais ampla. Regressei ao sector com a maturidade e o foco de quem sabe que o software é, acima de tudo, um compromisso com a continuidade. Sou casado, pai de um filho de 13 anos e vivo em Bragança — essa estabilidade traduz-se em foco, previsibilidade e fiabilidade técnica em cada projecto. Não sou apenas um programador; trago a disciplina de quem passou mais de uma década a garantir que sistemas críticos 24/7 nunca falhavam.",
+                "marketing_note": "Para além da técnica, possuo formação em Marketing Digital. Esta consciência de produto ajuda-me a pensar no utilizador final, comunicar com clareza e entregar valor antes da tecnologia.",
+                "next_label": "A seguir",
+                "next_text": "Quem sou aparece na forma como construo. A próxima secção mostra a engenharia que pratico hoje."
+            },
+            "development": {
+                "title": "Engenharia de Software",
+                "description": "Foco em Python e na arte de simplificar o complexo. Para mim, o código é uma ferramenta de estabilidade.",
+                "image": "assets/photos/engineering/work-desk.png",
+                "image_alt": "Ambiente de trabalho",
+                "skills": [
+                    {
+                        "technologies": [
+                            "Python",
+                            "OOP",
+                            "Algoritmos",
+                            "Estruturas de Dados"
+                        ],
+                        "title": "Python Ecosystem (I & II)",
+                        "focus_area": "Backend & Automação",
+                        "context_text": "Formação estruturada e exigente pela Universidade de Helsínquia (Programming I & II). Domínio de algoritmos, estruturas de dados e OOP.",
+                        "background": "Transitei do suporte técnico para a computação programática através de um percurso de 540h de formação intensiva. Onde outros vêm um script, eu vejo um sistema de automação resiliente."
+                    },
+                    {
+                        "technologies": [
+                            "C/C++",
+                            "SQL",
+                            "Java",
+                            "C#",
+                            "ASP.NET Core MVC",
+                            "Python",
+                            "Redes",
+                            "Sistemas Operativos"
+                        ],
+                        "resource": {
+                            "label": "Conteúdo Programático — Curso de Programação",
+                            "href": "assets/downloads/efa-program-content.pdf"
+                        },
+                        "title": "Formação EFA Programador",
+                        "focus_area": "Desenvolvimento Fullstack",
+                        "context_text": "Percurso de 1416h focado em tecnologias modernas e boas práticas de engenharia. Em curso.",
+                        "background": "Actualmente a consolidar conhecimentos em arquitecturas modernas, garantindo que a base técnica sólida se traduz em aplicações web robustas e escaláveis.",
+                        "progress_status": "EM CURSO",
+                        "duration_hours": "1416h"
+                    }
+                ],
+                "next_label": "Transição",
+                "next_text": "O que faço hoje assenta num rigor construído antes da programação. A seguir, a fundação técnica que moldou esse rigor."
+            },
+            "foundation": {
+                "title": "Fundação Técnica",
+                "description": "Duas décadas de evolução. Da infraestrutura crítica à engenharia de software.",
+                "image": "assets/photos/foundation/foundation-circle.jpg",
+                "image_alt": "Rosto e mãos — base técnica",
+                "challenge_label": "O Desafio",
+                "learning_label": "Aprendizagem Central",
+                "impact_label": "Impacto no Presente",
+                "experience": [
+                    {
+                        "technologies": [
+                            "PowerShell",
+                            "Automação",
+                            "Servidores",
+                            "Infraestrutura Bancária"
+                        ],
+                        "company_name": "BNP Paribas (via Devoteam/CAS)",
+                        "role_title": "Systems & Support Specialist",
+                        "timeframe": "2016 - 2024",
+                        "summary_text": "Gestão de infraestrutura bancária crítica em Lisboa e Madrid. Disciplina férrea sobre estabilidade.",
+                        "details_text": "Oito anos dedicados a garantir o funcionamento ininterrupto de sistemas bancários fundamentais. Aqui, a tecnologia era a estrutura que permitia a confiança do mercado global.",
+                        "intro_quote": "O auge da responsabilidade. Oito anos no coração financeiro onde a tolerância ao erro era zero.",
+                        "challenge_text": "Ambiente bancário 24/7. A automação com PowerShell tornou-se vital para gerir milhares de servidores com estabilidade absoluta.",
+                        "key_learning_text": "Zero Downtime Mindset. Rigor absoluto e a compreensão de que a estabilidade é um processo de automação contínua.",
+                        "present_link": "Aplico esta disciplina no desenvolvimento: código resiliente, testado e focado em disponibilidade inquestionável."
+                    },
+                    {
+                        "technologies": [
+                            "Redes",
+                            "Terminais Industriais",
+                            "Suporte IT",
+                            "Logística de Energia"
+                        ],
+                        "company_name": "CEPSA (via Tecnocom)",
+                        "role_title": "IT Support Technician",
+                        "timeframe": "2014 - 2016",
+                        "summary_text": "Suporte técnico em ambiente industrial de alta exigência em Madrid.",
+                        "details_text": "Sistemas de rede e terminais que suportavam logística de energia em larga escala. Onde o digital encontra o físico.",
+                        "intro_quote": "Robustez industrial. Cada sistema parado tinha um custo físico imediato e tangível.",
+                        "challenge_text": "Ambiente de refinaria e logística pesada. Pressão física por resolução rápida sob condições adversas.",
+                        "key_learning_text": "Obsessão por Robustez. Software e sistemas têm de sobreviver aos piores cenários, não apenas ao caminho feliz.",
+                        "present_link": "Escrevo software preparado para falhas parciais, garantindo previsibilidade e segurança nos meus sistemas."
+                    },
+                    {
+                        "technologies": [
+                            "Cloud",
+                            "Virtualização",
+                            "Infraestrutura Corporativa"
+                        ],
+                        "company_name": "Telefónica (via Anadat)",
+                        "role_title": "Cloud Computing Support",
+                        "timeframe": "2013 - 2014",
+                        "summary_text": "Suporte aos primórdios da infraestrutura Cloud e Virtualização.",
+                        "details_text": "A transição do físico para o lógico. Suporte à cloud corporativa e virtualização em escala.",
+                        "intro_quote": "A era da escala. Onde aprendi que as grandes infraestruturas são construídas com camadas de abstração.",
+                        "challenge_text": "Gerir complexidade em escala. Entender como instâncias virtuais interagem sem conflitos físicos.",
+                        "key_learning_text": "Pensamento Sistémico. Ver a arquitectura completa antes de actuar em componentes isolados.",
+                        "present_link": "Esta visão abstrata permite-me desenhar arquitecturas de software modulares e escaláveis."
+                    },
+                    {
+                        "technologies": [
+                            "Suporte Técnico",
+                            "Operações IT",
+                            "Customer Success"
+                        ],
+                        "company_name": "Reconfiguração e Percurso Inicial",
+                        "role_title": "IT Foundation & Professional Growth",
+                        "timeframe": "1999 - 2012",
+                        "summary_text": "Do suporte farmacêutico inicial à gestão de experiências internacionais.",
+                        "details_text": "Início em 1999 como técnico IT. Seguiu-se uma pausa deliberada e enriquecedora no sector do Turismo e Customer Success na Noruega.",
+                        "intro_quote": "A fundação humana. Entre a técnica inicial e a gestão multicultural em Oslo, aprendi o valor da comunicação.",
+                        "challenge_text": "Ambientes multiculturais de alta rotatividade. Gestão de expectativas e diagnóstico rápido de problemas sob pressão social.",
+                        "key_learning_text": "Empatia como Diagnóstico. Entender a dor do utilizador é metade da solução técnica.",
+                        "present_link": "Traduzo necessidades de negócio complexas em código que resolve problemas reais para pessoas reais."
+                    }
+                ],
+                "next_label": "A seguir",
+                "next_text": "A experiência formou a minha forma de pensar. Agora, a mentalidade que aplico no código."
+            },
+            "mindset": {
+                "title": "Mentalidade & Lógica Humana",
+                "subtitle": "A paciência do pão, a precisão do código",
+                "philosophy": "O meu raciocínio é determinístico. Acredito no processo, no tempo certo de cada etapa e na isolação absoluta das variáveis para resolver qualquer problema.",
+                "adoption": {
+                    "id": "adocao",
+                    "title": "Responsabilidade Estrutural e Compromisso a Longo Prazo",
+                    "icon": "🧭",
+                    "image": "assets/photos/mindset/adoption-family.png",
+                    "principle_title": "Estabilidade e Processo",
+                    "story_text": "O meu filho foi adotado há 4 anos. A adoção foi um processo longo, estruturado, exigente e regulado, que exige paciência, previsibilidade, estabilidade emocional e consistência de rotinas.",
+                    "engineering_note": "Para mim, isto é prova de competências humanas elevadas — compromisso a longo prazo, organização, disciplina e cumprimento rigoroso de processos. As mesmas competências que aplico em sistemas críticos, projetos longos e código que não pode falhar."
+                },
+                "blocks": [
+                    {
+                        "id": "pao",
+                        "title": "Pão & Dependências",
+                        "icon": "🍞",
+                        "image": "assets/photos/mindset/bread-making.png",
+                        "principle_title": "Fermentação Lenta",
+                        "story_text": "No pão artesanal, saltar etapas é destruir o resultado. O tempo de fermentação é uma dependência que não pode ser apressada sem comprometer a estrutura.",
+                        "engineering_note": "Em software, arquitecturas robustas requerem o tempo certo de design e validação. Respeitar as dependências e o tempo de maturação do código evita dívida técnica catastrófica."
+                    },
+                    {
+                        "id": "pizza",
+                        "title": "Pizza & Iteração",
+                        "icon": "🍕",
+                        "image": "assets/photos/mindset/cooking.png",
+                        "image_position": "center 20%",
+                        "principle_title": "Feedback Incremental",
+                        "story_text": "Uma pizza perfeita é o resultado de pequenos ajustes em cada fornada. Temperatura, hidratação, tempo — cada detalhe é afinado com base no resultado anterior.",
+                        "engineering_note": "Programar é iterar. Prefiro entregas pequenas e frequentes que permitam ajustar a rota rapidamente, garantindo que o produto final está alinhado com a realidade."
+                    },
+                    {
+                        "id": "manutencao",
+                        "title": "Manutenção & Prevenção",
+                        "icon": "💅",
+                        "image": "assets/photos/mindset/nails-gel.png",
+                        "image_position": "center 55%",
+                        "principle_title": "Cuidado Preventivo",
+                        "story_text": "A manutenção das unhas de gel ensinou-me que prevenir é mais barato do que reparar. Pequenos cuidados frequentes evitam falhas maiores e preservam a integridade — não é estética, é manutenção contínua.",
+                        "engineering_note": "Em software, prevenção é refactoring constante, testes regulares e atenção diária ao detalhe. A mesma lógica evita falhas silenciosas e mantém sistemas confiáveis ao longo dos anos."
+                    },
+                    {
+                        "id": "marketing",
+                        "title": "Marketing & Consciência de Produto",
+                        "icon": "📣",
+                        "image": "assets/photos/mindset/marketing-digital.webp",
+                        "principle_title": "Valor Antes da Tecnologia",
+                        "story_text": "O contacto inicial com marketing digital não foi planeado. Surgiu durante a formação em unhas de gel: a maioria das manicures trabalha sozinha, por isso o curso incluía noções de marketing. A exposição contínua ao tema levou-me ao estudo autónomo e à curiosidade técnica. Para mim, marketing não é carreira paralela — é consciência de produto.",
+                        "engineering_note": "Essa consciência traduz-se em três pilares na informática: pensar no utilizador final, comunicar com clareza e entregar valor antes da tecnologia."
+                    },
+                    {
+                        "id": "leis",
+                        "title": "Leis & Sistemas",
+                        "icon": "🗳️",
+                        "image": "assets/photos/mindset/elections-icon.jpg",
+                        "principle_title": "Sistemas Determinísticos",
+                        "story_text": "O meu interesse por leis e sistemas eleitorais não é político. É fascínio por regras explícitas, precisão processual e integridade de sistemas. Num processo eleitoral, cada passo é validado para garantir confiança no resultado.",
+                        "engineering_note": "Vejo isto como um exercício cognitivo estruturado, semelhante a uma auditoria de sistemas: dados íntegros, transições auditáveis e regras claras em cada etapa."
+                    }
+                ],
+                "next_label": "Próximo",
+                "next_text": "A seguir, o que procuro neste momento — o ponto de contacto entre história e ação."
+            },
+            "now": {
+                "title": "O que procuro neste momento",
+                "cta_label": "Vamos conversar",
+                "image": "assets/photos/now/now-portrait.png",
+                "image_alt": "Perfil profissional",
+                "summary": "Procuro uma entidade acolhedora para o estágio curricular obrigatório (210h) do EFA – Programador Informático.",
+                "details": "A componente teórica termina no final de junho e o estágio pode iniciar a partir de junho de 2026. O estágio é acompanhado pela entidade formadora, com plano individual e objetivos definidos. Procuro um contexto real de desenvolvimento ou sistemas, com preferência por remoto (todo o país) e alternativa híbrida na zona de Bragança. Ao longo da formação já tive contacto prático com programação, por isso o estágio não começa do zero. O contacto serve para alinharmos expectativas e enquadramento."
+            },
+            "contact": {
+                "title": "Contacte-me",
+                "description": "Disponível para projectos onde a maturidade técnica e o compromisso humano façam a diferença.",
+                "email_label": "Diga Olá",
+                "cv_label": "CV Standard",
+                "extended_cv_label": "Extended CV",
+                "efa_label": "Conteúdo Programático (Curso Programação)",
+                "python_1_label": "Python I (Helsinki)",
+                "python_2_label": "Python II (Helsinki)",
+                "marketing_label": "Marketing Digital",
+                "downloads_title": "Recursos Profissionais",
+                "certifications_title": "Certificações Estruturadas",
+                "download_groups": [
+                    {
+                        "id": "downloads",
+                        "label": "Recursos Profissionais",
+                        "open_in_new_tab": false
+                    },
+                    {
+                        "id": "certs",
+                        "label": "Certificações Estruturadas",
+                        "open_in_new_tab": true
+                    }
+                ]
+            }
+        },
+        "es": {
+            "navigation": {
+                "overview": "Identidad",
+                "development": "Ingeniería",
+                "foundation": "Fundación",
+                "mindset": "Mentalidad",
+                "now": "Ahora",
+                "contact": "Contacto"
+            },
+            "ui": {
+                "marketing_label": "Estrategia de Producto",
+                "technologies_label": "Tecnologías utilizadas",
+                "cta_contact_label": "¿Conversamos?",
+                "explore_skill_label": "Ver Contexto y Evolución →",
+                "explore_experience_label": "Ver Detalles Estratégicos →",
+                "explore_mindset_label": "Explorar Principio →",
+                "drawer_skill_context_label": "Contexto y Evolución",
+                "drawer_skill_competencies_label": "Competencias Relevantes",
+                "drawer_skill_default_history": "Consolidación activa mediante formación continua y aplicación práctica.",
+                "drawer_mindset_label": "Lógica Humana & Ingeniería",
+                "drawer_mindset_story_label": "La Experiencia Personal",
+                "exp_trace_label": "[ REGISTRO: MENTALIDAD_INFRA ]",
+                "exp_trace_status": "ESTADO: Robustez_Verificada",
+                "exp_trace_mode_label": "MODO",
+                "mindset_trace_label": "",
+                "mindset_trace_text": "Lo que llevo de mi vida personal al trabajo es disciplina en el proceso, atención al detalle y consistencia. Eso muestra que valoro el tiempo correcto, la prevención y el cuidado continuo — y aplico esa lógica cada día en el software.",
+                "skill_tags": [
+                    "Algoritmos",
+                    "Robustez",
+                    "Código Limpio"
+                ]
+            },
+            "certifications": [
+                {
+                    "label": "Python Programming I (Universidad de Helsinki)",
+                    "href": "assets/downloads/cert-python-intro-helsinki.png"
+                },
+                {
+                    "label": "Python Programming II (Universidad de Helsinki)",
+                    "href": "assets/downloads/cert-python-adv-helsinki.png"
+                }
+            ],
+            "overview": {
+                "name": "André Câmara",
+                "languages_label": "Idiomas",
+                "languages": [
+                    "Portugués — nativo",
+                    "Español — fluido",
+                    "Inglés — fluido"
+                ],
+                "education_label": "Formación escolar",
+                "education": [
+                    "12.º año finalizado",
+                    "EFA – Programador Informático (Nivel 4, 1416h, en curso)"
+                ],
+                "cta_label": "¿Conversamos?",
+                "location": "Quintanilha, Bragança PT",
+                "headline": "Software Developer & Systems Architect",
+                "intro_text": "Construyo soluciones donde la elegancia del código se encuentra con la robustez de la infraestructura. Mi foco es la estabilidad, la automatización y la traducción de necesidades críticas en arquitectura sostenible.",
+                "bio": "Mi recorrido con la tecnología empezó a finales de los 90. Fue un inicio entusiasta que siguió un camino no lineal, con una pausa significativa que me dio una perspectiva de vida más amplia. Volví al sector con la madurez y el foco de quien sabe que el software es, ante todo, un compromiso con la continuidad. Estoy casado, soy padre de un hijo de 13 años y vivo en Bragança — esa estabilidad se traduce en foco, previsibilidad y fiabilidad técnica en cada proyecto. No soy solo un programador; traigo la disciplina de quien pasó más de una década garantizando que sistemas críticos 24/7 nunca fallaran.",
+                "marketing_note": "Además de la técnica, tengo formación en Marketing Digital. Esta conciencia de producto me ayuda a pensar en el usuario final, comunicar con claridad y entregar valor antes que tecnología.",
+                "next_label": "A continuación",
+                "next_text": "Quién soy aparece en cómo construyo. La próxima sección muestra la ingeniería que practico hoy."
+            },
+            "development": {
+                "title": "Ingeniería de Software",
+                "description": "Foco en Python y en el arte de simplificar lo complejo. Para mí, el código es una herramienta de estabilidad.",
+                "image": "assets/photos/engineering/work-desk.png",
+                "image_alt": "Entorno de trabajo",
+                "skills": [
+                    {
+                        "technologies": [
+                            "Python",
+                            "OOP",
+                            "Algoritmos",
+                            "Estructuras de Datos"
+                        ],
+                        "title": "Python Ecosystem (I & II)",
+                        "focus_area": "Backend & Automatización",
+                        "context_text": "Formación estructurada y exigente por la Universidad de Helsinki (Programming I & II). Dominio de algoritmos, estructuras de datos y OOP.",
+                        "background": "Transité del soporte técnico a la computación programática a través de un recorrido intensivo de 540h. Donde otros ven un script, yo veo un sistema de automatización resiliente."
+                    },
+                    {
+                        "technologies": [
+                            "C/C++",
+                            "SQL",
+                            "Java",
+                            "C#",
+                            "ASP.NET Core MVC",
+                            "Python",
+                            "Redes",
+                            "Sistemas Operativos"
+                        ],
+                        "resource": {
+                            "label": "Contenido Programático — Curso de Programación",
+                            "href": "assets/downloads/efa-program-content.pdf"
+                        },
+                        "title": "Formación EFA Programador",
+                        "focus_area": "Desarrollo Fullstack",
+                        "context_text": "Recorrido de 1416h enfocado en tecnologías modernas y buenas prácticas de ingeniería. En curso.",
+                        "background": "Actualmente consolidando conocimientos en arquitecturas modernas, garantizando que la base técnica sólida se traduzca en aplicaciones web robustas y escalables.",
+                        "progress_status": "EN CURSO",
+                        "duration_hours": "1416h"
+                    }
+                ],
+                "next_label": "Transición",
+                "next_text": "Lo que hago hoy se apoya en un rigor construido antes de la programación. A continuación, la base técnica que lo moldeó."
+            },
+            "foundation": {
+                "title": "Fundación Técnica",
+                "description": "Dos décadas de evolución. De la infraestructura crítica a la ingeniería de software.",
+                "image": "assets/photos/foundation/foundation-circle.jpg",
+                "image_alt": "Rostro y manos — base técnica",
+                "challenge_label": "El Desafío",
+                "learning_label": "Aprendizaje Central",
+                "impact_label": "Impacto en el Presente",
+                "experience": [
+                    {
+                        "technologies": [
+                            "PowerShell",
+                            "Automatización",
+                            "Servidores",
+                            "Infraestructura Bancaria"
+                        ],
+                        "company_name": "BNP Paribas (via Devoteam/CAS)",
+                        "role_title": "Systems & Support Specialist",
+                        "timeframe": "2016 - 2024",
+                        "summary_text": "Gestión de infraestructura bancaria crítica en Lisboa y Madrid. Disciplina férrea sobre estabilidad.",
+                        "details_text": "Ocho años dedicados a garantizar el funcionamiento ininterrumpido de sistemas bancarios fundamentales. Aquí, la tecnología era la estructura que permitía la confianza del mercado global.",
+                        "intro_quote": "El máximo de responsabilidad. Ocho años en el corazón financiero donde la tolerancia al error era cero.",
+                        "challenge_text": "Entorno bancario 24/7. La automatización con PowerShell se volvió vital para gestionar miles de servidores con estabilidad absoluta.",
+                        "key_learning_text": "Zero Downtime Mindset. Rigor absoluto y la comprensión de que la estabilidad es un proceso de automatización continua.",
+                        "present_link": "Aplico esta disciplina al desarrollo: código resiliente, probado y enfocado en disponibilidad incuestionable."
+                    },
+                    {
+                        "technologies": [
+                            "Redes",
+                            "Terminales Industriales",
+                            "Soporte IT",
+                            "Logística de Energía"
+                        ],
+                        "company_name": "CEPSA (via Tecnocom)",
+                        "role_title": "IT Support Technician",
+                        "timeframe": "2014 - 2016",
+                        "summary_text": "Soporte técnico en entorno industrial de alta exigencia en Madrid.",
+                        "details_text": "Sistemas de red y terminales que soportaban logística de energía a gran escala. Donde lo digital se encuentra con lo físico.",
+                        "intro_quote": "Robustez industrial. Cada sistema detenido tenía un coste físico inmediato y tangible.",
+                        "challenge_text": "Entorno de refinería y logística pesada. Presión física por resolución rápida bajo condiciones adversas.",
+                        "key_learning_text": "Obsesión por la robustez. Software y sistemas deben sobrevivir a los peores escenarios, no solo al camino feliz.",
+                        "present_link": "Escribo software preparado para fallos parciales, garantizando previsibilidad y seguridad en mis sistemas."
+                    },
+                    {
+                        "technologies": [
+                            "Cloud",
+                            "Virtualización",
+                            "Infraestructura Corporativa"
+                        ],
+                        "company_name": "Telefónica (via Anadat)",
+                        "role_title": "Cloud Computing Support",
+                        "timeframe": "2013 - 2014",
+                        "summary_text": "Soporte a los inicios de la infraestructura Cloud y Virtualización.",
+                        "details_text": "La transición de lo físico a lo lógico. Soporte a la cloud corporativa y virtualización a escala.",
+                        "intro_quote": "La era de la escala. Donde aprendí que las grandes infraestructuras se construyen con capas de abstracción.",
+                        "challenge_text": "Gestionar complejidad a escala. Entender cómo las instancias virtuales interactúan sin conflictos físicos.",
+                        "key_learning_text": "Pensamiento sistémico. Ver la arquitectura completa antes de actuar sobre componentes aislados.",
+                        "present_link": "Esta visión abstracta me permite diseñar arquitecturas de software modulares y escalables."
+                    },
+                    {
+                        "technologies": [
+                            "Soporte Técnico",
+                            "Operaciones IT",
+                            "Customer Success"
+                        ],
+                        "company_name": "Reconfiguración y Recorrido Inicial",
+                        "role_title": "IT Foundation & Professional Growth",
+                        "timeframe": "1999 - 2012",
+                        "summary_text": "Del soporte farmacéutico inicial a la gestión de experiencias internacionales.",
+                        "details_text": "Inicio en 1999 como técnico IT. Siguió una pausa deliberada y enriquecedora en el sector de Turismo y Customer Success en Noruega.",
+                        "intro_quote": "La base humana. Entre la técnica inicial y la gestión multicultural en Oslo, aprendí el valor de la comunicación.",
+                        "challenge_text": "Entornos multiculturales de alta rotación. Gestión de expectativas y diagnóstico rápido de problemas bajo presión social.",
+                        "key_learning_text": "Empatía como diagnóstico. Entender el dolor del usuario es la mitad de la solución técnica.",
+                        "present_link": "Traduzco necesidades de negocio complejas en código que resuelve problemas reales para personas reales."
+                    }
+                ],
+                "next_label": "A continuación",
+                "next_text": "La experiencia formó mi manera de pensar. Ahora, la mentalidad que aplico al código."
+            },
+            "mindset": {
+                "title": "Mentalidad & Lógica Humana",
+                "subtitle": "La paciencia del pan, la precisión del código",
+                "philosophy": "Mi razonamiento es determinista. Creo en el proceso, en el tiempo correcto de cada etapa y en el aislamiento absoluto de variables para resolver cualquier problema.",
+                "adoption": {
+                    "id": "adopcion",
+                    "title": "Responsabilidad Estructural y Compromiso a Largo Plazo",
+                    "icon": "🧭",
+                    "image": "assets/photos/mindset/adoption-family.png",
+                    "principle_title": "Estabilidad y Proceso",
+                    "story_text": "Mi hijo fue adoptado hace 4 años. La adopción fue un proceso largo, estructurado, exigente y regulado, que requiere paciencia, previsibilidad, estabilidad emocional y consistencia de rutinas.",
+                    "engineering_note": "Para mí, esto es una prueba de competencias humanas elevadas: compromiso a largo plazo, organización, disciplina y cumplimiento riguroso de procesos. Las mismas competencias que aplico en sistemas críticos, proyectos largos y código que no puede fallar."
+                },
+                "blocks": [
+                    {
+                        "id": "pao",
+                        "title": "Pan & Dependencias",
+                        "icon": "🍞",
+                        "image": "assets/photos/mindset/bread-making.png",
+                        "principle_title": "Fermentación Lenta",
+                        "story_text": "En el pan artesanal, saltarse etapas destruye el resultado. El tiempo de fermentación es una dependencia que no se puede acelerar sin comprometer la estructura.",
+                        "engineering_note": "En software, arquitecturas robustas requieren el tiempo correcto de diseño y validación. Respetar dependencias y el tiempo de maduración del código evita deuda técnica catastrófica."
+                    },
+                    {
+                        "id": "pizza",
+                        "title": "Pizza & Iteración",
+                        "icon": "🍕",
+                        "image": "assets/photos/mindset/cooking.png",
+                        "image_position": "center 20%",
+                        "principle_title": "Feedback Incremental",
+                        "story_text": "Una pizza perfecta es el resultado de pequeños ajustes en cada hornada. Temperatura, hidratación, tiempo — cada detalle se afina con base en el resultado anterior.",
+                        "engineering_note": "Programar es iterar. Prefiero entregas pequeñas y frecuentes que permitan ajustar el rumbo rápidamente, garantizando que el producto final esté alineado con la realidad."
+                    },
+                    {
+                        "id": "manutencao",
+                        "title": "Mantenimiento & Prevención",
+                        "icon": "💅",
+                        "image": "assets/photos/mindset/nails-gel.png",
+                        "image_position": "center 55%",
+                        "principle_title": "Cuidado Preventivo",
+                        "story_text": "El mantenimiento de uñas de gel me enseñó que prevenir es más barato que reparar. Pequeños cuidados frecuentes evitan fallos mayores y preservan la integridad — no es estética, es mantenimiento continuo.",
+                        "engineering_note": "En software, la prevención es refactoring constante, pruebas regulares y atención diaria al detalle. La misma lógica evita fallos silenciosos y mantiene sistemas fiables a lo largo de los años."
+                    },
+                    {
+                        "id": "marketing",
+                        "title": "Marketing & Conciencia de Producto",
+                        "icon": "📣",
+                        "image": "assets/photos/mindset/marketing-digital.webp",
+                        "principle_title": "Valor Antes de la Tecnología",
+                        "story_text": "El contacto inicial con el marketing digital no fue planeado. Surgió durante la formación en uñas de gel: la mayoría de las manicuras trabaja sola, por eso el curso incluía nociones de marketing. La exposición continua al tema me llevó al estudio autónomo y a la curiosidad técnica. Para mí, el marketing no es una carrera paralela: es conciencia de producto.",
+                        "engineering_note": "Esa conciencia se traduce en tres pilares en la informática: pensar en el usuario final, comunicar con claridad y entregar valor antes que tecnología."
+                    },
+                    {
+                        "id": "leis",
+                        "title": "Leyes & Sistemas",
+                        "icon": "🗳️",
+                        "image": "assets/photos/mindset/elections-icon.jpg",
+                        "principle_title": "Sistemas Deterministas",
+                        "story_text": "Mi interés por leyes y sistemas electorales no es político. Es fascinación por reglas explícitas, precisión procesal e integridad de sistemas. En un proceso electoral, cada paso se valida para garantizar confianza en el resultado.",
+                        "engineering_note": "Lo veo como un ejercicio cognitivo estructurado, similar a una auditoría de sistemas: datos íntegros, transiciones auditables y reglas claras en cada etapa."
+                    }
+                ],
+                "next_label": "Siguiente",
+                "next_text": "A continuación, lo que busco en este momento: el punto de contacto entre historia y acción."
+            },
+            "now": {
+                "title": "Qué busco en este momento",
+                "cta_label": "Hablemos",
+                "image": "assets/photos/now/now-portrait.png",
+                "image_alt": "Perfil profesional",
+                "summary": "Busco una entidad acogedora para las prácticas curriculares obligatorias (210h) del EFA – Programador Informático.",
+                "details": "La parte teórica termina a finales de junio y las prácticas pueden comenzar a partir de junio de 2026. Las prácticas están acompañadas por la entidad formadora, con plan individual y objetivos definidos. Busco un contexto real de desarrollo o sistemas, con preferencia por remoto (todo el país) y alternativa híbrida en la zona de Bragança. A lo largo de la formación ya tuve contacto práctico con programación, así que las prácticas no empiezan de cero. El contacto sirve para alinear expectativas y encuadre."
+            },
+            "contact": {
+                "title": "Contáctame",
+                "description": "Disponible para proyectos donde la madurez técnica y el compromiso humano marquen la diferencia.",
+                "email_label": "Di Hola",
+                "cv_label": "CV Estándar",
+                "extended_cv_label": "CV Extendido",
+                "efa_label": "Contenido Programático (Curso de Programación)",
+                "python_1_label": "Python I (Helsinki)",
+                "python_2_label": "Python II (Helsinki)",
+                "marketing_label": "Marketing Digital",
+                "downloads_title": "Recursos Profesionales",
+                "certifications_title": "Certificaciones Estructuradas",
+                "download_groups": [
+                    {
+                        "id": "downloads",
+                        "label": "Recursos Profesionales",
+                        "open_in_new_tab": false
+                    },
+                    {
+                        "id": "certs",
+                        "label": "Certificaciones Estructuradas",
+                        "open_in_new_tab": true
+                    }
+                ]
+            }
+        },
+        "en": {
+            "navigation": {
+                "overview": "Identity",
+                "development": "Engineering",
+                "foundation": "Foundation",
+                "mindset": "Mindset",
+                "now": "Now",
+                "contact": "Contact"
+            },
+            "ui": {
+                "marketing_label": "Product Strategy",
+                "technologies_label": "Technologies used",
+                "cta_contact_label": "Let’s Talk?",
+                "explore_skill_label": "Explore Context & Evolution →",
+                "explore_experience_label": "See Strategic Details →",
+                "explore_mindset_label": "Explore Principle →",
+                "drawer_skill_context_label": "Context & Evolution",
+                "drawer_skill_competencies_label": "Relevant Skills",
+                "drawer_skill_default_history": "Consolidation through continuous training and hands-on application.",
+                "drawer_mindset_label": "Human Logic & Engineering",
+                "drawer_mindset_story_label": "Personal Experience",
+                "exp_trace_label": "[ TRACE_LOG: INFRASTRUCTURE_MINDSET ]",
+                "exp_trace_status": "STATUS: Verified_Robust",
+                "exp_trace_mode_label": "MODE",
+                "mindset_trace_label": "",
+                "mindset_trace_text": "What I bring from my personal life to work is process discipline, attention to detail, and consistency. It shows that I value the right timing, prevention, and continuous care — and I apply that logic every day in software.",
+                "skill_tags": [
+                    "Algorithms",
+                    "Robustness",
+                    "Clean Code"
+                ]
+            },
+            "certifications": [
+                {
+                    "label": "Python Programming I (University of Helsinki)",
+                    "href": "assets/downloads/cert-python-intro-helsinki.png"
+                },
+                {
+                    "label": "Python Programming II (University of Helsinki)",
+                    "href": "assets/downloads/cert-python-adv-helsinki.png"
+                }
+            ],
+            "overview": {
+                "name": "André Câmara",
+                "languages_label": "Languages",
+                "languages": [
+                    "Portuguese — native",
+                    "Spanish — fluent",
+                    "English — fluent"
+                ],
+                "education_label": "Education",
+                "education": [
+                    "12th grade completed",
+                    "EFA – Programmer (Level 4, 1416h, in progress)"
+                ],
+                "cta_label": "Let’s Talk?",
+                "location": "Quintanilha, Bragança PT",
+                "headline": "Software Developer & Systems Architect",
+                "intro_text": "I build solutions where code elegance meets infrastructure resilience. I focus on stability, automation, and sustainable architecture.",
+                "bio": "My journey with technology began in the late 90s. It was an enthusiastic start that followed a non-linear path, with a significant pause that gave me a broader life perspective. I returned to the sector with the maturity and focus of someone who knows software is, above all, a commitment to continuity. I am married, father to a 13-year-old, and I live in Bragança — that stability translates into focus, predictability, and technical reliability in every project. I’m not just a programmer; I carry the discipline of someone who spent over a decade ensuring 24/7 critical systems never failed.",
+                "marketing_note": "Alongside the technical path, I have training in Digital Marketing. That product awareness helps me think about the end user, communicate clearly, and deliver value before technology.",
+                "next_label": "Next",
+                "next_text": "Who I am shows up in how I build. The next section lays out the engineering I practice today."
+            },
+            "development": {
+                "title": "Software Engineering",
+                "description": "Focused on Python and on simplifying the complex. To me, code is a tool for stability.",
+                "image": "assets/photos/engineering/work-desk.png",
+                "image_alt": "Work environment",
+                "skills": [
+                    {
+                        "technologies": [
+                            "Python",
+                            "OOP",
+                            "Algorithms",
+                            "Data Structures"
+                        ],
+                        "title": "Python Ecosystem (I & II)",
+                        "focus_area": "Backend & Automation",
+                        "context_text": "Structured, demanding training from the University of Helsinki (Programming I & II). Solid grasp of algorithms, data structures, and OOP.",
+                        "background": "I moved from technical support to programmatic computing through an intensive 540h training path. Where others see a script, I see a resilient automation system."
+                    },
+                    {
+                        "technologies": [
+                            "C/C++",
+                            "SQL",
+                            "Java",
+                            "C#",
+                            "ASP.NET Core MVC",
+                            "Python",
+                            "Networking",
+                            "Operating Systems"
+                        ],
+                        "resource": {
+                            "label": "Program Content — Programming Course",
+                            "href": "assets/downloads/efa-program-content.pdf"
+                        },
+                        "title": "EFA Programmer Program",
+                        "focus_area": "Fullstack Development",
+                        "context_text": "1416h program focused on modern technologies and engineering best practices. In progress.",
+                        "background": "Currently consolidating knowledge in modern architectures, ensuring a solid technical base translates into robust, scalable web applications.",
+                        "progress_status": "IN PROGRESS",
+                        "duration_hours": "1416h"
+                    }
+                ],
+                "next_label": "Transition",
+                "next_text": "What I do today rests on rigor built before programming. Next, the technical foundation that shaped it."
+            },
+            "foundation": {
+                "title": "Technical Foundation",
+                "description": "Two decades of evolution. From critical infrastructure to software engineering.",
+                "image": "assets/photos/foundation/foundation-circle.jpg",
+                "image_alt": "Face and hands — technical foundation",
+                "challenge_label": "The Challenge",
+                "learning_label": "Core Learning",
+                "impact_label": "Impact Today",
+                "experience": [
+                    {
+                        "technologies": [
+                            "PowerShell",
+                            "Automation",
+                            "Servers",
+                            "Banking Infrastructure"
+                        ],
+                        "company_name": "BNP Paribas (via Devoteam/CAS)",
+                        "role_title": "Systems & Support Specialist",
+                        "timeframe": "2016 - 2024",
+                        "summary_text": "Managing critical banking infrastructure in Lisbon and Madrid. Uncompromising discipline on stability.",
+                        "details_text": "Eight years dedicated to ensuring uninterrupted operation of core banking systems. Here, technology was the structure that enabled trust in the global market.",
+                        "intro_quote": "The peak of responsibility. Eight years in the financial core where error tolerance was zero.",
+                        "challenge_text": "24/7 banking environment. PowerShell automation became vital to manage thousands of servers with absolute stability.",
+                        "key_learning_text": "Zero Downtime Mindset. Absolute rigor and the understanding that stability is a continuous automation process.",
+                        "present_link": "I apply this discipline in development: resilient, tested code focused on unquestionable availability."
+                    },
+                    {
+                        "technologies": [
+                            "Networking",
+                            "Industrial Terminals",
+                            "IT Support",
+                            "Energy Logistics"
+                        ],
+                        "company_name": "CEPSA (via Tecnocom)",
+                        "role_title": "IT Support Technician",
+                        "timeframe": "2014 - 2016",
+                        "summary_text": "Technical support in a high-demand industrial environment in Madrid.",
+                        "details_text": "Network systems and terminals supporting large-scale energy logistics. Where digital meets physical.",
+                        "intro_quote": "Industrial robustness. Every system stop had an immediate, tangible physical cost.",
+                        "challenge_text": "Refinery and heavy logistics environment. Physical pressure for fast resolution under adverse conditions.",
+                        "key_learning_text": "Obsession with robustness. Software and systems must survive worst-case scenarios, not only the happy path.",
+                        "present_link": "I write software prepared for partial failures, ensuring predictability and safety in my systems."
+                    },
+                    {
+                        "technologies": [
+                            "Cloud",
+                            "Virtualization",
+                            "Corporate Infrastructure"
+                        ],
+                        "company_name": "Telefónica (via Anadat)",
+                        "role_title": "Cloud Computing Support",
+                        "timeframe": "2013 - 2014",
+                        "summary_text": "Support for the early days of cloud infrastructure and virtualization.",
+                        "details_text": "The transition from physical to logical. Support for corporate cloud and virtualization at scale.",
+                        "intro_quote": "The era of scale. Where I learned that large infrastructures are built with layers of abstraction.",
+                        "challenge_text": "Managing complexity at scale. Understanding how virtual instances interact without physical conflicts.",
+                        "key_learning_text": "Systems thinking. Seeing the full architecture before acting on isolated components.",
+                        "present_link": "This abstract view allows me to design modular, scalable software architectures."
+                    },
+                    {
+                        "technologies": [
+                            "Technical Support",
+                            "IT Operations",
+                            "Customer Success"
+                        ],
+                        "company_name": "Reconfiguration and Early Path",
+                        "role_title": "IT Foundation & Professional Growth",
+                        "timeframe": "1999 - 2012",
+                        "summary_text": "From early pharma support to managing international experiences.",
+                        "details_text": "Started in 1999 as an IT technician. Followed by a deliberate, enriching pause in Tourism and Customer Success in Norway.",
+                        "intro_quote": "The human foundation. Between early tech work and multicultural management in Oslo, I learned the value of communication.",
+                        "challenge_text": "High-rotation multicultural environments. Managing expectations and fast diagnostics under social pressure.",
+                        "key_learning_text": "Empathy as diagnosis. Understanding user pain is half the technical solution.",
+                        "present_link": "I translate complex business needs into code that solves real problems for real people."
+                    }
+                ],
+                "next_label": "Next",
+                "next_text": "Experience shaped how I think. Now, the mindset I bring to code."
+            },
+            "mindset": {
+                "title": "Mindset & Human Logic",
+                "subtitle": "The patience of bread, the precision of code",
+                "philosophy": "My reasoning is deterministic. I believe in the process, the right timing of each stage, and the absolute isolation of variables to solve any problem.",
+                "adoption": {
+                    "id": "adoption",
+                    "title": "Structural Responsibility and Long-Term Commitment",
+                    "icon": "🧭",
+                    "image": "assets/photos/mindset/adoption-family.png",
+                    "principle_title": "Stability and Process",
+                    "story_text": "My son was adopted 4 years ago. The adoption was a long, structured, demanding, and regulated process that requires patience, predictability, emotional stability, and consistent routines.",
+                    "engineering_note": "For me, this proves high-level human skills: long-term commitment, organization, discipline, and strict compliance with processes. The same skills I apply to critical systems, long projects, and code that cannot fail."
+                },
+                "blocks": [
+                    {
+                        "id": "pao",
+                        "title": "Bread & Dependencies",
+                        "icon": "🍞",
+                        "image": "assets/photos/mindset/bread-making.png",
+                        "principle_title": "Slow Fermentation",
+                        "story_text": "In artisanal bread, skipping steps destroys the result. Fermentation time is a dependency that cannot be rushed without compromising structure.",
+                        "engineering_note": "In software, robust architectures require the right time for design and validation. Respecting dependencies and code maturation prevents catastrophic technical debt."
+                    },
+                    {
+                        "id": "pizza",
+                        "title": "Pizza & Iteration",
+                        "icon": "🍕",
+                        "image": "assets/photos/mindset/cooking.png",
+                        "image_position": "center 20%",
+                        "principle_title": "Incremental Feedback",
+                        "story_text": "A perfect pizza is the result of small adjustments in each batch. Temperature, hydration, time — each detail is refined based on the previous result.",
+                        "engineering_note": "Programming is iteration. I prefer small, frequent deliveries that allow rapid course correction, ensuring the final product matches reality."
+                    },
+                    {
+                        "id": "manutencao",
+                        "title": "Maintenance & Prevention",
+                        "icon": "💅",
+                        "image": "assets/photos/mindset/nails-gel.png",
+                        "image_position": "center 55%",
+                        "principle_title": "Preventive Care",
+                        "story_text": "Gel nail maintenance taught me that prevention is cheaper than repair. Small, frequent care avoids larger failures and preserves integrity — it’s not aesthetics, it’s continuous maintenance.",
+                        "engineering_note": "In software, prevention is constant refactoring, regular tests, and daily attention to detail. The same logic avoids silent failures and keeps systems reliable over time."
+                    },
+                    {
+                        "id": "marketing",
+                        "title": "Marketing & Product Awareness",
+                        "icon": "📣",
+                        "image": "assets/photos/mindset/marketing-digital.webp",
+                        "principle_title": "Value Before Technology",
+                        "story_text": "My first contact with digital marketing was unplanned. It emerged during gel nail training: most nail technicians work alone, so the course included marketing basics. Continued exposure led me to self-study and technical curiosity. For me, marketing is not a parallel career — it is product awareness.",
+                        "engineering_note": "That awareness translates into three pillars in software: thinking about the end user, communicating clearly, and delivering value before technology."
+                    },
+                    {
+                        "id": "leis",
+                        "title": "Laws & Systems",
+                        "icon": "🗳️",
+                        "image": "assets/photos/mindset/elections-icon.jpg",
+                        "principle_title": "Deterministic Systems",
+                        "story_text": "My interest in laws and electoral systems is not political. It’s a fascination with explicit rules, procedural precision, and system integrity. In an electoral process, every step is validated to ensure trust in the outcome.",
+                        "engineering_note": "I see this as a structured cognitive exercise, similar to a systems audit: intact data, auditable transitions, and clear rules at every stage."
+                    }
+                ],
+                "next_label": "Next",
+                "next_text": "Next, what I’m looking for right now — the bridge between story and action."
+            },
+            "now": {
+                "title": "What I’m looking for right now",
+                "cta_label": "Let’s talk",
+                "image": "assets/photos/now/now-portrait.png",
+                "image_alt": "Professional portrait",
+                "summary": "I’m looking for a host organization for the mandatory 210-hour curricular internship in the EFA – Programmer program.",
+                "details": "The theoretical phase ends at the end of June, and the internship can start from June 2026. It is supervised by the training entity, with an individual plan and defined objectives. I’m looking for a real development or systems context, preferably remote (nationwide) with a hybrid alternative in the Bragança area. I’ve already had practical programming contact during the course, so the internship doesn’t start from zero. The contact is to align expectations and fit."
+            },
+            "contact": {
+                "title": "Contact Me",
+                "description": "Available for projects where technical maturity and human commitment make the difference.",
+                "email_label": "Say Hello",
+                "cv_label": "Standard CV",
+                "extended_cv_label": "Extended CV",
+                "efa_label": "Program Content (Programming Course)",
+                "python_1_label": "Python I (Helsinki)",
+                "python_2_label": "Python II (Helsinki)",
+                "marketing_label": "Digital Marketing",
+                "downloads_title": "Professional Resources",
+                "certifications_title": "Structured Certifications",
+                "download_groups": [
+                    {
+                        "id": "downloads",
+                        "label": "Professional Resources",
+                        "open_in_new_tab": false
+                    },
+                    {
+                        "id": "certs",
+                        "label": "Structured Certifications",
+                        "open_in_new_tab": true
+                    }
+                ]
+            }
+        }
+    }
+}

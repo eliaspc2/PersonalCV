@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>André Câmara | Software Engineer</title>
+    <meta name="description"
+        content="Portfolio of André Câmara - Software Developer with a Systems Engineering background." id="meta-description">
+    <link rel="icon" href="assets/icons/favicon.ico" id="site-favicon">
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" id="apple-touch-icon">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="css/styles.css">
+    <meta name="theme-color" content="#0b1220">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="ux-modern">
+
+    <!-- Sidebar -->
+    <aside id="main-sidebar" class="sidebar">
+        <div class="sidebar-brand">
+            <div class="profile-avatar-container">
+                <div class="profile-circle">
+                    <img id="sidebar-photo" src="" alt="André Câmara" loading="lazy" decoding="async" data-admin-trigger="true">
+                </div>
+                <div id="social-identity-links" class="social-overlay">
+                    <!-- Dynamic links injected here -->
+                </div>
+            </div>
+            <div class="brand-text">
+                <div class="brand-name" id="brand-trigger">André Câmara</div>
+                <div class="brand-status">Software Developer</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-item active" data-section="overview">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <span class="nav-label" data-nav="overview">Início</span>
+            </a>
+            <a href="#engineering" class="nav-item" data-section="development">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <span class="nav-label" data-nav="development">Engenharia</span>
+            </a>
+            <a href="#foundation" class="nav-item" data-section="foundation">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                    <line x1="6" y1="6" x2="6.01" y2="6" />
+                    <line x1="6" y1="18" x2="6.01" y2="18" />
+                </svg>
+                <span class="nav-label" data-nav="foundation">Sistemas</span>
+            </a>
+            <a href="#mindset" class="nav-item" data-section="mindset">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+                <span class="nav-label" data-nav="mindset">Mindset</span>
+            </a>
+            <a href="#now" class="nav-item" data-section="now">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M3 12h7l2 3h9" />
+                    <path d="M3 12l2-3h6" />
+                    <circle cx="19" cy="12" r="2" />
+                </svg>
+                <span class="nav-label" data-nav="now">Agora</span>
+            </a>
+            <a href="#contact" class="nav-item" data-section="contact">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                </svg>
+                <span class="nav-label" data-nav="contact">Contacto</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <select id="lang-switcher" class="modern-select">
+                <option value="pt">Português</option>
+                <option value="es">Español</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="main-wrapper">
+        <header class="app-header">
+            <div class="header-breadcrumb" id="active-breadcrumb">Identidade</div>
+            <select id="lang-switcher-mobile" class="modern-select responsive-lang" aria-label="Idioma">
+                <option value="pt">PT</option>
+                <option value="es">ES</option>
+                <option value="en">EN</option>
+            </select>
+            <button id="sidebar-mobile-toggle" class="mobile-only">Menu</button>
+        </header>
+
+        <main class="app-content" id="app-viewport">
+            <div class="content-container">
+                <!-- Sections rendered here -->
+                <div id="dynamic-content">
+                    <section id="section-overview" class="view-section" data-section="overview"></section>
+                    <section id="section-development" class="view-section" data-section="development"></section>
+                    <section id="section-foundation" class="view-section" data-section="foundation"></section>
+                    <section id="section-mindset" class="view-section" data-section="mindset"></section>
+                    <section id="section-now" class="view-section" data-section="now"></section>
+                    <section id="section-contact" class="view-section" data-section="contact"></section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Discovery Drawer (Context Details) -->
+    <div id="discovery-drawer" class="drawer">
+        <div class="drawer-overlay" id="drawer-close"></div>
+        <div class="drawer-panel">
+            <button class="drawer-close-btn" id="drawer-x">✕</button>
+            <div id="drawer-body" class="drawer-content">
+                <!-- Detailed content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/cv-render.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
+</body>
+
+</html>

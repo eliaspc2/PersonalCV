@@ -1,0 +1,22 @@
+{
+  "name": "Andre Camara",
+  "short_name": "AC",
+  "description": "Narrative professional portfolio of André Câmara.",
+  "start_url": ".",
+  "scope": ".",
+  "icons": [
+    {
+      "src": "assets/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0b1220",
+  "background_color": "#0b1220",
+  "display": "standalone"
+}

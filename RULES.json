@@ -1,0 +1,36 @@
+{
+  "projectRules": {
+    "noBackend": true,
+    "singleSourceOfTruth": "data/cv.json",
+    "tokenStorage": "sessionStorage",
+    "noHardcodedCvData": true,
+    "moduleContractsEnforced": true,
+    "githubApiInOwnModule": true,
+    "uiSeparateFromLogic": true,
+    "noInlineHtmlLogic": true,
+    "accessGateRequired": true,
+    "configUiHidden": true
+  },
+  "modules": {
+    "cv-render.js": {
+      "allowedImports": [],
+      "allowedGlobalAccess": ["document", "window"],
+      "forbiddenCalls": ["fetch", "githubApi", "configUi"]
+    },
+    "github-api.js": {
+      "allowedImports": [],
+      "allowedGlobalAccess": ["fetch"],
+      "forbiddenCalls": ["document", "window", "alert"]
+    },
+    "config-ui.js": {
+      "allowedImports": ["github-api.js", "auth-gate.js"],
+      "allowedGlobalAccess": ["document", "window"],
+      "forbiddenCalls": ["fetch"]
+    },
+    "auth-gate.js": {
+      "allowedImports": [],
+      "allowedGlobalAccess": ["sessionStorage", "crypto"],
+      "forbiddenCalls": ["document"]
+    }
+  }
+}
