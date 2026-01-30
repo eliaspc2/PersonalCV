@@ -3119,10 +3119,6 @@ function renderStoryEditor(config, { append = false } = {}) {
         ? (currentCV?.localized?.[currentLang]?.ui?.skill_tags || [])
         : [];
 
-    const fieldsetTitle = document.createElement('div');
-    fieldsetTitle.className = 'form-group';
-    fieldsetTitle.innerHTML = `<label>Edição do cartão</label>`;
-    uiNodes.editorForm.appendChild(fieldsetTitle);
 
     const cardFieldset = document.createElement('fieldset');
     const cardLegend = document.createElement('legend');
