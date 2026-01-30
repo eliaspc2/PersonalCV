@@ -21,6 +21,9 @@ const uiNodes = {
     loadBtn: document.getElementById('load-btn'),
     restoreBtn: document.getElementById('restore-btn'),
     restoreFile: document.getElementById('restore-file'),
+    exportJsonBtn: document.getElementById('export-json-btn'),
+    importJsonBtn: document.getElementById('import-json-btn'),
+    importJsonFile: document.getElementById('import-json-file'),
     ghToken: document.getElementById('gh-token'),
     repoOwner: document.getElementById('repo-owner'),
     repoName: document.getElementById('repo-name'),
@@ -62,6 +65,11 @@ let emojiPickerState = null;
 
 const BASE_SECTIONS = ['overview', 'development', 'foundation', 'mindset', 'now', 'contact'];
 const NAV_SECTIONS = new Set(BASE_SECTIONS);
+const DEFAULT_PATHS = {
+    photos: 'assets/photos/',
+    downloads: 'assets/downloads/',
+    icons: 'assets/icons/'
+};
 const EMOJI_CHOICES = [
     '🏠', '🧭', '🧠', '🧩', '🧱', '⚙️', '🛠️', '🧪', '🧰', '📚',
     '📌', '📍', '📎', '📝', '📄', '📂', '📁', '🗂️', '🧾', '🔖',
@@ -76,6 +84,119 @@ const NAV_DEFAULT_ICONS = {
     mindset: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/></svg>`,
     now: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M3 12h7l2 3h9\"/><path d=\"M3 12l2-3h6\"/><circle cx=\"19\" cy=\"12\" r=\"2\"/></svg>`,
     contact: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\"/><polyline points=\"22,6 12,13 2,6\"/></svg>`
+};
+
+const SECTION_FIELD_ORDER = {
+    overview: [
+        'name',
+        'headline',
+        'location',
+        'intro_text',
+        'bio',
+        'marketing_note',
+        'languages_label',
+        'languages',
+        'education_label',
+        'education',
+        'next_label',
+        'next_text',
+        'cta_label',
+        'cta_link'
+    ],
+    development: [
+        'title',
+        'description',
+        'image',
+        'image_alt',
+        'image_position',
+        'image_zoom',
+        'skills',
+        'next_label',
+        'next_text',
+        'cta_label',
+        'cta_link'
+    ],
+    foundation: [
+        'title',
+        'description',
+        'image',
+        'image_alt',
+        'image_position',
+        'image_zoom',
+        'experience',
+        'next_label',
+        'next_text',
+        'cta_label',
+        'cta_link'
+    ],
+    mindset: [
+        'title',
+        'subtitle',
+        'philosophy',
+        'adoption',
+        'blocks',
+        'next_label',
+        'next_text',
+        'cta_label',
+        'cta_link'
+    ],
+    now: [
+        'title',
+        'description',
+        'image',
+        'image_alt',
+        'image_position',
+        'image_zoom',
+        'cta_label',
+        'cta_link'
+    ],
+    contact: [
+        'email_label',
+        'title',
+        'description',
+        'cta_label',
+        'cta_link',
+        'download_groups',
+        'downloads_title',
+        'certifications_title'
+    ]
+};
+
+const STORY_FIELD_ORDER = {
+    skills: [
+        'title',
+        'focus_area',
+        'progress_status',
+        'duration_hours',
+        'context_text',
+        'background',
+        'competencies',
+        'technologies',
+        'resource'
+    ],
+    experience: [
+        'company_name',
+        'role_title',
+        'timeframe',
+        'summary_text',
+        'details_text',
+        'intro_quote',
+        'challenge_text',
+        'key_learning_text',
+        'present_link',
+        'technologies'
+    ],
+    mindset: [
+        'id',
+        'title',
+        'icon',
+        'image',
+        'image_position',
+        'image_zoom',
+        'principle_title',
+        'story_text',
+        'engineering_note'
+    ]
 };
 
 const SECTION_TEMPLATES = [
@@ -116,24 +237,227 @@ function getSectionType(sectionKey) {
     return custom?.type || null;
 }
 
+function normalizeBasePath(value, fallback) {
+    const base = value || fallback;
+    if (!base) return '';
+    return base.endsWith('/') ? base : `${base}/`;
+}
+
+function getPaths() {
+    if (!currentCV) return { ...DEFAULT_PATHS };
+    if (!currentCV.paths) currentCV.paths = { ...DEFAULT_PATHS };
+    currentCV.paths.photos = normalizeBasePath(currentCV.paths.photos, DEFAULT_PATHS.photos);
+    currentCV.paths.downloads = normalizeBasePath(currentCV.paths.downloads, DEFAULT_PATHS.downloads);
+    currentCV.paths.icons = normalizeBasePath(currentCV.paths.icons, DEFAULT_PATHS.icons);
+    return currentCV.paths;
+}
+
+function resolveAssetPath(type, value) {
+    if (!value) return '';
+    const text = String(value);
+    if (/^(https?:|data:|mailto:|tel:)/.test(text)) return text;
+    if (text.includes('/')) return text;
+    const paths = getPaths();
+    return `${paths[type] || ''}${text}`;
+}
+
+function stripAssetBase(type, value) {
+    if (!value) return value;
+    const text = String(value);
+    const base = getPaths()[type] || '';
+    return text.startsWith(base) ? text.slice(base.length) : text;
+}
+
+function normalizeAssetPaths() {
+    if (!currentCV) return;
+    const paths = getPaths();
+    if (currentCV.meta) {
+        if (currentCV.meta.favicon) currentCV.meta.favicon = stripAssetBase('icons', currentCV.meta.favicon);
+        if (currentCV.meta.apple_icon) currentCV.meta.apple_icon = stripAssetBase('icons', currentCV.meta.apple_icon);
+    }
+    if (currentCV.profile) {
+        Object.keys(currentCV.profile).forEach((key) => {
+            if (typeof currentCV.profile[key] !== 'string') return;
+            if (key.endsWith('photo') || key.endsWith('_photo') || key === 'photo' || key === 'work_photo') {
+                currentCV.profile[key] = stripAssetBase('photos', currentCV.profile[key]);
+            }
+        });
+        if (Array.isArray(currentCV.profile.downloads)) {
+            currentCV.profile.downloads.forEach((item) => {
+                if (item?.href) item.href = stripAssetBase('downloads', item.href);
+            });
+        }
+    }
+    if (currentCV.localized) {
+        Object.values(currentCV.localized).forEach((locale) => {
+            if (!locale || typeof locale !== 'object') return;
+            if (Array.isArray(locale.certifications)) {
+                locale.certifications.forEach((cert) => {
+                    if (cert?.href) cert.href = stripAssetBase('downloads', cert.href);
+                });
+            }
+            Object.values(locale).forEach((section) => {
+                if (!section || typeof section !== 'object') return;
+                Object.entries(section).forEach(([key, val]) => {
+                    if (typeof val === 'string') {
+                        if (key === 'image' || key.endsWith('_image') || key.endsWith('photo')) {
+                            section[key] = stripAssetBase('photos', val);
+                        }
+                        if ((key === 'favicon' || key === 'apple_icon') && val) {
+                            section[key] = stripAssetBase('icons', val);
+                        }
+                    }
+                });
+                if (Array.isArray(section.skills)) {
+                    section.skills.forEach((item) => {
+                        if (item?.resource?.href) item.resource.href = stripAssetBase('downloads', item.resource.href);
+                    });
+                }
+                if (Array.isArray(section.experience)) {
+                    section.experience.forEach((item) => {
+                        if (item?.resource?.href) item.resource.href = stripAssetBase('downloads', item.resource.href);
+                    });
+                }
+                if (Array.isArray(section.blocks)) {
+                    section.blocks.forEach((item) => {
+                        if (item?.image) item.image = stripAssetBase('photos', item.image);
+                    });
+                }
+                if (section.adoption?.image) {
+                    section.adoption.image = stripAssetBase('photos', section.adoption.image);
+                }
+            });
+        });
+    }
+}
+
+function removeCustomSection(sectionId) {
+    if (!sectionId || BASE_SECTIONS.includes(sectionId) || !currentCV?.meta) return;
+    if (Array.isArray(currentCV.meta.section_order)) {
+        currentCV.meta.section_order = currentCV.meta.section_order.filter((id) => id !== sectionId);
+    }
+    const custom = getCustomSections();
+    const index = custom.findIndex((section) => section.id === sectionId);
+    if (index === -1) return;
+    custom.splice(index, 1);
+
+    if (currentCV.localized) {
+        Object.values(currentCV.localized).forEach((locale) => {
+            if (!locale) return;
+            if (locale.navigation && locale.navigation[sectionId]) {
+                delete locale.navigation[sectionId];
+            }
+            if (locale.navigation_icons && locale.navigation_icons[sectionId]) {
+                delete locale.navigation_icons[sectionId];
+            }
+            if (locale[sectionId]) {
+                delete locale[sectionId];
+            }
+        });
+    }
+
+    if (currentSection === sectionId) {
+        const nextList = getSectionList();
+        currentSection = nextList.length ? nextList[0].id : 'overview';
+    }
+
+    renderSidebar();
+    renderSectionEditor();
+    renderPreview();
+}
+
+function moveSection(sectionId, direction) {
+    if (!currentCV?.meta) return;
+    const order = getSectionOrder();
+    const index = order.indexOf(sectionId);
+    if (index === -1) return;
+    const target = index + direction;
+    if (target < 0 || target >= order.length) return;
+    const updated = [...order];
+    [updated[index], updated[target]] = [updated[target], updated[index]];
+    currentCV.meta.section_order = updated;
+    renderSidebar();
+    renderPreview();
+}
+
+function getOrderedEntries(sectionKey, content) {
+    if (!content || typeof content !== 'object') return [];
+    const sectionType = getSectionType(sectionKey);
+    const order = SECTION_FIELD_ORDER[sectionType] || [];
+    const seen = new Set();
+    const entries = [];
+    order.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(content, key)) {
+            entries.push([key, content[key]]);
+            seen.add(key);
+        }
+    });
+    Object.keys(content).forEach((key) => {
+        if (!seen.has(key)) {
+            entries.push([key, content[key]]);
+        }
+    });
+    return entries;
+}
+
+function getStoryOrderedKeys(type, item) {
+    if (!item || typeof item !== 'object') return [];
+    const order = STORY_FIELD_ORDER[type] || [];
+    const seen = new Set();
+    const keys = [];
+    order.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(item, key)) {
+            keys.push(key);
+            seen.add(key);
+        }
+    });
+    Object.keys(item).forEach((key) => {
+        if (!seen.has(key)) keys.push(key);
+    });
+    return keys;
+}
+
 function getSectionList() {
     const locale = currentCV?.localized?.[currentLang] || {};
     const { nav } = ensureNavigationConfig(locale);
-    const list = BASE_SECTIONS.map((id) => ({
-        id,
-        type: id,
-        label: SECTION_LABELS[id]?.[currentLang] || id,
-        isCustom: false
-    }));
-    getCustomSections().forEach((section) => {
-        list.push({
-            id: section.id,
-            type: section.type,
-            label: nav[section.id] || section.id,
-            isCustom: true
-        });
+    const order = getSectionOrder();
+    const customMap = new Map(getCustomSections().map((section) => [section.id, section.type]));
+    return order.map((id) => {
+        const isCustom = customMap.has(id);
+        const type = isCustom ? customMap.get(id) : id;
+        return {
+            id,
+            type,
+            label: nav[id] || SECTION_LABELS[id]?.[currentLang] || id,
+            isCustom
+        };
     });
-    return list;
+}
+
+function getSectionOrder() {
+    if (!currentCV?.meta) return [...BASE_SECTIONS];
+    if (!Array.isArray(currentCV.meta.section_order)) {
+        currentCV.meta.section_order = [...BASE_SECTIONS];
+    }
+    const order = currentCV.meta.section_order;
+    const customIds = getCustomSections().map((section) => section.id);
+    const expected = [...BASE_SECTIONS, ...customIds];
+    const seen = new Set();
+    const normalized = [];
+    order.forEach((id) => {
+        if (expected.includes(id) && !seen.has(id)) {
+            normalized.push(id);
+            seen.add(id);
+        }
+    });
+    expected.forEach((id) => {
+        if (!seen.has(id)) {
+            normalized.push(id);
+            seen.add(id);
+        }
+    });
+    currentCV.meta.section_order = normalized;
+    return normalized;
 }
 
 function getDefaultCtaLink() {
@@ -142,14 +466,9 @@ function getDefaultCtaLink() {
 }
 
 function getImageBaseFolder(sectionKey, key) {
-    if (sectionKey === 'meta') return 'assets/icons';
-    if (sectionKey === 'overview') return 'assets/photos/identity';
-    if (sectionKey === 'development') return 'assets/photos/engineering';
-    if (sectionKey === 'foundation') return 'assets/photos/foundation';
-    if (sectionKey === 'mindset') return 'assets/photos/mindset';
-    if (sectionKey === 'now') return 'assets/photos/now';
-    if (sectionKey === 'contact') return 'assets/photos/contact';
-    return 'assets/photos';
+    const paths = getPaths();
+    if (sectionKey === 'meta') return paths.icons;
+    return paths.photos;
 }
 
 function getImagePositionKey(key) {
@@ -169,6 +488,7 @@ function getImageZoomKey(key) {
 function getCropperFrameType(sectionKey, key) {
     if (key === 'photo' || key === 'contact_photo') return 'circle';
     if (sectionKey === 'foundation' && key === 'image') return 'circle';
+    if (sectionKey === 'mindset' && key === 'image') return 'circle';
     return 'rounded';
 }
 
@@ -357,6 +677,12 @@ function createCustomSection({ label, type }) {
         counter += 1;
     }
     customSections.push({ id, type });
+    if (!currentCV.meta.section_order) {
+        currentCV.meta.section_order = [...BASE_SECTIONS];
+    }
+    if (!currentCV.meta.section_order.includes(id)) {
+        currentCV.meta.section_order.push(id);
+    }
 
     LANGS.forEach((lang) => {
         if (!currentCV.localized[lang]) currentCV.localized[lang] = {};
@@ -491,14 +817,28 @@ function appendCtaFields(sectionKey, content) {
     uiNodes.editorForm.appendChild(fieldset);
 }
 
+function ensureCtaDefaults(content) {
+    if (!content) return;
+    const uiConfig = getUiConfig();
+    if (!content.cta_label) {
+        content.cta_label = uiConfig?.cta_contact_label || '';
+    }
+    if (!content.cta_link) {
+        content.cta_link = getDefaultCtaLink();
+    }
+}
+
 function makeImageField(wrapper, targetObj, key, sectionKey) {
     const row = document.createElement('div');
     row.className = 'photo-row';
     const input = document.createElement('input');
     input.type = 'text';
-    input.value = targetObj[key] || '';
+    const assetType = sectionKey === 'meta' ? 'icons' : 'photos';
+    input.value = stripAssetBase(assetType, targetObj[key] || '');
     input.oninput = (event) => {
-        targetObj[key] = event.target.value;
+        const normalized = stripAssetBase(assetType, event.target.value);
+        targetObj[key] = normalized;
+        if (input.value !== normalized) input.value = normalized;
         renderPreview();
     };
     const fileInput = document.createElement('input');
@@ -507,11 +847,9 @@ function makeImageField(wrapper, targetObj, key, sectionKey) {
     fileInput.onchange = (event) => {
         const file = event.target.files?.[0];
         if (!file) return;
-        const base = getImageBaseFolder(sectionKey, key);
         const safeName = normalizeFileName(file.name);
-        const suggested = `${base}/${safeName}`;
-        input.value = suggested;
-        targetObj[key] = suggested;
+        input.value = safeName;
+        targetObj[key] = safeName;
         renderPreview();
     };
     row.appendChild(input);
@@ -530,7 +868,7 @@ function makeImageField(wrapper, targetObj, key, sectionKey) {
             return;
         }
         openImageCropper({
-            imagePath: input.value,
+            imagePath: resolveAssetPath(assetType, input.value),
             targetObj,
             positionKey: getImagePositionKey(key),
             zoomKey: getImageZoomKey(key),
@@ -641,6 +979,75 @@ function makeArrayField(wrapper, targetObj, key, values = []) {
     wrapper.appendChild(addBtn);
 }
 
+function makeResourceListField(wrapper, targetObj, key, values = []) {
+    const list = document.createElement('div');
+    list.className = 'story-list';
+
+    const renderItems = () => {
+        list.innerHTML = '';
+        values.forEach((val, index) => {
+            const entry = val && typeof val === 'object' ? val : {};
+            const row = document.createElement('div');
+            row.className = 'array-card';
+            const inputs = document.createElement('div');
+            inputs.className = 'photo-row';
+
+            const labelInput = document.createElement('input');
+            labelInput.type = 'text';
+            labelInput.placeholder = 'Etiqueta';
+            labelInput.value = entry.label || '';
+            const hrefInput = document.createElement('input');
+            hrefInput.type = 'text';
+            hrefInput.placeholder = 'Link';
+            hrefInput.value = stripAssetBase('downloads', entry.href || '');
+
+            const sync = () => {
+                const normalizedHref = stripAssetBase('downloads', hrefInput.value);
+                if (hrefInput.value !== normalizedHref) hrefInput.value = normalizedHref;
+                values[index] = { ...entry, label: labelInput.value, href: normalizedHref };
+                targetObj[key] = values;
+                renderPreview();
+            };
+
+            labelInput.oninput = sync;
+            hrefInput.oninput = sync;
+
+            inputs.appendChild(labelInput);
+            inputs.appendChild(hrefInput);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'toggle-visibility';
+            removeBtn.textContent = '−';
+            removeBtn.onclick = () => {
+                values.splice(index, 1);
+                targetObj[key] = values;
+                renderItems();
+                renderPreview();
+            };
+
+            row.appendChild(inputs);
+            row.appendChild(removeBtn);
+            list.appendChild(row);
+        });
+    };
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'toggle-visibility';
+    addBtn.textContent = '+ Adicionar';
+    addBtn.onclick = () => {
+        values.push({ label: '', href: '' });
+        targetObj[key] = values;
+        renderItems();
+        renderPreview();
+    };
+
+    renderItems();
+    wrapper.appendChild(list);
+    wrapper.appendChild(addBtn);
+}
+
 function makeResourceField(wrapper, targetObj, key, value = {}) {
     const resource = value && typeof value === 'object' ? value : {};
     const labelRow = document.createElement('div');
@@ -654,13 +1061,15 @@ function makeResourceField(wrapper, targetObj, key, value = {}) {
     const hrefInput = document.createElement('input');
     hrefInput.type = 'text';
     hrefInput.placeholder = 'href';
-    hrefInput.value = resource.href || '';
+    hrefInput.value = stripAssetBase('downloads', resource.href || '');
 
     const sync = () => {
+        const normalizedHref = stripAssetBase('downloads', hrefInput.value);
+        if (hrefInput.value !== normalizedHref) hrefInput.value = normalizedHref;
         targetObj[key] = {
             ...(resource || {}),
             label: labelInput.value,
-            href: hrefInput.value
+            href: normalizedHref
         };
         renderPreview();
     };
@@ -681,9 +1090,11 @@ function makeFileField(wrapper, targetObj, key, labelText, baseFolder) {
     row.className = 'photo-row';
     const input = document.createElement('input');
     input.type = 'text';
-    input.value = targetObj[key] || '';
+    input.value = stripAssetBase('downloads', targetObj[key] || '');
     input.oninput = (event) => {
-        targetObj[key] = event.target.value;
+        const normalized = stripAssetBase('downloads', event.target.value);
+        targetObj[key] = normalized;
+        if (input.value !== normalized) input.value = normalized;
         renderPreview();
     };
     const fileInput = document.createElement('input');
@@ -693,9 +1104,8 @@ function makeFileField(wrapper, targetObj, key, labelText, baseFolder) {
         const file = event.target.files?.[0];
         if (!file) return;
         const safeName = normalizeFileName(file.name);
-        const suggested = `${baseFolder}/${safeName}`;
-        input.value = suggested;
-        targetObj[key] = suggested;
+        input.value = safeName;
+        targetObj[key] = safeName;
         renderPreview();
     };
     row.appendChild(input);
@@ -715,8 +1125,9 @@ function createDownloadItem({ label = '', icon = '', href = '', group = 'downloa
 
 function queueDownloadDeletion(href) {
     if (!href || typeof href !== 'string') return;
-    if (!href.startsWith('assets/downloads/')) return;
-    pendingDownloadDeletes.add(href);
+    const resolved = resolveAssetPath('downloads', href);
+    if (!resolved.startsWith(getPaths().downloads)) return;
+    pendingDownloadDeletes.add(resolved);
 }
 
 function getDownloadGroups(contact, downloads = []) {
@@ -1001,6 +1412,7 @@ async function loadCV(preferGitHub = false, lockOnFail = true) {
             currentSHA = null;
             showMessage('cv.json carregado localmente.', 'info');
         }
+        normalizeAssetPaths();
         currentLang = currentCV.meta?.defaultLanguage || 'pt';
         currentSection = 'overview';
         renderSidebar();
@@ -1047,7 +1459,9 @@ function renderSidebar() {
     if (!sectionList.find((section) => section.id === currentSection) && sectionList.length) {
         currentSection = sectionList[0].id;
     }
-    sectionList.forEach(section => {
+    sectionList.forEach((section, index) => {
+        const row = document.createElement('div');
+        row.className = 'section-item';
         const btn = document.createElement('button');
         btn.type = 'button';
         const label = section.label || section.id;
@@ -1061,7 +1475,48 @@ function renderSidebar() {
             renderSectionEditor();
             renderPreview();
         };
-        uiNodes.sectionButtons.appendChild(btn);
+        row.appendChild(btn);
+
+        const actions = document.createElement('div');
+        actions.className = 'section-actions';
+        const upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.className = 'section-move';
+        upBtn.textContent = '↑';
+        upBtn.disabled = index === 0;
+        upBtn.onclick = (event) => {
+            event.stopPropagation();
+            moveSection(section.id, -1);
+        };
+        const downBtn = document.createElement('button');
+        downBtn.type = 'button';
+        downBtn.className = 'section-move';
+        downBtn.textContent = '↓';
+        downBtn.disabled = index === sectionList.length - 1;
+        downBtn.onclick = (event) => {
+            event.stopPropagation();
+            moveSection(section.id, 1);
+        };
+        actions.appendChild(upBtn);
+        actions.appendChild(downBtn);
+
+        if (!BASE_SECTIONS.includes(section.id)) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'section-remove';
+            removeBtn.setAttribute('aria-label', `Remover ${label}`);
+            removeBtn.textContent = '×';
+            removeBtn.onclick = (event) => {
+                event.stopPropagation();
+                if (confirm(`Remover a secção “${label}”?`)) {
+                    removeCustomSection(section.id);
+                }
+            };
+            actions.appendChild(removeBtn);
+        }
+
+        row.appendChild(actions);
+        uiNodes.sectionButtons.appendChild(row);
     });
 
     const activeSectionName = document.getElementById('active-section-name');
@@ -1259,7 +1714,8 @@ function renderDownloadsEditor() {
 
             const fileWrapper = document.createElement('div');
             fileWrapper.className = 'form-group';
-            makeFileField(fileWrapper, entry, 'href', 'Ficheiro (assets/downloads)', 'assets/downloads');
+            const downloadsBase = getPaths().downloads;
+            makeFileField(fileWrapper, entry, 'href', `Ficheiro (${downloadsBase})`, downloadsBase);
             fieldset.appendChild(fileWrapper);
 
             const removeBtn = document.createElement('button');
@@ -1327,6 +1783,7 @@ function renderSectionEditor() {
     appendNavigationFields(currentSection);
 
     const sectionContent = currentCV.localized?.[currentLang]?.[currentSection];
+    const pendingFieldsets = [];
 
     if (currentSection === 'overview') {
         appendProfilePhotoField({
@@ -1346,36 +1803,6 @@ function renderSectionEditor() {
             positionKey: 'contact_photo_position',
             positionLabel: 'Recorte (object-position) foto contacto'
         });
-
-        if (!currentCV.profile) currentCV.profile = {};
-        if (!currentCV.profile.social) currentCV.profile.social = {};
-        const linksFieldset = document.createElement('fieldset');
-        const linksLegend = document.createElement('legend');
-        linksLegend.textContent = 'Links';
-        linksFieldset.appendChild(linksLegend);
-        const fields = [
-            { key: 'email', label: 'Email (CTA)' },
-            { key: 'linkedin', label: 'LinkedIn' },
-            { key: 'github', label: 'GitHub' }
-        ];
-        fields.forEach((field) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'form-group';
-            const label = document.createElement('label');
-            label.textContent = field.label;
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = currentCV.profile.social[field.key] || '';
-            input.oninput = (event) => {
-                currentCV.profile.social[field.key] = event.target.value;
-                renderPreview();
-            };
-            wrapper.appendChild(label);
-            wrapper.appendChild(input);
-            linksFieldset.appendChild(wrapper);
-        });
-        uiNodes.editorForm.appendChild(linksFieldset);
-        renderDownloadsEditor();
     }
 
     const uiConfig = getUiConfig();
@@ -1412,85 +1839,77 @@ function renderSectionEditor() {
 
     if (currentSection === 'overview') {
         if (!currentCV.meta) currentCV.meta = {};
-        const metaFieldset = document.createElement('fieldset');
-        const metaLegend = document.createElement('legend');
-        metaLegend.textContent = 'Site (Meta)';
-        metaFieldset.appendChild(metaLegend);
-        const metaFields = [
-            { key: 'site_title', label: 'Título do site', defaultValue: currentCV.meta.site_title || document.title || '' },
-            { key: 'site_description', label: 'Descrição do site', multiline: true, defaultValue: currentCV.meta.site_description || (document.querySelector('meta[name="description"]')?.getAttribute('content') || '') },
-            { key: 'favicon', label: 'Favicon (path)', isImage: true, defaultValue: currentCV.meta.favicon || (document.getElementById('site-favicon')?.getAttribute('href') || 'assets/icons/favicon.ico') },
-            { key: 'apple_icon', label: 'Apple touch icon (path)', isImage: true, defaultValue: currentCV.meta.apple_icon || (document.getElementById('apple-touch-icon')?.getAttribute('href') || 'assets/icons/apple-touch-icon.png') }
-        ];
-        metaFields.forEach((field) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'form-group';
-            const label = document.createElement('label');
-            label.textContent = field.label;
-            wrapper.appendChild(label);
-            if (field.isImage) {
-                if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
-                makeImageField(wrapper, currentCV.meta, field.key, 'meta');
-            } else {
-                const input = field.multiline ? document.createElement('textarea') : document.createElement('input');
-                if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
-                input.value = currentCV.meta[field.key] || '';
-                input.oninput = (event) => {
-                    currentCV.meta[field.key] = event.target.value;
-                    renderPreview();
-                };
-                wrapper.appendChild(input);
-            }
-            metaFieldset.appendChild(wrapper);
+        pendingFieldsets.push(() => {
+            const iconsBase = getPaths().icons;
+            const metaFieldset = document.createElement('fieldset');
+            const metaLegend = document.createElement('legend');
+            metaLegend.textContent = 'Site (Meta)';
+            metaFieldset.appendChild(metaLegend);
+            const metaFields = [
+                { key: 'site_title', label: 'Título do site', defaultValue: currentCV.meta.site_title || document.title || '' },
+                { key: 'site_description', label: 'Descrição do site', multiline: true, defaultValue: currentCV.meta.site_description || (document.querySelector('meta[name="description"]')?.getAttribute('content') || '') },
+                { key: 'favicon', label: 'Favicon (path)', isImage: true, defaultValue: stripAssetBase('icons', currentCV.meta.favicon || (document.getElementById('site-favicon')?.getAttribute('href') || `${iconsBase}favicon.ico`)) },
+                { key: 'apple_icon', label: 'Apple touch icon (path)', isImage: true, defaultValue: stripAssetBase('icons', currentCV.meta.apple_icon || (document.getElementById('apple-touch-icon')?.getAttribute('href') || `${iconsBase}apple-touch-icon.png`)) }
+            ];
+            metaFields.forEach((field) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'form-group';
+                const label = document.createElement('label');
+                label.textContent = field.label;
+                wrapper.appendChild(label);
+                if (field.isImage) {
+                    if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
+                    makeImageField(wrapper, currentCV.meta, field.key, 'meta');
+                } else {
+                    const input = field.multiline ? document.createElement('textarea') : document.createElement('input');
+                    if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
+                    input.value = currentCV.meta[field.key] || '';
+                    input.oninput = (event) => {
+                        currentCV.meta[field.key] = event.target.value;
+                        renderPreview();
+                    };
+                    wrapper.appendChild(input);
+                }
+                metaFieldset.appendChild(wrapper);
+            });
+            uiNodes.editorForm.appendChild(metaFieldset);
         });
-        uiNodes.editorForm.appendChild(metaFieldset);
 
-        addUiFieldset('Textos de Identidade', [
+        pendingFieldsets.push(() => addUiFieldset('Textos de Identidade', [
             { key: 'marketing_label', label: 'Etiqueta de marketing' }
-        ]);
+        ]));
     }
 
     if (currentSection === 'development') {
-        addUiFieldset('Textos de Engenharia', [
+        pendingFieldsets.push(() => addUiFieldset('Textos de Engenharia', [
             { key: 'explore_skill_label', label: 'Texto “Explorar” dos cartões' },
             { key: 'drawer_skill_context_label', label: 'Título do bloco “Contexto”' },
             { key: 'drawer_skill_competencies_label', label: 'Título do bloco “Competências”' },
             { key: 'drawer_skill_default_history', label: 'Texto padrão de histórico', multiline: true },
-            { key: 'technologies_label', label: 'Etiqueta de tecnologias' },
-            { key: 'skill_tags', label: 'Tags de competências', type: 'array' }
-        ]);
+            { key: 'technologies_label', label: 'Etiqueta de tecnologias' }
+        ]));
     }
 
     if (currentSection === 'foundation') {
-        addUiFieldset('Textos de Fundação', [
-            { key: 'explore_experience_label', label: 'Texto “Explorar” dos cartões' },
-            { key: 'exp_trace_label', label: 'Etiqueta de trace' },
-            { key: 'exp_trace_status', label: 'Estado do trace' },
-            { key: 'exp_trace_mode_label', label: 'Etiqueta de modo' }
-        ]);
+        pendingFieldsets.push(() => addUiFieldset('Textos de Fundação', [
+            { key: 'explore_experience_label', label: 'Texto “Explorar” dos cartões' }
+        ]));
     }
 
     if (currentSection === 'mindset') {
-        addUiFieldset('Textos de Mentalidade', [
+        pendingFieldsets.push(() => addUiFieldset('Textos de Mentalidade', [
             { key: 'explore_mindset_label', label: 'Texto “Explorar” dos cartões' },
             { key: 'drawer_mindset_label', label: 'Título do drawer' },
             { key: 'drawer_mindset_story_label', label: 'Etiqueta da experiência pessoal' },
             { key: 'mindset_trace_label', label: 'Etiqueta do bloco final' },
             { key: 'mindset_trace_text', label: 'Texto do bloco final', multiline: true }
-        ]);
+        ]));
     }
 
     if (currentSection === 'contact') {
-        addUiFieldset('Chamada para ação', [
+        pendingFieldsets.push(() => addUiFieldset('Chamada para ação', [
             { key: 'cta_contact_label', label: 'Texto do botão CTA' }
-        ]);
-    }
-
-    const storyConfig = getStoryConfig(currentSection);
-    if (storyConfig) {
-        appendSectionImageFields(currentSection);
-        renderStoryEditor(storyConfig, { append: true });
-        return;
+        ]));
     }
 
     const content = sectionContent;
@@ -1505,12 +1924,94 @@ function renderSectionEditor() {
         return;
     }
 
-    const handledImageKeys = appendSectionImageFields(currentSection);
+    ensureCtaDefaults(content);
+    const orderedEntries = getOrderedEntries(currentSection, content);
+    const storyConfig = getStoryConfig(currentSection);
+    let storyRendered = false;
+    let ctaRendered = false;
+    let certsRendered = false;
+    const sectionType = getSectionType(currentSection);
 
-    Object.entries(content).forEach(([key, value]) => {
-        if (currentSection === 'contact' && key === 'download_groups') return;
-        if (handledImageKeys.has(key)) return;
-        if (key === 'cta_label' || key === 'cta_link') return;
+    const renderCertificationsFieldset = () => {
+        const locale = currentCV.localized?.[currentLang];
+        if (!locale) return;
+        if (!Array.isArray(locale.certifications)) {
+            locale.certifications = [];
+        }
+        const fieldset = document.createElement('fieldset');
+        const legend = document.createElement('legend');
+        legend.textContent = 'Certificações';
+        fieldset.appendChild(legend);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'form-group';
+        makeResourceListField(wrapper, locale, 'certifications', [...locale.certifications]);
+        fieldset.appendChild(wrapper);
+        uiNodes.editorForm.appendChild(fieldset);
+        certsRendered = true;
+    };
+
+    const renderContactLinks = () => {
+        if (!currentCV.profile) currentCV.profile = {};
+        if (!currentCV.profile.social) currentCV.profile.social = {};
+        const linksFieldset = document.createElement('fieldset');
+        const linksLegend = document.createElement('legend');
+        linksLegend.textContent = 'Links';
+        linksFieldset.appendChild(linksLegend);
+        const fields = [
+            { key: 'email', label: 'Email (CTA)' },
+            { key: 'linkedin', label: 'LinkedIn' },
+            { key: 'github', label: 'GitHub' }
+        ];
+        fields.forEach((field) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-group';
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentCV.profile.social[field.key] || '';
+            input.oninput = (event) => {
+                currentCV.profile.social[field.key] = event.target.value;
+                renderPreview();
+            };
+            wrapper.appendChild(label);
+            wrapper.appendChild(input);
+            linksFieldset.appendChild(wrapper);
+        });
+        uiNodes.editorForm.appendChild(linksFieldset);
+    };
+
+    orderedEntries.forEach(([key, value]) => {
+        if (currentSection === 'overview' && key === 'intro_text' && !certsRendered) {
+            renderCertificationsFieldset();
+        }
+        if (currentSection === 'contact' && key === 'download_groups') {
+            renderDownloadsEditor();
+            return;
+        }
+        if ((sectionType === 'development' && key === 'skills')
+            || (sectionType === 'foundation' && key === 'experience')
+            || (sectionType === 'mindset' && (key === 'blocks' || key === 'adoption'))) {
+            if (!storyRendered && storyConfig) {
+                renderStoryEditor(storyConfig, { append: true });
+                storyRendered = true;
+            }
+            return;
+        }
+        if (key === 'cta_label') {
+            if (!ctaRendered) {
+                appendCtaFields(currentSection, content);
+                ctaRendered = true;
+            }
+            return;
+        }
+        if (key === 'cta_link') {
+            if (!ctaRendered) {
+                appendCtaFields(currentSection, content);
+                ctaRendered = true;
+            }
+            return;
+        }
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
 
@@ -1550,6 +2051,20 @@ function renderSectionEditor() {
 
         uiNodes.editorForm.appendChild(wrapper);
     });
+
+    if (currentSection === 'overview' && !certsRendered) {
+        renderCertificationsFieldset();
+    }
+
+    if (storyConfig && !storyRendered) {
+        renderStoryEditor(storyConfig, { append: true });
+    }
+
+    if (currentSection === 'contact') {
+        renderContactLinks();
+    }
+
+    pendingFieldsets.forEach((fn) => fn());
 }
 
 function getStoryConfig(sectionKey) {
@@ -1629,6 +2144,7 @@ function renderStoryEditor(config, { append = false } = {}) {
                     focus_area: '',
                     context_text: '',
                     technologies: [],
+                    competencies: [],
                     background: '',
                     progress_status: '',
                     duration_hours: ''
@@ -1658,6 +2174,9 @@ function renderStoryEditor(config, { append = false } = {}) {
     const targetEntry = items[currentStoryIndex];
     if (!targetEntry) return;
     const targetItem = config.type === 'mindset' ? targetEntry.item : targetEntry;
+    if (config.type === 'skills' && !Array.isArray(targetItem.competencies)) {
+        targetItem.competencies = [];
+    }
 
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
@@ -1679,7 +2198,8 @@ function renderStoryEditor(config, { append = false } = {}) {
         renderPreview();
     };
 
-    Object.entries(targetItem).forEach(([key, value]) => {
+    getStoryOrderedKeys(config.type, targetItem).forEach((key) => {
+        const value = targetItem[key];
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
 
@@ -1993,7 +2513,7 @@ async function saveChanges() {
         currentSource = 'github';
         if (pendingDownloadDeletes.size) {
             const downloads = Array.isArray(currentCV.profile?.downloads) ? currentCV.profile.downloads : [];
-            const activeHrefs = new Set(downloads.map((item) => item?.href).filter(Boolean));
+            const activeHrefs = new Set(downloads.map((item) => resolveAssetPath('downloads', item?.href)).filter(Boolean));
             const toDelete = Array.from(pendingDownloadDeletes).filter((href) => !activeHrefs.has(href));
             const failed = [];
             for (const href of toDelete) {
@@ -2042,6 +2562,24 @@ function bindEvents() {
             if (!file) return;
             await restoreLocalConfigBackup(file);
             uiNodes.restoreFile.value = '';
+        });
+    }
+
+    if (uiNodes.exportJsonBtn) {
+        uiNodes.exportJsonBtn.addEventListener('click', () => {
+            downloadFullCVJson();
+        });
+    }
+
+    if (uiNodes.importJsonBtn && uiNodes.importJsonFile) {
+        uiNodes.importJsonBtn.addEventListener('click', () => {
+            uiNodes.importJsonFile.click();
+        });
+        uiNodes.importJsonFile.addEventListener('change', async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            await restoreFullCVJson(file);
+            uiNodes.importJsonFile.value = '';
         });
     }
 
@@ -2124,6 +2662,44 @@ async function downloadLocalConfigBackup() {
     URL.revokeObjectURL(link.href);
     link.remove();
     showMessage('Backup das configurações descarregado.', 'success');
+}
+
+function downloadFullCVJson() {
+    if (!currentCV) {
+        showMessage('Sem dados carregados para exportar.', 'error');
+        return;
+    }
+    const blob = new Blob([JSON.stringify(currentCV, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'cv.json';
+    document.body.appendChild(link);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    link.remove();
+    showMessage('cv.json exportado.', 'success');
+}
+
+async function restoreFullCVJson(file) {
+    try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed || typeof parsed !== 'object' || !parsed.localized || !parsed.profile) {
+            showMessage('JSON inválido: falta estrutura base do CV.', 'error');
+            return;
+        }
+        currentCV = parsed;
+        currentSource = 'local';
+        currentSHA = null;
+        pendingDownloadDeletes.clear();
+        normalizeAssetPaths();
+        renderSidebar();
+        renderSectionEditor();
+        renderPreview();
+        showMessage('cv.json importado com sucesso.', 'success');
+    } catch (error) {
+        showMessage('Erro ao importar cv.json.', 'error');
+    }
 }
 
 function parsePosition(value) {

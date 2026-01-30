@@ -9,10 +9,15 @@
       "en"
     ]
   },
+  "paths": {
+    "photos": "assets/photos/",
+    "downloads": "assets/downloads/",
+    "icons": "assets/icons/"
+  },
   "profile": {
-    "photo": "assets/photos/identity/profile-main.png",
-    "contact_photo": "assets/photos/contact/portrait-casual-2.png",
-    "work_photo": "assets/photos/engineering/work-desk.png",
+    "photo": "profile-main.png",
+    "contact_photo": "portrait-casual-2.png",
+    "work_photo": "work-desk.png",
     "social": {
       "linkedin": "https://www.linkedin.com/in/eliaspc/",
       "github": "https://github.com/eliaspc2",
@@ -22,48 +27,48 @@
       {
         "label": "CV Standard",
         "icon": "",
-        "href": "assets/downloads/cv-andre-camara.pdf",
+        "href": "cv-andre-camara.pdf",
         "group": "downloads"
       },
       {
         "label": "Extended CV",
         "icon": "",
-        "href": "assets/downloads/cv-extended-andre-camara.pdf",
+        "href": "cv-extended-andre-camara.pdf",
         "group": "downloads"
       },
       {
         "label": "Conteúdo Programático (EFA)",
         "icon": "",
-        "href": "assets/downloads/efa-program-content.pdf",
+        "href": "efa-program-content.pdf",
         "group": "downloads"
       },
       {
         "label": "Python I (Helsinki)",
         "icon": "",
-        "href": "assets/downloads/cert-python-intro-helsinki.png",
+        "href": "cert-python-intro-helsinki.png",
         "group": "certs"
       },
       {
         "label": "Python II (Helsinki)",
         "icon": "",
-        "href": "assets/downloads/cert-python-adv-helsinki.png",
+        "href": "cert-python-adv-helsinki.png",
         "group": "certs"
       },
       {
         "label": "Marketing Digital",
         "icon": "",
-        "href": "assets/downloads/cert-marketing-digital.pdf",
+        "href": "cert-marketing-digital.pdf",
         "group": "certs"
       }
     ],
     "certifications": [
       {
         "label": "Python Programming I (University of Helsinki)",
-        "href": "assets/downloads/cert-python-intro-helsinki.png"
+        "href": "cert-python-intro-helsinki.png"
       },
       {
         "label": "Python Programming II (University of Helsinki)",
-        "href": "assets/downloads/cert-python-adv-helsinki.png"
+        "href": "cert-python-adv-helsinki.png"
       }
     ]
   },
@@ -89,9 +94,6 @@
         "drawer_skill_default_history": "Consolidação activa através de formação contínua e aplicação prática.",
         "drawer_mindset_label": "Lógica Humana & Engenharia",
         "drawer_mindset_story_label": "A Experiência Pessoal",
-        "exp_trace_label": "[ REGISTO: MINDSET_INFRA ]",
-        "exp_trace_status": "STATUS: Robustez_Verificada",
-        "exp_trace_mode_label": "MODO",
         "mindset_trace_label": "",
         "mindset_trace_text": "O que trago da minha vida pessoal para o trabalho é disciplina no processo, atenção ao detalhe e consistência. Isso mostra que valorizo o tempo certo, a prevenção e o cuidado contínuo — e aplico essa lógica todos os dias no software.",
         "skill_tags": [
@@ -103,11 +105,11 @@
       "certifications": [
         {
           "label": "Python Programming I (Universidade de Helsínquia)",
-          "href": "assets/downloads/cert-python-intro-helsinki.png"
+          "href": "cert-python-intro-helsinki.png"
         },
         {
           "label": "Python Programming II (Universidade de Helsínquia)",
-          "href": "assets/downloads/cert-python-adv-helsinki.png"
+          "href": "cert-python-adv-helsinki.png"
         }
       ],
       "overview": {
@@ -136,7 +138,7 @@
       "development": {
         "title": "Engenharia de Software",
         "description": "Foco em Python e na arte de simplificar o complexo. Para mim, o código é uma ferramenta de estabilidade.",
-        "image": "assets/photos/engineering/work-desk.png",
+        "image": "work-desk.png",
         "image_alt": "Ambiente de trabalho",
         "skills": [
           {
@@ -164,7 +166,7 @@
             ],
             "resource": {
               "label": "Conteúdo Programático — Curso de Programação",
-              "href": "assets/downloads/efa-program-content.pdf"
+              "href": "efa-program-content.pdf"
             },
             "title": "Formação EFA Programador",
             "focus_area": "Desenvolvimento Fullstack",
@@ -182,7 +184,7 @@
       "foundation": {
         "title": "Fundação Técnica",
         "description": "Duas décadas de evolução. Da infraestrutura crítica à engenharia de software.",
-        "image": "assets/photos/foundation/foundation-circle.jpg",
+        "image": "foundation-circle.jpg",
         "image_alt": "Rosto e mãos — base técnica",
         "challenge_label": "O Desafio",
         "learning_label": "Aprendizagem Central",
@@ -268,7 +270,7 @@
           "id": "adocao",
           "title": "Responsabilidade Estrutural e Compromisso a Longo Prazo",
           "icon": "🧭",
-          "image": "assets/photos/mindset/adoption-family.png",
+          "image": "adoption-family.png",
           "principle_title": "Estabilidade e Processo",
           "story_text": "O meu filho foi adotado há 4 anos. A adoção foi um processo longo, estruturado, exigente e regulado, que exige paciência, previsibilidade, estabilidade emocional e consistência de rotinas.",
           "engineering_note": "Para mim, isto é prova de competências humanas elevadas — compromisso a longo prazo, organização, disciplina e cumprimento rigoroso de processos. As mesmas competências que aplico em sistemas críticos, projetos longos e código que não pode falhar."
@@ -278,7 +280,7 @@
             "id": "pao",
             "title": "Pão & Dependências",
             "icon": "🍞",
-            "image": "assets/photos/mindset/bread-making.png",
+            "image": "bread-making.png",
             "principle_title": "Fermentação Lenta",
             "story_text": "No pão artesanal, saltar etapas é destruir o resultado. O tempo de fermentação é uma dependência que não pode ser apressada sem comprometer a estrutura.",
             "engineering_note": "Em software, arquitecturas robustas requerem o tempo certo de design e validação. Respeitar as dependências e o tempo de maturação do código evita dívida técnica catastrófica."
@@ -287,7 +289,7 @@
             "id": "pizza",
             "title": "Pizza & Iteração",
             "icon": "🍕",
-            "image": "assets/photos/mindset/cooking.png",
+            "image": "cooking.png",
             "image_position": "center 20%",
             "principle_title": "Feedback Incremental",
             "story_text": "Uma pizza perfeita é o resultado de pequenos ajustes em cada fornada. Temperatura, hidratação, tempo — cada detalhe é afinado com base no resultado anterior.",
@@ -297,7 +299,7 @@
             "id": "manutencao",
             "title": "Manutenção & Prevenção",
             "icon": "💅",
-            "image": "assets/photos/mindset/nails-gel.png",
+            "image": "nails-gel.png",
             "image_position": "center 55%",
             "principle_title": "Cuidado Preventivo",
             "story_text": "A manutenção das unhas de gel ensinou-me que prevenir é mais barato do que reparar. Pequenos cuidados frequentes evitam falhas maiores e preservam a integridade — não é estética, é manutenção contínua.",
@@ -307,7 +309,7 @@
             "id": "marketing",
             "title": "Marketing & Consciência de Produto",
             "icon": "📣",
-            "image": "assets/photos/mindset/marketing-digital.webp",
+            "image": "marketing-digital.webp",
             "principle_title": "Valor Antes da Tecnologia",
             "story_text": "O contacto inicial com marketing digital não foi planeado. Surgiu durante a formação em unhas de gel: a maioria das manicures trabalha sozinha, por isso o curso incluía noções de marketing. A exposição contínua ao tema levou-me ao estudo autónomo e à curiosidade técnica. Para mim, marketing não é carreira paralela — é consciência de produto.",
             "engineering_note": "Essa consciência traduz-se em três pilares na informática: pensar no utilizador final, comunicar com clareza e entregar valor antes da tecnologia."
@@ -316,7 +318,7 @@
             "id": "leis",
             "title": "Leis & Sistemas",
             "icon": "🗳️",
-            "image": "assets/photos/mindset/elections-icon.jpg",
+            "image": "elections-icon.jpg",
             "principle_title": "Sistemas Determinísticos",
             "story_text": "O meu interesse por leis e sistemas eleitorais não é político. É fascínio por regras explícitas, precisão processual e integridade de sistemas. Num processo eleitoral, cada passo é validado para garantir confiança no resultado.",
             "engineering_note": "Vejo isto como um exercício cognitivo estruturado, semelhante a uma auditoria de sistemas: dados íntegros, transições auditáveis e regras claras em cada etapa."
@@ -330,7 +332,7 @@
       "now": {
         "title": "O que procuro neste momento",
         "cta_label": "Vamos conversar",
-        "image": "assets/photos/now/now-portrait.png",
+        "image": "now-portrait.png",
         "image_alt": "Perfil profissional",
         "summary": "Procuro uma entidade acolhedora para o estágio curricular obrigatório (210h) do EFA – Programador Informático.",
         "details": "A componente teórica termina no final de junho e o estágio pode iniciar a partir de junho de 2026. O estágio é acompanhado pela entidade formadora, com plano individual e objetivos definidos. Procuro um contexto real de desenvolvimento ou sistemas, com preferência por remoto (todo o país) e alternativa híbrida na zona de Bragança. Ao longo da formação já tive contacto prático com programação, por isso o estágio não começa do zero. O contacto serve para alinharmos expectativas e enquadramento.",
@@ -385,9 +387,6 @@
         "drawer_skill_default_history": "Consolidación activa mediante formación continua y aplicación práctica.",
         "drawer_mindset_label": "Lógica Humana & Ingeniería",
         "drawer_mindset_story_label": "La Experiencia Personal",
-        "exp_trace_label": "[ REGISTRO: MENTALIDAD_INFRA ]",
-        "exp_trace_status": "ESTADO: Robustez_Verificada",
-        "exp_trace_mode_label": "MODO",
         "mindset_trace_label": "",
         "mindset_trace_text": "Lo que llevo de mi vida personal al trabajo es disciplina en el proceso, atención al detalle y consistencia. Eso muestra que valoro el tiempo correcto, la prevención y el cuidado continuo — y aplico esa lógica cada día en el software.",
         "skill_tags": [
@@ -399,11 +398,11 @@
       "certifications": [
         {
           "label": "Python Programming I (Universidad de Helsinki)",
-          "href": "assets/downloads/cert-python-intro-helsinki.png"
+          "href": "cert-python-intro-helsinki.png"
         },
         {
           "label": "Python Programming II (Universidad de Helsinki)",
-          "href": "assets/downloads/cert-python-adv-helsinki.png"
+          "href": "cert-python-adv-helsinki.png"
         }
       ],
       "overview": {
@@ -432,7 +431,7 @@
       "development": {
         "title": "Ingeniería de Software",
         "description": "Foco en Python y en el arte de simplificar lo complejo. Para mí, el código es una herramienta de estabilidad.",
-        "image": "assets/photos/engineering/work-desk.png",
+        "image": "work-desk.png",
         "image_alt": "Entorno de trabajo",
         "skills": [
           {
@@ -460,7 +459,7 @@
             ],
             "resource": {
               "label": "Contenido Programático — Curso de Programación",
-              "href": "assets/downloads/efa-program-content.pdf"
+              "href": "efa-program-content.pdf"
             },
             "title": "Formación EFA Programador",
             "focus_area": "Desarrollo Fullstack",
@@ -478,7 +477,7 @@
       "foundation": {
         "title": "Fundación Técnica",
         "description": "Dos décadas de evolución. De la infraestructura crítica a la ingeniería de software.",
-        "image": "assets/photos/foundation/foundation-circle.jpg",
+        "image": "foundation-circle.jpg",
         "image_alt": "Rostro y manos — base técnica",
         "challenge_label": "El Desafío",
         "learning_label": "Aprendizaje Central",
@@ -564,7 +563,7 @@
           "id": "adopcion",
           "title": "Responsabilidad Estructural y Compromiso a Largo Plazo",
           "icon": "🧭",
-          "image": "assets/photos/mindset/adoption-family.png",
+          "image": "adoption-family.png",
           "principle_title": "Estabilidad y Proceso",
           "story_text": "Mi hijo fue adoptado hace 4 años. La adopción fue un proceso largo, estructurado, exigente y regulado, que requiere paciencia, previsibilidad, estabilidad emocional y consistencia de rutinas.",
           "engineering_note": "Para mí, esto es una prueba de competencias humanas elevadas: compromiso a largo plazo, organización, disciplina y cumplimiento riguroso de procesos. Las mismas competencias que aplico en sistemas críticos, proyectos largos y código que no puede fallar."
@@ -574,7 +573,7 @@
             "id": "pao",
             "title": "Pan & Dependencias",
             "icon": "🍞",
-            "image": "assets/photos/mindset/bread-making.png",
+            "image": "bread-making.png",
             "principle_title": "Fermentación Lenta",
             "story_text": "En el pan artesanal, saltarse etapas destruye el resultado. El tiempo de fermentación es una dependencia que no se puede acelerar sin comprometer la estructura.",
             "engineering_note": "En software, arquitecturas robustas requieren el tiempo correcto de diseño y validación. Respetar dependencias y el tiempo de maduración del código evita deuda técnica catastrófica."
@@ -583,7 +582,7 @@
             "id": "pizza",
             "title": "Pizza & Iteración",
             "icon": "🍕",
-            "image": "assets/photos/mindset/cooking.png",
+            "image": "cooking.png",
             "image_position": "center 20%",
             "principle_title": "Feedback Incremental",
             "story_text": "Una pizza perfecta es el resultado de pequeños ajustes en cada hornada. Temperatura, hidratación, tiempo — cada detalle se afina con base en el resultado anterior.",
@@ -593,7 +592,7 @@
             "id": "manutencao",
             "title": "Mantenimiento & Prevención",
             "icon": "💅",
-            "image": "assets/photos/mindset/nails-gel.png",
+            "image": "nails-gel.png",
             "image_position": "center 55%",
             "principle_title": "Cuidado Preventivo",
             "story_text": "El mantenimiento de uñas de gel me enseñó que prevenir es más barato que reparar. Pequeños cuidados frecuentes evitan fallos mayores y preservan la integridad — no es estética, es mantenimiento continuo.",
@@ -603,7 +602,7 @@
             "id": "marketing",
             "title": "Marketing & Conciencia de Producto",
             "icon": "📣",
-            "image": "assets/photos/mindset/marketing-digital.webp",
+            "image": "marketing-digital.webp",
             "principle_title": "Valor Antes de la Tecnología",
             "story_text": "El contacto inicial con el marketing digital no fue planeado. Surgió durante la formación en uñas de gel: la mayoría de las manicuras trabaja sola, por eso el curso incluía nociones de marketing. La exposición continua al tema me llevó al estudio autónomo y a la curiosidad técnica. Para mí, el marketing no es una carrera paralela: es conciencia de producto.",
             "engineering_note": "Esa conciencia se traduce en tres pilares en la informática: pensar en el usuario final, comunicar con claridad y entregar valor antes que tecnología."
@@ -612,7 +611,7 @@
             "id": "leis",
             "title": "Leyes & Sistemas",
             "icon": "🗳️",
-            "image": "assets/photos/mindset/elections-icon.jpg",
+            "image": "elections-icon.jpg",
             "principle_title": "Sistemas Deterministas",
             "story_text": "Mi interés por leyes y sistemas electorales no es político. Es fascinación por reglas explícitas, precisión procesal e integridad de sistemas. En un proceso electoral, cada paso se valida para garantizar confianza en el resultado.",
             "engineering_note": "Lo veo como un ejercicio cognitivo estructurado, similar a una auditoría de sistemas: datos íntegros, transiciones auditables y reglas claras en cada etapa."
@@ -626,7 +625,7 @@
       "now": {
         "title": "Qué busco en este momento",
         "cta_label": "Hablemos",
-        "image": "assets/photos/now/now-portrait.png",
+        "image": "now-portrait.png",
         "image_alt": "Perfil profesional",
         "summary": "Busco una entidad acogedora para las prácticas curriculares obligatorias (210h) del EFA – Programador Informático.",
         "details": "La parte teórica termina a finales de junio y las prácticas pueden comenzar a partir de junio de 2026. Las prácticas están acompañadas por la entidad formadora, con plan individual y objetivos definidos. Busco un contexto real de desarrollo o sistemas, con preferencia por remoto (todo el país) y alternativa híbrida en la zona de Bragança. A lo largo de la formación ya tuve contacto práctico con programación, así que las prácticas no empiezan de cero. El contacto sirve para alinear expectativas y encuadre.",
@@ -681,9 +680,6 @@
         "drawer_skill_default_history": "Consolidation through continuous training and hands-on application.",
         "drawer_mindset_label": "Human Logic & Engineering",
         "drawer_mindset_story_label": "Personal Experience",
-        "exp_trace_label": "[ TRACE_LOG: INFRASTRUCTURE_MINDSET ]",
-        "exp_trace_status": "STATUS: Verified_Robust",
-        "exp_trace_mode_label": "MODE",
         "mindset_trace_label": "",
         "mindset_trace_text": "What I bring from my personal life to work is process discipline, attention to detail, and consistency. It shows that I value the right timing, prevention, and continuous care — and I apply that logic every day in software.",
         "skill_tags": [
@@ -695,11 +691,11 @@
       "certifications": [
         {
           "label": "Python Programming I (University of Helsinki)",
-          "href": "assets/downloads/cert-python-intro-helsinki.png"
+          "href": "cert-python-intro-helsinki.png"
         },
         {
           "label": "Python Programming II (University of Helsinki)",
-          "href": "assets/downloads/cert-python-adv-helsinki.png"
+          "href": "cert-python-adv-helsinki.png"
         }
       ],
       "overview": {
@@ -728,7 +724,7 @@
       "development": {
         "title": "Software Engineering",
         "description": "Focused on Python and on simplifying the complex. To me, code is a tool for stability.",
-        "image": "assets/photos/engineering/work-desk.png",
+        "image": "work-desk.png",
         "image_alt": "Work environment",
         "skills": [
           {
@@ -756,7 +752,7 @@
             ],
             "resource": {
               "label": "Program Content — Programming Course",
-              "href": "assets/downloads/efa-program-content.pdf"
+              "href": "efa-program-content.pdf"
             },
             "title": "EFA Programmer Program",
             "focus_area": "Fullstack Development",
@@ -774,7 +770,7 @@
       "foundation": {
         "title": "Technical Foundation",
         "description": "Two decades of evolution. From critical infrastructure to software engineering.",
-        "image": "assets/photos/foundation/foundation-circle.jpg",
+        "image": "foundation-circle.jpg",
         "image_alt": "Face and hands — technical foundation",
         "challenge_label": "The Challenge",
         "learning_label": "Core Learning",
@@ -860,7 +856,7 @@
           "id": "adoption",
           "title": "Structural Responsibility and Long-Term Commitment",
           "icon": "🧭",
-          "image": "assets/photos/mindset/adoption-family.png",
+          "image": "adoption-family.png",
           "principle_title": "Stability and Process",
           "story_text": "My son was adopted 4 years ago. The adoption was a long, structured, demanding, and regulated process that requires patience, predictability, emotional stability, and consistent routines.",
           "engineering_note": "For me, this proves high-level human skills: long-term commitment, organization, discipline, and strict compliance with processes. The same skills I apply to critical systems, long projects, and code that cannot fail."
@@ -870,7 +866,7 @@
             "id": "pao",
             "title": "Bread & Dependencies",
             "icon": "🍞",
-            "image": "assets/photos/mindset/bread-making.png",
+            "image": "bread-making.png",
             "principle_title": "Slow Fermentation",
             "story_text": "In artisanal bread, skipping steps destroys the result. Fermentation time is a dependency that cannot be rushed without compromising structure.",
             "engineering_note": "In software, robust architectures require the right time for design and validation. Respecting dependencies and code maturation prevents catastrophic technical debt."
@@ -879,7 +875,7 @@
             "id": "pizza",
             "title": "Pizza & Iteration",
             "icon": "🍕",
-            "image": "assets/photos/mindset/cooking.png",
+            "image": "cooking.png",
             "image_position": "center 20%",
             "principle_title": "Incremental Feedback",
             "story_text": "A perfect pizza is the result of small adjustments in each batch. Temperature, hydration, time — each detail is refined based on the previous result.",
@@ -889,7 +885,7 @@
             "id": "manutencao",
             "title": "Maintenance & Prevention",
             "icon": "💅",
-            "image": "assets/photos/mindset/nails-gel.png",
+            "image": "nails-gel.png",
             "image_position": "center 55%",
             "principle_title": "Preventive Care",
             "story_text": "Gel nail maintenance taught me that prevention is cheaper than repair. Small, frequent care avoids larger failures and preserves integrity — it’s not aesthetics, it’s continuous maintenance.",
@@ -899,7 +895,7 @@
             "id": "marketing",
             "title": "Marketing & Product Awareness",
             "icon": "📣",
-            "image": "assets/photos/mindset/marketing-digital.webp",
+            "image": "marketing-digital.webp",
             "principle_title": "Value Before Technology",
             "story_text": "My first contact with digital marketing was unplanned. It emerged during gel nail training: most nail technicians work alone, so the course included marketing basics. Continued exposure led me to self-study and technical curiosity. For me, marketing is not a parallel career — it is product awareness.",
             "engineering_note": "That awareness translates into three pillars in software: thinking about the end user, communicating clearly, and delivering value before technology."
@@ -908,7 +904,7 @@
             "id": "leis",
             "title": "Laws & Systems",
             "icon": "🗳️",
-            "image": "assets/photos/mindset/elections-icon.jpg",
+            "image": "elections-icon.jpg",
             "principle_title": "Deterministic Systems",
             "story_text": "My interest in laws and electoral systems is not political. It’s a fascination with explicit rules, procedural precision, and system integrity. In an electoral process, every step is validated to ensure trust in the outcome.",
             "engineering_note": "I see this as a structured cognitive exercise, similar to a systems audit: intact data, auditable transitions, and clear rules at every stage."
@@ -922,7 +918,7 @@
       "now": {
         "title": "What I’m looking for right now",
         "cta_label": "Let’s talk",
-        "image": "assets/photos/now/now-portrait.png",
+        "image": "now-portrait.png",
         "image_alt": "Professional portrait",
         "summary": "I’m looking for a host organization for the mandatory 210-hour curricular internship in the EFA – Programmer program.",
         "details": "The theoretical phase ends at the end of June, and the internship can start from June 2026. It is supervised by the training entity, with an individual plan and defined objectives. I’m looking for a real development or systems context, preferably remote (nationwide) with a hybrid alternative in the Bragança area. I’ve already had practical programming contact during the course, so the internship doesn’t start from zero. The contact is to align expectations and fit.",

@@ -29,6 +29,12 @@ const BASE_SECTIONS = [
     { id: 'contact', type: 'contact' }
 ];
 
+const DEFAULT_PATHS = {
+    photos: 'assets/photos/',
+    downloads: 'assets/downloads/',
+    icons: 'assets/icons/'
+};
+
 const NAV_TYPE_ICONS = {
     overview: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
     development: `<svg class="nav-icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
@@ -37,6 +43,30 @@ const NAV_TYPE_ICONS = {
     now: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 12h7l2 3h9"/><path d="M3 12l2-3h6"/><circle cx="19" cy="12" r="2"/></svg>`,
     contact: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`
 };
+
+function normalizeBasePath(value, fallback) {
+    const base = value || fallback;
+    if (!base) return '';
+    return base.endsWith('/') ? base : `${base}/`;
+}
+
+function getPaths() {
+    if (!cvData?.paths) return { ...DEFAULT_PATHS };
+    return {
+        photos: normalizeBasePath(cvData.paths.photos, DEFAULT_PATHS.photos),
+        downloads: normalizeBasePath(cvData.paths.downloads, DEFAULT_PATHS.downloads),
+        icons: normalizeBasePath(cvData.paths.icons, DEFAULT_PATHS.icons)
+    };
+}
+
+function resolveAssetPath(type, value) {
+    if (!value) return '';
+    const text = String(value);
+    if (/^(https?:|data:|mailto:|tel:)/.test(text)) return text;
+    if (text.includes('/')) return text;
+    const paths = getPaths();
+    return `${paths[type] || ''}${text}`;
+}
 
 function getContactHref(profile) {
     const email = profile?.social?.email || 'eliaspc2@gmail.com';
@@ -93,9 +123,38 @@ function getCustomSections() {
     return Array.isArray(cvData.meta.custom_sections) ? cvData.meta.custom_sections : [];
 }
 
+function getSectionOrder() {
+    const custom = getCustomSections();
+    const customIds = custom.map((section) => section.id);
+    const baseIds = BASE_SECTIONS.map((section) => section.id);
+    const expected = [...baseIds, ...customIds];
+    if (!cvData?.meta?.section_order || !Array.isArray(cvData.meta.section_order)) {
+        return expected;
+    }
+    const seen = new Set();
+    const ordered = [];
+    cvData.meta.section_order.forEach((id) => {
+        if (expected.includes(id) && !seen.has(id)) {
+            ordered.push(id);
+            seen.add(id);
+        }
+    });
+    expected.forEach((id) => {
+        if (!seen.has(id)) {
+            ordered.push(id);
+            seen.add(id);
+        }
+    });
+    return ordered;
+}
+
 function getSectionMetaList() {
     const custom = getCustomSections();
-    return [...BASE_SECTIONS, ...custom.map((section) => ({ id: section.id, type: section.type }))];
+    const customMap = new Map(custom.map((section) => [section.id, section.type]));
+    return getSectionOrder().map((id) => ({
+        id,
+        type: customMap.get(id) || id
+    }));
 }
 
 function ensureDynamicSections(locale) {
@@ -163,7 +222,7 @@ async function bootstrap() {
         // Set sidebar photo
         const sidebarPhoto = document.getElementById('sidebar-photo');
         if (sidebarPhoto && cvData.profile.photo) {
-            sidebarPhoto.src = cvData.profile.photo;
+            sidebarPhoto.src = resolveAssetPath('photos', cvData.profile.photo);
             sidebarPhoto.style.objectPosition = cvData.profile.photo_position || 'center 20%';
             const zoom = Number(cvData.profile.photo_zoom || 1);
             sidebarPhoto.style.transform = zoom !== 1 ? `scale(${zoom})` : '';
@@ -328,8 +387,8 @@ function updatePageMeta(locale) {
     const ui = locale?.ui || {};
     const title = ui.page_title || meta.site_title;
     const description = ui.page_description || meta.site_description;
-    const favicon = meta.favicon;
-    const appleIcon = meta.apple_icon;
+    const favicon = resolveAssetPath('icons', meta.favicon);
+    const appleIcon = resolveAssetPath('icons', meta.apple_icon);
 
     if (title) {
         document.title = title;
@@ -497,7 +556,7 @@ function renderOverview(data, container, sectionId = 'overview') {
             <div class="hero-header-flex" style="display:flex; align-items:center; gap:2.5rem; margin-bottom:4rem; flex-wrap:wrap;">
                 <div class="profile-group" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
                     <div class="profile-circle large" style="width:140px; height:140px; border-width:3px; box-shadow: var(--shadow-md);">
-                        <img src="${profile.photo}" alt="André Câmara" loading="lazy" decoding="async" style="object-position:${profile.photo_position || 'center 20%'}; ${getImageTransform(profile.photo_zoom)}">
+                        <img src="${resolveAssetPath('photos', profile.photo)}" alt="André Câmara" loading="lazy" decoding="async" style="object-position:${profile.photo_position || 'center 20%'}; ${getImageTransform(profile.photo_zoom)}">
                     </div>
                 </div>
                 <div style="flex:1; min-width:300px;">
@@ -509,7 +568,7 @@ function renderOverview(data, container, sectionId = 'overview') {
                     ${certifications.length ? `
                         <div class="cert-badges">
                             ${certifications.map(cert => `
-                                <a class="cert-chip" href="${cert.href}" target="_blank" rel="noopener">
+                                <a class="cert-chip" href="${resolveAssetPath('downloads', cert.href)}" target="_blank" rel="noopener">
                                     ${cert.label}
                                 </a>
                             `).join('')}
@@ -584,7 +643,7 @@ function renderDevelopment(data, container, sectionId = 'development') {
             ${data.image ? `
                 <div class="development-layout">
                     <div class="development-image">
-                        <img src="${data.image}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
+                        <img src="${resolveAssetPath('photos', data.image)}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
                     </div>
                     <div class="development-cards">
                         ${skillsHtml}
@@ -619,7 +678,7 @@ function renderFoundation(data, container, sectionId = 'foundation') {
             <div class="section-header foundation-header">
                 ${data.image ? `
                     <div class="foundation-circle">
-                        <img src="${data.image}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
+                        <img src="${resolveAssetPath('photos', data.image)}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
                     </div>
                 ` : ''}
                 <div class="foundation-text">
@@ -674,7 +733,7 @@ function renderMindset(data, container, sectionId = 'mindset') {
                 ${allBlocks.map((block, index) => `
                     <div class="rich-card mindset-card ${block.id === 'adocao' || block.id === 'adopcion' || block.id === 'adoption' ? 'adoption-card' : ''}" onclick="app.showDetail('mindset', ${index}, '${sectionId}')" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="height: 200px; background: var(--border); overflow: hidden; position: relative;">
-                            ${block.image ? `<img src="${block.image}" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover; object-position: ${block.image_position || 'center 20%'}; ${getImageTransform(block.image_zoom)} opacity: 0.8; transition: var(--transition);">` : `
+                            ${block.image ? `<img src="${resolveAssetPath('photos', block.image)}" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover; object-position: ${block.image_position || 'center 20%'}; ${getImageTransform(block.image_zoom)} opacity: 0.8; transition: var(--transition);">` : `
                                 <div style="display:flex; align-items:center; justify-content:center; height:100%; font-size: 5rem;">${block.icon}</div>
                             `}
                             <div style="position: absolute; bottom: 1rem; left: 1rem; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;">
@@ -723,8 +782,9 @@ function renderContact(data, locale, container, sectionId = 'contact') {
     const renderDownloadItem = (item, fallbackIcon, { openInNewTab = false } = {}) => {
         if (!item.href) return '';
         const attrs = openInNewTab ? 'target="_blank" rel="noopener"' : 'download';
+        const href = resolveAssetPath('downloads', item.href);
         return `
-            <a href="${item.href}" ${attrs} class="download-item nav-item">
+            <a href="${href}" ${attrs} class="download-item nav-item">
                 ${renderDownloadIcon(item, fallbackIcon)}
                 <span>${item.label || item.href}</span>
             </a>
@@ -775,7 +835,7 @@ function renderContact(data, locale, container, sectionId = 'contact') {
         <div class="contact-hero">
             <div style="margin-bottom:3rem; display:flex; flex-direction:column; align-items:center;">
                 <div class="profile-circle" style="width:120px; height:120px; border-width:2px; margin-bottom:1.5rem; box-shadow: var(--shadow-md);">
-                    <img src="${profile.contact_photo || profile.photo}" alt="André Câmara" loading="lazy" decoding="async" style="object-position:${profile.contact_photo_position || profile.photo_position || 'center 20%'}; ${getImageTransform(profile.contact_photo_zoom || profile.photo_zoom)}">
+                    <img src="${resolveAssetPath('photos', profile.contact_photo || profile.photo)}" alt="André Câmara" loading="lazy" decoding="async" style="object-position:${profile.contact_photo_position || profile.photo_position || 'center 20%'}; ${getImageTransform(profile.contact_photo_zoom || profile.photo_zoom)}">
                 </div>
                 <p class="dim-label" style="letter-spacing:0.1em; margin-bottom:1rem;">${data.email_label}</p>
                 <h2 style="margin-bottom:1rem;">${data.title}</h2>
@@ -824,7 +884,7 @@ function renderNow(data, container, sectionId = 'now') {
             <div class="now-layout">
                 ${data.image ? `
                     <div class="now-media">
-                        <img src="${data.image}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
+                        <img src="${resolveAssetPath('photos', data.image)}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
                     </div>
                 ` : ''}
                 <div class="now-card">
@@ -863,7 +923,7 @@ function showDetail(type, index, contextSection) {
             </div>
             ${item.resource ? `
                 <div style="margin-top:2.5rem;">
-                    <a href="${item.resource.href}" class="resource-btn" target="_blank" rel="noopener" download>${item.resource.label}</a>
+                    <a href="${resolveAssetPath('downloads', item.resource.href)}" class="resource-btn" target="_blank" rel="noopener" download>${item.resource.label}</a>
                 </div>
             ` : ''}
 
@@ -875,11 +935,11 @@ function showDetail(type, index, contextSection) {
                     </div>
                 </div>
             ` : ''}
-            ${ui.skill_tags && ui.skill_tags.length ? `
+            ${(item.competencies && item.competencies.length) || (ui.skill_tags && ui.skill_tags.length) ? `
                 <div style="margin-top:2rem; padding:2rem; background:var(--bg-app); border-radius:12px;">
                     <h4 style="margin-bottom:1rem; font-size:0.9rem;">${ui.drawer_skill_competencies_label || ''}</h4>
                     <ul style="list-style:none; display:flex; flex-wrap:wrap; gap:8px;">
-                        ${ui.skill_tags.map(tag => `
+                        ${(item.competencies && item.competencies.length ? item.competencies : ui.skill_tags || []).map(tag => `
                             <li style="padding:6px 12px; background:white; border:1px solid var(--border); border-radius:20px; font-size:0.75rem; font-weight:600;">${tag}</li>
                         `).join('')}
                     </ul>
@@ -941,7 +1001,7 @@ function showDetail(type, index, contextSection) {
             <h2 style="margin-top:0.5rem; margin-bottom: 2rem;">${item.title}</h2>
             ${item.image ? `
                 <div style="margin-bottom:2.5rem;">
-                    <img src="${item.image}" alt="${item.title}" loading="lazy" decoding="async" style="width:100%; max-width:520px; border-radius:16px; border:1px solid var(--border); box-shadow: var(--shadow-sm); object-position:${item.image_position || 'center 20%'}; ${getImageTransform(item.image_zoom)}">
+                    <img src="${resolveAssetPath('photos', item.image)}" alt="${item.title}" loading="lazy" decoding="async" style="width:100%; max-width:520px; border-radius:16px; border:1px solid var(--border); box-shadow: var(--shadow-sm); object-position:${item.image_position || 'center 20%'}; ${getImageTransform(item.image_zoom)}">
                 </div>
             ` : ''}
             

@@ -321,6 +321,42 @@
             gap: 0.5rem;
         }
 
+        .section-item {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .section-item button:first-child {
+            flex: 1 1 auto;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+        }
+
+        .section-move {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #cbd5f5;
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .section-move:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         .lang-buttons button,
         .section-buttons button {
             background: white;
@@ -344,6 +380,31 @@
             text-align: left;
             padding: 0.7rem 1.2rem;
             border-radius: 8px;
+        }
+
+        .sidebar-action {
+            margin-top: 0.5rem;
+        }
+
+        .section-remove {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid #cbd5f5;
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .section-remove:hover {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #b91c1c;
         }
 
         .panel-actions-row {
@@ -548,7 +609,18 @@
         .emoji-actions {
             display: flex;
             justify-content: flex-end;
+            gap: 0.5rem;
             margin-top: 0.75rem;
+        }
+
+        .emoji-modal .panel-action {
+            width: auto;
+            text-align: center;
+            padding: 0.55rem 1rem;
+        }
+
+        .emoji-close {
+            background: #f8fafc;
         }
 
         .template-overlay {
@@ -646,6 +718,18 @@
             align-items: center;
         }
 
+        .template-actions-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .template-actions-row .panel-action {
+            width: 100%;
+            text-align: center;
+        }
+
         .template-actions input {
             flex: 1 1 auto;
         }
@@ -728,12 +812,12 @@
                         <div class="panel">
                             <h3>Secções</h3>
                             <div class="section-buttons" id="section-buttons"></div>
-                            <button id="add-section-btn" type="button" class="panel-action">+ Adicionar secção</button>
+                            <button id="add-section-btn" type="button" class="panel-action sidebar-action">+ Adicionar secção</button>
                         </div>
                         <div class="panel">
                             <h3>Idioma</h3>
                             <div class="lang-buttons" id="lang-buttons"></div>
-                            <button id="translate-btn" type="button" class="panel-action">Traduz PT → EN/ES</button>
+                            <button id="translate-btn" type="button" class="panel-action sidebar-action">Traduz PT → EN/ES</button>
                         </div>
                         <div class="panel">
                             <h3>Ligação & chaves</h3>
@@ -763,6 +847,11 @@
                                 <button id="load-btn" type="button" class="panel-action">Backup</button>
                                 <button id="restore-btn" type="button" class="panel-action">Restore</button>
                                 <input type="file" id="restore-file" accept="application/json" class="hidden">
+                            </div>
+                            <div class="panel-actions-row">
+                                <button id="export-json-btn" type="button" class="panel-action">Exportar JSON</button>
+                                <button id="import-json-btn" type="button" class="panel-action">Importar JSON</button>
+                                <input type="file" id="import-json-file" accept="application/json" class="hidden">
                             </div>
                         </div>
                     </aside>
@@ -800,7 +889,7 @@
         <div class="emoji-modal">
             <div class="emoji-header">
                 <h3 style="margin:0;">Escolher emoji</h3>
-                <button id="emoji-close" type="button" class="panel-action">Fechar</button>
+                <button id="emoji-close" type="button" class="panel-action emoji-close">Fechar</button>
             </div>
             <div id="emoji-grid" class="emoji-grid"></div>
             <div class="emoji-actions">
@@ -812,12 +901,14 @@
         <div class="template-modal">
             <div class="template-header">
                 <h3 style="margin:0;">Adicionar secção</h3>
-                <button id="section-template-close" type="button" class="panel-action">Fechar</button>
             </div>
             <div id="section-template-grid" class="template-grid"></div>
             <div class="template-actions">
                 <input id="section-template-name" type="text" placeholder="Nome da nova secção">
-                <button id="section-template-create" type="button" class="panel-action">Criar</button>
+                <div class="template-actions-row">
+                    <button id="section-template-close" type="button" class="panel-action">Fechar</button>
+                    <button id="section-template-create" type="button" class="panel-action">Criar</button>
+                </div>
             </div>
         </div>
     </div>
