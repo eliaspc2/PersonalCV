@@ -222,10 +222,12 @@ function getSectionsMeta() {
             : [];
         if (Array.isArray(currentCV.meta.section_order) && currentCV.meta.section_order.length) {
             const types = currentCV.meta.section_types || {};
-            currentCV.meta.sections = currentCV.meta.section_order.map((id) => ({
-                id,
-                type: types[id] || id
-            }));
+            currentCV.meta.sections = currentCV.meta.section_order
+                .filter((id) => typeof id === 'string' && id.trim())
+                .map((id) => ({
+                    id,
+                    type: types[id] || id
+                }));
         } else if (currentCV.meta.section_types && typeof currentCV.meta.section_types === 'object') {
             currentCV.meta.sections = Object.entries(currentCV.meta.section_types).map(([id, type]) => ({ id, type }));
         } else {
@@ -235,6 +237,7 @@ function getSectionsMeta() {
             ];
         }
     }
+    currentCV.meta.sections = currentCV.meta.sections.filter((section) => section && section.id);
     return currentCV.meta.sections;
 }
 
@@ -350,11 +353,16 @@ function normalizeAssetPaths() {
                 });
             }
             Object.entries(locale).forEach(([sectionKey, section]) => {
+                if (sectionKey === 'navigation' && section && typeof section === 'object') {
+                    Object.entries(section).forEach(([navKey, navVal]) => {
+                        if (typeof navVal !== 'string') {
+                            delete section[navKey];
+                        }
+                    });
+                    delete section.image_position;
+                    delete section.image_zoom;
+                }
                 if (!BASE_SECTIONS.includes(sectionKey)) {
-                    if (sectionKey === 'navigation' && section && typeof section === 'object') {
-                        delete section.image_position;
-                        delete section.image_zoom;
-                    }
                     return;
                 }
                 if (!section || typeof section !== 'object') return;
@@ -1677,13 +1685,23 @@ function makeFileField(wrapper, targetObj, key, labelText, baseFolder) {
     wrapper.appendChild(row);
 }
 
-function createDownloadItem({ label = '', icon = '', href = '', group = 'downloads' } = {}) {
-    return {
+function createDownloadItem(input) {
+    const data = input && typeof input === 'object' ? input : {};
+    const {
+        label = '',
+        icon = '',
+        href = '',
+        group = 'downloads',
+        viewer
+    } = data;
+    const entry = {
         label,
         icon,
         href,
         group: group || 'downloads'
     };
+    if (viewer !== undefined) entry.viewer = viewer;
+    return entry;
 }
 
 function queueDownloadDeletion(href) {

@@ -74,6 +74,7 @@ Runtime validation is enforced via `schema/cv.schema.json` + `validators/*` (cri
 
 ## 🚀 Usage
 See [WALKTHROUGH.md](./WALKTHROUGH.md) for detailed instructions on how to set up and use the CV.
+See [FORK_SETUP.md](./FORK_SETUP.md) for a step‑by‑step guide to forking, GitHub Pages, PAT, OpenAI key, and admin UI access.
 
 ## ✨ Admin UI Highlights
 - Per‑section navigation (nome + ícone) with SVG icon picker (theme color).
