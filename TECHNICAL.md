@@ -22,6 +22,12 @@ There is no automatic privacy filtering in the renderer today.
 - **Sensitive Data**: Keep sensitive fields out of `data/cv.json` or store them in private documents.
 - **Visibility**: A `visibility` attribute may exist in data, but `cv-render.js` does not currently filter by it.
 
+## ✅ Data Validation (Runtime)
+- **Schema**: `schema/cv.schema.json` (JSON Schema v2020‑12).
+- **Validators**: `validators/schema-validate.js`, `validators/cv-consistency.js`, `validators/error-messages.js`.
+- **Public site**: validates on load and shows a safe fallback UI on critical errors.
+- **Admin UI**: validates on load and blocks save if critical errors exist.
+
 ## 🛠 Module Responsibility Map (Contracts)
 
 Each module has a strict contract to prevent architectural drift.
@@ -44,4 +50,10 @@ This project is designed for **maximum portability and zero cost**.
 - **Do not try to hide the JavaScript**: Ofuscation only makes debugging harder; it doesn't add real security.
 - **Token persistence**: Current implementation uses encrypted `localStorage` for PAT persistence. If you prefer session‑only behavior, adjust `auth-gate.js`.
 - **Encryption**: Sensitive storage (PAT, admin session flag, admin hash) is encrypted client‑side (AES‑GCM).
+- **Do not store secrets** in `data/` or `config/`. Only local encrypted storage is allowed.
 - **Do not remove SPEC.md**: This file is the "Law" of the project. Any change in logic must first be reflected there.
+
+## 📦 Service Worker & Cache
+- **Versioned cache**: SW cache uses a version from `data/config.json` (fallback to `meta.version`).
+- **Network-first for JSON**: `cv.json`, `config.json` and `i18n/*.json` try network first to avoid stale content.
+- **Precache**: Core entrypoints + schema/validators + i18n files are precached.

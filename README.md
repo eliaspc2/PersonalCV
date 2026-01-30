@@ -5,8 +5,8 @@ A 100% static narrative profile site with a built-in configuration interface, de
 ## 🎯 Architecture Overview
 
 The project is built on the concept of **Static Frontend as Admin**. 
-- **Persistence**: All data is stored in a `cv.json` file within the repository.
-- **Single Source of Truth**: The `data/cv.json` file is the ONLY place where CV content lives.
+- **Persistence**: Content in `data/cv.json`, behavior in `data/config.json`, i18n in `data/i18n/*.json`.
+- **Single Source of Truth**: CV content lives in `data/cv.json` (structure + values). Config/i18n are separate.
 - **Admin Flow**: A hidden configuration page (`config.html`) allows the user to edit the JSON data and commit changes back to GitHub using a Personal Access Token (PAT).
 - **Security**: Access to the config page is obscured (3-click trigger). Write operations require a valid GitHub PAT (stored encrypted in localStorage).
 
@@ -21,7 +21,20 @@ The project is built on the concept of **Static Frontend as Admin**.
 ├── _sources/               # Optional archive (can be empty)
 │   └── INDEX.md            # Mapping of source documents to data (if used)
 ├── data/
-│   └── cv.json             # Content Source of Truth
+│   ├── cv.json             # Content (structure + values)
+│   ├── config.json         # Behavior/config (paths, theme, meta)
+│   └── i18n/               # Optional translations (key/value)
+│       ├── pt.json
+│       ├── es.json
+│       └── en.json
+├── schema/
+│   └── cv.schema.json      # JSON Schema (validation)
+├── validators/
+│   ├── schema-validate.js  # Schema validation (no backend)
+│   ├── cv-consistency.js   # Cross-field/lang checks
+│   └── error-messages.js   # Friendly error messages
+├── constants/
+│   └── ...                 # Shared constants (paths, themes, icons)
 ├── js/
 │   ├── cv-render.js        # Logic: Renders JSON data to HTML (Read-only)
 │   ├── config-ui.js        # Logic: Handles Form UI and Save triggers
@@ -51,6 +64,7 @@ To ensure maintainability, modules follow strict rules defined in `SPEC.md`:
 
 ### 3. Data Integrity
 Provenance mapping lives in `_sources/INDEX.md`. The renderer does not enforce visibility rules, so keep sensitive data out of `data/cv.json` unless you intend it to be public.
+Runtime validation is enforced via `schema/cv.schema.json` + `validators/*` (critical errors show a fallback UI).
 
 ## 🛑 Limitations & Accepted Risks
 - **Security by Obscurity**: The entry to `config.html` is hidden (3-click trigger), not fully protected.
@@ -62,7 +76,8 @@ Provenance mapping lives in `_sources/INDEX.md`. The renderer does not enforce v
 See [WALKTHROUGH.md](./WALKTHROUGH.md) for detailed instructions on how to set up and use the CV.
 
 ## ✨ Admin UI Highlights
-- Per‑section navigation (nome + ícone) with emoji picker.
+- Per‑section navigation (nome + ícone) with SVG icon picker (theme color).
 - Image crop/zoom tooling for photo framing.
-- Downloads managed inside Contacto with groups and links.
+- Downloads managed inside Contacto with groups and links (viewer inside the site).
 - Add new sections using existing templates (visual picker).
+- Export/Import bundle (cv + config + i18n) via the Admin UI.

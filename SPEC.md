@@ -4,7 +4,7 @@
 Develop a personal CV website hosted on GitHub Pages, consisting of:
 - **Public CV**: Static frontend displaying the CV data.
 - **Config Interface (Admin UI)**: Controlled access static frontend to edit CV data.
-- **Data Source**: `data/cv.json` versioned in Git as the single source of truth.
+- **Data Source**: `data/cv.json` (content), `data/config.json` (behavior), `data/i18n/*.json` (optional translations).
 
 **Constraints**:
 - No backend.
@@ -24,7 +24,20 @@ This structure is mandatory.
 ├── _sources/               # Optional archive (may be empty)
 │   └── INDEX.md            # Map of source files to CV data (if used)
 ├── data/
-│   └── cv.json             # Single Source of Truth for CV content
+│   ├── cv.json             # Content structure + values
+│   ├── config.json         # Behavior/config (paths, theme, meta)
+│   └── i18n/               # Optional translations (key/value)
+│       ├── pt.json
+│       ├── es.json
+│       └── en.json
+├── schema/
+│   └── cv.schema.json      # JSON Schema (validation)
+├── validators/
+│   ├── schema-validate.js  # Schema validation (no backend)
+│   ├── cv-consistency.js   # Cross-field/lang checks
+│   └── error-messages.js   # Friendly error messages
+├── constants/
+│   └── ...                 # Shared constants (paths, themes, icons)
 ├── js/
 │   ├── cv-render.js        # CV Rendering Logic
 │   ├── config-ui.js        # Config UI Logic
@@ -53,10 +66,11 @@ This structure is mandatory.
 | `self-check.js` | Validates project rules against `RULES.json`. | formatting/linting/runtime checks only. |
 
 ## 4. Data Rules (Source of Truth)
-- `data/cv.json` is the **ONLY** source of truth.
-- Public CV only reads this file.
-- Config UI edits this file and commits changes via API.
-- Structured CV content lives in `data/cv.json`. UI chrome and helper copy can remain static.
+- `data/cv.json` holds **content** (structure + values).
+- `data/config.json` holds **behavior/config** (paths, theme, meta).
+- `data/i18n/*.json` holds **translations** (key/value). If empty, fallback to `cv.json`.
+- Public CV reads `cv.json` + `config.json` + `i18n`.
+- Config UI edits both `cv.json` and `config.json` and commits changes via API.
 
 **`cv.json` Schema (current)**:
 - `meta`: Versioning + language control (`version`, `lastUpdated`, `defaultLanguage`, `availableLanguages`).
@@ -67,10 +81,14 @@ This structure is mandatory.
   - `navigation`: UI labels for sections.
   - `navigation_icons`: Emoji overrides per section (optional).
   - `overview`, `development`, `foundation`, `mindset`, `now`, `contact`: Section content consumed by `cv-render.js`.
-  - `contact.download_groups`: Optional array of `{ id, label, open_in_new_tab, icon? }` for grouping downloads.
-  - Section-level CTA fields: `cta_label`, `cta_link`.
-  - `ui`: Shared UI copy and labels used across renderers.
+- `contact.download_groups`: Optional array of `{ id, label, open_in_new_tab, icon? }` for grouping downloads.
+- Section-level CTA fields: `cta_label`, `cta_link`.
+- `ui`: Shared UI copy and labels used across renderers.
 - Provenance mapping lives in `_sources/INDEX.md`.
+
+**Validation**:
+- `schema/cv.schema.json` + `validators/*` are mandatory.
+- Public site blocks render on critical errors with a fallback UI.
 
 ## 5. Authentication Model
 - **No real backend authentication.**
@@ -89,7 +107,7 @@ This structure is mandatory.
 - Separate from Public CV view.
 - Clear structured forms for JSON editing.
 - Includes a lightweight preview panel (text + hierarchy).
-- **Save** button triggers explicit commit to GitHub.
+- **Save** button triggers explicit commit to GitHub (cv + config).
 - No automatic commits.
 
 ## 7. Programming Standards

@@ -102,9 +102,11 @@ export async function updateCVData(owner, repo, path, token, content, sha, messa
 
     const body = {
         message: message || "Update CV data via Config UI",
-        content: base64Content,
-        sha: sha
+        content: base64Content
     };
+    if (sha) {
+        body.sha = sha;
+    }
 
     const response = await fetch(url, {
         method: "PUT",

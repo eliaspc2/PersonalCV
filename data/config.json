@@ -1,0 +1,25 @@
+{
+  "version": "4.3.0",
+  "paths": {
+    "photos": "assets/photos/",
+    "downloads": "assets/downloads/",
+    "icons": "assets/icons/"
+  },
+  "site": {
+    "title": "André Câmara | Software Engineer",
+    "description": "Portfolio of André Câmara - Software Developer with a Systems Engineering background.",
+    "favicon": "favicon.ico",
+    "apple_icon": "apple-touch-icon.png"
+  },
+  "theme": {
+    "bg_app": "#fcfcfd",
+    "bg_sidebar": "#ffffff",
+    "primary": "#020617",
+    "accent": "#3b82f6",
+    "accent_soft": "rgba(59, 130, 246, 0.08)",
+    "text_main": "#0f172a",
+    "text_muted": "#64748b",
+    "text_dim": "#94a3b8",
+    "border": "#f1f5f9"
+  }
+}

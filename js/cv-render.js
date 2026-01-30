@@ -1,5 +1,9 @@
 import { getSecureItem } from './crypto-utils.js';
 import { renderIcon, normalizeIconValue, isIconId } from './icon-set.js';
+import { CONFIG_PATH, CV_PATH, DEFAULT_PATHS, DEFAULT_THEME, NAV_TYPE_ICON_IDS } from './constants.js';
+import { validateCVSchema } from '../validators/schema-validate.js';
+import { validateConsistency } from '../validators/cv-consistency.js';
+import { formatErrorMessages } from '../validators/error-messages.js';
 
 const dom = {
     sidebar: document.querySelector('.sidebar'),
@@ -14,6 +18,8 @@ const dom = {
 };
 
 let cvData = null;
+let configData = null;
+const i18nData = {};
 let currentLang = 'pt';
 let currentSection = null;
 let sectionObserver = null;
@@ -30,32 +36,64 @@ const BASE_SECTIONS = [
     { id: 'contact', type: 'contact' }
 ];
 
-const DEFAULT_PATHS = {
-    photos: 'assets/photos/',
-    downloads: 'assets/downloads/',
-    icons: 'assets/icons/'
-};
+const NAV_TYPE_ICONS = Object.fromEntries(
+    Object.entries(NAV_TYPE_ICON_IDS).map(([key, iconId]) => [key, renderIcon(iconId, 'nav-icon')])
+);
+const missingI18nKeys = new Set();
 
-const DEFAULT_THEME = {
-    bg_app: '#fcfcfd',
-    bg_sidebar: '#ffffff',
-    primary: '#020617',
-    accent: '#3b82f6',
-    accent_soft: 'rgba(59, 130, 246, 0.08)',
-    text_main: '#0f172a',
-    text_muted: '#64748b',
-    text_dim: '#94a3b8',
-    border: '#f1f5f9'
-};
+async function loadI18n(lang) {
+    if (!lang) return;
+    if (i18nData[lang]) return;
+    try {
+        const response = await fetch(`data/i18n/${lang}.json`, { cache: 'no-store' });
+        if (response.ok) {
+            i18nData[lang] = await response.json();
+            return;
+        }
+    } catch (err) {
+        // ignore
+    }
+    i18nData[lang] = {};
+}
 
-const NAV_TYPE_ICONS = {
-    overview: renderIcon('home', 'nav-icon'),
-    development: renderIcon('code', 'nav-icon'),
-    foundation: renderIcon('layers', 'nav-icon'),
-    mindset: renderIcon('book', 'nav-icon'),
-    now: renderIcon('compass', 'nav-icon'),
-    contact: renderIcon('mail', 'nav-icon')
-};
+function t(key, fallback = '', lang = currentLang) {
+    if (!key) return fallback;
+    const dict = i18nData[lang] || {};
+    const hasI18n = dict && Object.keys(dict).length > 0;
+    if (Object.prototype.hasOwnProperty.call(dict, key)) {
+        const value = dict[key];
+        return value !== undefined && value !== null ? value : fallback;
+    }
+    if (hasI18n && !missingI18nKeys.has(key)) {
+        missingI18nKeys.add(key);
+        showI18nWarning(key);
+        console.warn(`[i18n] Missing key "${key}" for ${lang}`);
+    }
+    return fallback;
+}
+
+function getText(sectionId, field, fallback = '') {
+    return t(`${sectionId}.${field}`, fallback);
+}
+
+function getItemText(sectionId, collectionKey, item, field, fallback = '') {
+    const id = item?.id;
+    if (!id) return fallback;
+    return t(`${sectionId}.${collectionKey}.${id}.${field}`, fallback);
+}
+
+function showI18nWarning(key) {
+    const container = document.querySelector('.app-content');
+    if (!container) return;
+    let banner = document.getElementById('i18n-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'i18n-banner';
+        banner.className = 'validation-banner warning';
+        container.prepend(banner);
+    }
+    banner.innerHTML = `<strong>Tradução em falta</strong><span>${key}</span>`;
+}
 
 function normalizeBasePath(value, fallback) {
     const base = value || fallback;
@@ -64,11 +102,12 @@ function normalizeBasePath(value, fallback) {
 }
 
 function getPaths() {
-    if (!cvData?.paths) return { ...DEFAULT_PATHS };
+    const sources = [configData?.paths, cvData?.paths];
+    const base = sources.find((value) => value && typeof value === 'object') || {};
     return {
-        photos: normalizeBasePath(cvData.paths.photos, DEFAULT_PATHS.photos),
-        downloads: normalizeBasePath(cvData.paths.downloads, DEFAULT_PATHS.downloads),
-        icons: normalizeBasePath(cvData.paths.icons, DEFAULT_PATHS.icons)
+        photos: normalizeBasePath(base.photos, DEFAULT_PATHS.photos),
+        downloads: normalizeBasePath(base.downloads, DEFAULT_PATHS.downloads),
+        icons: normalizeBasePath(base.icons, DEFAULT_PATHS.icons)
     };
 }
 
@@ -110,6 +149,34 @@ function applyTheme(theme) {
     root.style.setProperty('--text-muted', payload.text_muted);
     root.style.setProperty('--text-dim', payload.text_dim);
     root.style.setProperty('--border', payload.border);
+}
+
+function showValidationBanner(messages = [], type = 'warning') {
+    if (!messages.length) return;
+    const container = document.querySelector('.app-content');
+    if (!container) return;
+    const existing = document.getElementById('validation-banner');
+    if (existing) existing.remove();
+    const banner = document.createElement('div');
+    banner.id = 'validation-banner';
+    banner.className = `validation-banner ${type}`;
+    banner.innerHTML = `<strong>${type === 'error' ? 'Dados inválidos' : 'Aviso'}</strong>
+        <span>${messages[0]}</span>`;
+    container.prepend(banner);
+}
+
+function showValidationFailure(messages = []) {
+    const container = document.querySelector('.app-content');
+    if (!container) return;
+    container.innerHTML = `
+        <div class="validation-fallback">
+            <h2>Dados inválidos</h2>
+            <p>O conteúdo não pôde ser carregado. Corrige o cv.json.</p>
+            <ul>
+                ${messages.slice(0, 5).map((msg) => `<li>${msg}</li>`).join('')}
+            </ul>
+        </div>
+    `;
 }
 
 function getContactHref(profile) {
@@ -269,6 +336,29 @@ function getSectionType(sectionId) {
     return match?.type || sectionId;
 }
 
+function buildFallbackConfig() {
+    const meta = cvData?.meta || {};
+    const theme = { ...DEFAULT_THEME, ...(meta.theme || {}) };
+    if (!theme.accent_soft && theme.accent) {
+        theme.accent_soft = hexToRgba(theme.accent, 0.08);
+    }
+    const paths = cvData?.paths || {};
+    return {
+        paths: {
+            photos: normalizeBasePath(paths.photos, DEFAULT_PATHS.photos),
+            downloads: normalizeBasePath(paths.downloads, DEFAULT_PATHS.downloads),
+            icons: normalizeBasePath(paths.icons, DEFAULT_PATHS.icons)
+        },
+        site: {
+            title: meta.site_title || document.title || '',
+            description: meta.site_description || '',
+            favicon: meta.favicon || 'favicon.ico',
+            apple_icon: meta.apple_icon || 'apple-touch-icon.png'
+        },
+        theme
+    };
+}
+
 async function bootstrap() {
     try {
         if (isPreviewMode) {
@@ -284,13 +374,47 @@ async function bootstrap() {
                     cvData = null;
                 }
             }
+            const previewConfigRaw = await getSecureItem(sessionStorage, 'preview_config');
+            if (previewConfigRaw) {
+                try {
+                    configData = JSON.parse(previewConfigRaw);
+                } catch (err) {
+                    configData = null;
+                }
+            }
         }
 
         if (!cvData) {
-            const response = await fetch('data/cv.json', { cache: 'no-store' });
+            const response = await fetch(CV_PATH, { cache: 'no-store' });
             cvData = await response.json();
         }
+        if (!configData) {
+            try {
+                const configResponse = await fetch(CONFIG_PATH, { cache: 'no-store' });
+                if (configResponse.ok) {
+                    configData = await configResponse.json();
+                } else {
+                    configData = buildFallbackConfig();
+                }
+            } catch (err) {
+                configData = buildFallbackConfig();
+            }
+        }
+        const schemaResult = await validateCVSchema(cvData);
+        const consistency = validateConsistency(cvData);
+        const langForErrors = cvData?.meta?.defaultLanguage || 'pt';
+        const schemaMessages = formatErrorMessages(schemaResult.errors, langForErrors);
+        if (!schemaResult.valid || consistency.critical.length) {
+            const consistencyMessages = formatErrorMessages(consistency.critical, langForErrors);
+            showValidationFailure([...schemaMessages, ...consistencyMessages]);
+            return;
+        }
+        if (consistency.warnings.length) {
+            const warningMessages = formatErrorMessages(consistency.warnings, langForErrors);
+            showValidationBanner(warningMessages, 'warning');
+        }
         currentLang = cvData.meta.defaultLanguage || 'pt';
+        await loadI18n(currentLang);
 
         // sync language switchers to current lang
         if (dom.langSwitcher) dom.langSwitcher.value = currentLang;
@@ -344,10 +468,11 @@ function setupGlobalEvents() {
     }
 
     // 2. Language
-    const onLangChange = (value) => {
+    const onLangChange = async (value) => {
         currentLang = value;
         if (dom.langSwitcher) dom.langSwitcher.value = value;
         if (dom.langSwitcherMobile) dom.langSwitcherMobile.value = value;
+        await loadI18n(currentLang);
         render();
     };
 
@@ -496,7 +621,7 @@ function navigateTo(sectionId) {
 
 function render() {
     if (!cvData) return;
-    applyTheme(cvData.meta?.theme || cvData.theme || {});
+    applyTheme(configData?.theme || cvData.meta?.theme || cvData.theme || {});
     const locale = cvData.localized[currentLang];
     ensureDynamicSections(locale);
     updateNavigationLabels(locale);
@@ -532,11 +657,12 @@ function render() {
 function updatePageMeta(locale) {
     if (!cvData) return;
     const meta = cvData.meta || {};
+    const siteConfig = configData?.site || {};
     const ui = locale?.ui || {};
-    const title = ui.page_title || meta.site_title;
-    const description = ui.page_description || meta.site_description;
-    const favicon = resolveAssetPath('icons', meta.favicon);
-    const appleIcon = resolveAssetPath('icons', meta.apple_icon);
+    const title = ui.page_title || siteConfig.title || meta.site_title;
+    const description = ui.page_description || siteConfig.description || meta.site_description;
+    const favicon = resolveAssetPath('icons', siteConfig.favicon || meta.favicon);
+    const appleIcon = resolveAssetPath('icons', siteConfig.apple_icon || meta.apple_icon);
 
     if (title) {
         document.title = title;
@@ -577,22 +703,25 @@ function updateBrandName(locale) {
 function updateUiLabels(locale) {
     const ui = locale?.ui || {};
     const menuBtn = document.getElementById('sidebar-mobile-toggle');
-    if (menuBtn && ui.menu_label) {
-        menuBtn.textContent = ui.menu_label;
+    if (menuBtn) {
+        const label = t('ui.menu_label', ui.menu_label || menuBtn.textContent);
+        if (label) menuBtn.textContent = label;
     }
     const langSelect = document.getElementById('lang-switcher');
     const langMobile = document.getElementById('lang-switcher-mobile');
-    if (ui.language_label) {
-        if (langSelect) langSelect.setAttribute('aria-label', ui.language_label);
-        if (langMobile) langMobile.setAttribute('aria-label', ui.language_label);
+    const labelText = t('ui.language_label', ui.language_label || '');
+    if (labelText) {
+        if (langSelect) langSelect.setAttribute('aria-label', labelText);
+        if (langMobile) langMobile.setAttribute('aria-label', labelText);
     }
 }
 
 function updateNavigationLabels(locale) {
     document.querySelectorAll('[data-nav]').forEach(label => {
         const key = label.getAttribute('data-nav');
-        if (locale.navigation && locale.navigation[key]) {
-            label.textContent = locale.navigation[key];
+        const labelText = t(`navigation.${key}`, (locale.navigation && locale.navigation[key]) || label.textContent || key);
+        if (labelText) {
+            label.textContent = labelText;
         }
         const navItem = label.closest('.nav-item');
         const iconValue = normalizeIconValue(locale.navigation_icons && locale.navigation_icons[key]);
@@ -619,7 +748,7 @@ function updateNavigationLabels(locale) {
 function updateBreadcrumb(sectionId, locale) {
     if (!dom.breadcrumb || !sectionId) return;
     const label = (locale && locale.navigation && locale.navigation[sectionId]) || sectionId;
-    dom.breadcrumb.textContent = label;
+    dom.breadcrumb.textContent = t(`navigation.${sectionId}`, label);
 }
 
 function setActiveSection(sectionId) {
@@ -730,8 +859,17 @@ function renderOverview(data, container, sectionId = 'overview') {
     const profile = cvData.profile;
     const ui = cvData.localized[currentLang].ui || {};
     const certifications = cvData.localized[currentLang].certifications || profile.certifications || [];
-    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaLabel = getText(sectionId, 'cta_label', data.cta_label || ui.cta_contact_label);
     const ctaHref = data.cta_link || getContactHref(profile);
+    const headline = getText(sectionId, 'headline', data.headline);
+    const location = getText(sectionId, 'location', data.location);
+    const introText = getText(sectionId, 'intro_text', data.intro_text);
+    const bioText = getText(sectionId, 'bio', data.bio);
+    const marketingNote = getText(sectionId, 'marketing_note', data.marketing_note);
+    const languagesLabel = getText(sectionId, 'languages_label', data.languages_label || '');
+    const educationLabel = getText(sectionId, 'education_label', data.education_label || '');
+    const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
+    const nextText = getText(sectionId, 'next_text', data.next_text || '');
     container.innerHTML = `
         <div class="hero-section">
             <div class="hero-header-flex" style="display:flex; align-items:center; gap:2.5rem; margin-bottom:4rem; flex-wrap:wrap;">
@@ -741,10 +879,10 @@ function renderOverview(data, container, sectionId = 'overview') {
                     </div>
                 </div>
                 <div style="flex:1; min-width:300px;">
-                    <h1 class="hero-tagline" style="margin:0; font-size: 3rem;">${data.headline}</h1>
+                    <h1 class="hero-tagline" style="margin:0; font-size: 3rem;">${headline}</h1>
                     <p style="color:var(--text-muted); font-weight:600; margin-top:0.75rem; display:flex; align-items:center; gap:8px;">
                         <svg style="width:16px; height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        ${data.location}
+                        ${location}
                     </p>
                     ${certifications.length ? `
                         <div class="cert-badges">
@@ -762,13 +900,13 @@ function renderOverview(data, container, sectionId = 'overview') {
                 </div>
             </div>
             
-            <p class="hero-intro" style="font-weight: 500; color: var(--text-main);">${data.intro_text}</p>
+            <p class="hero-intro" style="font-weight: 500; color: var(--text-main);">${introText}</p>
             
             <div class="story-text" style="max-width:850px; background: white; padding: 2.5rem; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-                <p style="margin-bottom: 2rem;">${data.bio}</p>
+                <p style="margin-bottom: 2rem;">${bioText}</p>
                 <div style="padding:1.5rem; background:var(--accent-soft); border-radius:12px; border-left:4px solid var(--accent);">
                     <p style="font-size:0.95rem; color:var(--text-main); margin:0;">
-                        ${ui.marketing_label ? `<strong style="color:var(--accent)">${ui.marketing_label}:</strong>` : ''} ${data.marketing_note}
+                        ${ui.marketing_label ? `<strong style="color:var(--accent)">${t('ui.marketing_label', ui.marketing_label)}:</strong>` : ''} ${marketingNote}
                     </p>
                 </div>
             </div>
@@ -776,22 +914,22 @@ function renderOverview(data, container, sectionId = 'overview') {
                 <div class="overview-meta">
                     ${data.languages && data.languages.length ? `
                         <div class="overview-meta-block">
-                            <span class="dim-label">${data.languages_label || ''}</span>
+                            <span class="dim-label">${languagesLabel}</span>
                             <p>${data.languages.join(' · ')}</p>
                         </div>
                     ` : ''}
                     ${data.education && data.education.length ? `
                         <div class="overview-meta-block">
-                            <span class="dim-label">${data.education_label || ''}</span>
+                            <span class="dim-label">${educationLabel}</span>
                             <p>${data.education.join(' · ')}</p>
                         </div>
                     ` : ''}
                 </div>
             ` : ''}
-            ${data.next_text ? `
+            ${nextText ? `
                 <div class="section-transition">
-                    ${data.next_label ? `<span>${data.next_label}</span>` : ''}
-                    ${data.next_text}
+                    ${nextLabel ? `<span>${nextLabel}</span>` : ''}
+                    ${nextText}
                 </div>
             ` : ''}
             
@@ -806,25 +944,29 @@ function renderOverview(data, container, sectionId = 'overview') {
 
 function renderDevelopment(data, container, sectionId = 'development') {
     const ui = cvData.localized[currentLang].ui || {};
-    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaLabel = getText(sectionId, 'cta_label', data.cta_label || ui.cta_contact_label);
     const ctaHref = data.cta_link || getContactHref(cvData.profile);
+    const title = getText(sectionId, 'title', data.title);
+    const description = getText(sectionId, 'description', data.description);
+    const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
+    const nextText = getText(sectionId, 'next_text', data.next_text || '');
     const skillsHtml = data.skills.map((skill, index) => `
         <div class="rich-card" onclick="app.showDetail('skill', ${index}, '${sectionId}')">
             <div class="card-tags">
-                <span class="focus-tag">${skill.focus_area}</span>
-                ${skill.progress_status ? `<span class="status-tag">${skill.progress_status}</span>` : ''}
+                <span class="focus-tag">${getItemText(sectionId, 'skills', skill, 'focus_area', skill.focus_area || '')}</span>
+                ${skill.progress_status ? `<span class="status-tag">${getItemText(sectionId, 'skills', skill, 'progress_status', skill.progress_status)}</span>` : ''}
             </div>
-            <h3>${skill.title}</h3>
-            ${skill.duration_hours ? `<div class="dim-label">${skill.duration_hours}</div>` : ''}
-            <p style="color:var(--text-muted); margin-bottom:1.5rem; line-height:1.5;">${skill.context_text}</p>
-            <div class="explore-hint">${ui.explore_skill_label || ''}</div>
+            <h3>${getItemText(sectionId, 'skills', skill, 'title', skill.title)}</h3>
+            ${skill.duration_hours ? `<div class="dim-label">${getItemText(sectionId, 'skills', skill, 'duration_hours', skill.duration_hours)}</div>` : ''}
+            <p style="color:var(--text-muted); margin-bottom:1.5rem; line-height:1.5;">${getItemText(sectionId, 'skills', skill, 'context_text', skill.context_text)}</p>
+            <div class="explore-hint">${t('ui.explore_skill_label', ui.explore_skill_label || '')}</div>
         </div>
     `).join('');
 
     container.innerHTML = `
         <div class="section-container">
-            <h2 class="section-title">${data.title}</h2>
-            <p class="section-desc">${data.description}</p>
+            <h2 class="section-title">${title}</h2>
+            <p class="section-desc">${description}</p>
             ${data.image ? `
                 <div class="development-layout">
                     <div class="development-image">
@@ -834,10 +976,10 @@ function renderDevelopment(data, container, sectionId = 'development') {
                         ${skillsHtml}
                     </div>
                 </div>
-            ${data.next_text ? `
+            ${nextText ? `
                 <div class="section-transition">
-                        ${data.next_label ? `<span>${data.next_label}</span>` : ''}
-                        ${data.next_text}
+                        ${nextLabel ? `<span>${nextLabel}</span>` : ''}
+                        ${nextText}
                 </div>
             ` : ''}
             ` : `
@@ -856,8 +998,12 @@ function renderDevelopment(data, container, sectionId = 'development') {
 
 function renderFoundation(data, container, sectionId = 'foundation') {
     const ui = cvData.localized[currentLang].ui || {};
-    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaLabel = getText(sectionId, 'cta_label', data.cta_label || ui.cta_contact_label);
     const ctaHref = data.cta_link || getContactHref(cvData.profile);
+    const title = getText(sectionId, 'title', data.title);
+    const description = getText(sectionId, 'description', data.description);
+    const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
+    const nextText = getText(sectionId, 'next_text', data.next_text || '');
     container.innerHTML = `
         <div class="section-container">
             <div class="section-header foundation-header">
@@ -867,27 +1013,27 @@ function renderFoundation(data, container, sectionId = 'foundation') {
                     </div>
                 ` : ''}
                 <div class="foundation-text">
-                    <h2 class="section-title">${data.title}</h2>
-                    <p class="section-desc foundation-desc">${data.description}</p>
+                    <h2 class="section-title">${title}</h2>
+                    <p class="section-desc foundation-desc">${description}</p>
                 </div>
             </div>
             <div class="timeline-rich">
                 ${data.experience.map((exp, index) => `
                     <div class="rich-card" style="margin-bottom: 2rem;" onclick="app.showDetail('exp', ${index}, '${sectionId}')">
                         <div style="display:flex; justify-content:space-between; margin-bottom:1rem; align-items:center;">
-                           <span class="focus-tag">${exp.company_name}</span>
-                           <span style="font-size:0.8rem; font-weight:700; color:var(--text-dim);">${exp.timeframe}</span>
+                           <span class="focus-tag">${getItemText(sectionId, 'experience', exp, 'company_name', exp.company_name)}</span>
+                           <span style="font-size:0.8rem; font-weight:700; color:var(--text-dim);">${getItemText(sectionId, 'experience', exp, 'timeframe', exp.timeframe)}</span>
                         </div>
-                        <h3>${exp.role_title}</h3>
-                        <p style="color:var(--text-muted); line-height:1.5;">${exp.summary_text}</p>
-                        <div class="explore-hint">${ui.explore_experience_label || ''}</div>
+                        <h3>${getItemText(sectionId, 'experience', exp, 'role_title', exp.role_title)}</h3>
+                        <p style="color:var(--text-muted); line-height:1.5;">${getItemText(sectionId, 'experience', exp, 'summary_text', exp.summary_text)}</p>
+                        <div class="explore-hint">${t('ui.explore_experience_label', ui.explore_experience_label || '')}</div>
                     </div>
                 `).join('')}
             </div>
-            ${data.next_text ? `
+            ${nextText ? `
                 <div class="section-transition">
-                    ${data.next_label ? `<span>${data.next_label}</span>` : ''}
-                    ${data.next_text}
+                    ${nextLabel ? `<span>${nextLabel}</span>` : ''}
+                    ${nextText}
                 </div>
             ` : ''}
             ${ctaLabel ? `
@@ -901,17 +1047,22 @@ function renderFoundation(data, container, sectionId = 'foundation') {
 
 function renderMindset(data, container, sectionId = 'mindset') {
     const ui = cvData.localized[currentLang].ui || {};
-    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaLabel = getText(sectionId, 'cta_label', data.cta_label || ui.cta_contact_label);
     const ctaHref = data.cta_link || getContactHref(cvData.profile);
+    const title = getText(sectionId, 'title', data.title);
+    const subtitle = getText(sectionId, 'subtitle', data.subtitle);
+    const philosophy = getText(sectionId, 'philosophy', data.philosophy);
+    const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
+    const nextText = getText(sectionId, 'next_text', data.next_text || '');
     const adoptionBlock = data.adoption ? [data.adoption] : [];
     const allBlocks = [...adoptionBlock, ...data.blocks];
     container.innerHTML = `
         <div class="section-container">
-            <h2 class="section-title">${data.title}</h2>
-            <p class="section-desc">${data.subtitle}</p>
+            <h2 class="section-title">${title}</h2>
+            <p class="section-desc">${subtitle}</p>
 
             <div class="philosophy-box" style="margin-bottom: 4rem;">
-                <p>${data.philosophy}</p>
+                <p>${philosophy}</p>
             </div>
 
             <div class="mindset-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2.5rem;">
@@ -924,26 +1075,26 @@ function renderMindset(data, container, sectionId = 'mindset') {
                                 </div>
                             `}
                             <div style="position: absolute; bottom: 1rem; left: 1rem; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;">
-                                ${block.principle_title}
+                                ${getItemText(sectionId, 'blocks', block, 'principle_title', block.principle_title)}
                             </div>
                         </div>
                         <div style="padding: 2rem;">
                             <div style="display:flex; align-items:center; gap:12px; margin-bottom: 1rem;">
                                 <span style="color: var(--accent); display:inline-flex;">${renderIcon(block.icon, 'icon icon-lg')}</span>
-                                <h3 style="margin:0;">${block.title}</h3>
+                                <h3 style="margin:0;">${getItemText(sectionId, 'blocks', block, 'title', block.title)}</h3>
                             </div>
                             <p style="color:var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                                ${block.story_text.substring(0, 120)}...
+                                ${getItemText(sectionId, 'blocks', block, 'story_text', block.story_text).substring(0, 120)}...
                             </p>
-                            <div class="explore-hint" style="margin-top: auto;">${ui.explore_mindset_label || ''}</div>
+                            <div class="explore-hint" style="margin-top: auto;">${t('ui.explore_mindset_label', ui.explore_mindset_label || '')}</div>
                         </div>
                     </div>
                 `).join('')}
             </div>
-            ${data.next_text ? `
+            ${nextText ? `
                 <div class="section-transition">
-                    ${data.next_label ? `<span>${data.next_label}</span>` : ''}
-                    ${data.next_text}
+                    ${nextLabel ? `<span>${nextLabel}</span>` : ''}
+                    ${nextText}
                 </div>
             ` : ''}
             ${ctaLabel ? `
@@ -958,9 +1109,14 @@ function renderMindset(data, container, sectionId = 'mindset') {
 function renderContact(data, locale, container, sectionId = 'contact') {
     const profile = cvData.profile;
     const ui = locale.ui || {};
-    const ctaLabel = data.cta_label || ui.cta_contact_label;
+    const ctaLabel = getText(sectionId, 'cta_label', data.cta_label || ui.cta_contact_label);
     const downloads = normalizeDownloads(profile, locale);
     const ctaHref = data.cta_link || `mailto:${profile.social.email}`;
+    const title = getText(sectionId, 'title', data.title);
+    const description = getText(sectionId, 'description', data.description);
+    const emailLabel = getText(sectionId, 'email_label', data.email_label || '');
+    const linkedinLabel = getText(sectionId, 'linkedin_label', data.linkedin_label || 'LinkedIn');
+    const githubLabel = getText(sectionId, 'github_label', data.github_label || 'GitHub');
     const downloadIcon = renderIcon('file', 'nav-icon');
     const certIcon = renderIcon('graduation', 'nav-icon');
     const renderDownloadIcon = (iconId, fallbackIcon) => {
@@ -985,17 +1141,17 @@ function renderContact(data, locale, container, sectionId = 'contact') {
         groupDefs.forEach((group) => {
             if (!group?.id) return;
             groupMap.set(group.id, {
-                label: group.label || group.id,
+                label: getItemText(sectionId, 'download_groups', group, 'label', group.label || group.id),
                 icon: group.icon || ''
             });
         });
     } else {
         groupMap.set('downloads', {
-            label: data.downloads_title,
+            label: getText(sectionId, 'downloads_title', data.downloads_title || ''),
             icon: ''
         });
         groupMap.set('certs', {
-            label: data.certifications_title,
+            label: getText(sectionId, 'certifications_title', data.certifications_title || ''),
             icon: ''
         });
     }
@@ -1020,9 +1176,9 @@ function renderContact(data, locale, container, sectionId = 'contact') {
                 <div class="profile-circle" style="width:120px; height:120px; border-width:2px; margin-bottom:1.5rem; box-shadow: var(--shadow-md);">
                     <img src="${resolveAssetPath('photos', profile.contact_photo || profile.photo)}" alt="André Câmara" loading="lazy" decoding="async" style="object-position:${profile.contact_photo_position || profile.photo_position || 'center 20%'}; ${getImageTransform(profile.contact_photo_zoom || profile.photo_zoom)}">
                 </div>
-                <p class="dim-label" style="letter-spacing:0.1em; margin-bottom:1rem;">${data.email_label}</p>
-                <h2 style="margin-bottom:1rem;">${data.title}</h2>
-                <p style="color:var(--text-muted); font-size:1.1rem; max-width:600px; margin-left:auto; margin-right:auto;">${data.description}</p>
+                <p class="dim-label" style="letter-spacing:0.1em; margin-bottom:1rem;">${emailLabel}</p>
+                <h2 style="margin-bottom:1rem;">${title}</h2>
+                <p style="color:var(--text-muted); font-size:1.1rem; max-width:600px; margin-left:auto; margin-right:auto;">${description}</p>
                 ${ctaLabel ? `
                     <div style="margin-top:2rem;">
                         <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
@@ -1046,11 +1202,11 @@ function renderContact(data, locale, container, sectionId = 'contact') {
             <div style="margin-top:6rem; display:flex; justify-content:center; gap:3rem;">
                 <a href="${profile.social.linkedin}" target="_blank" class="social-icon-link" style="color:var(--primary); font-weight:700; font-size: 1.1rem; display:flex; align-items:center; gap:8px;">
                     <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    ${data.linkedin_label || 'LinkedIn'}
+                    ${linkedinLabel}
                 </a>
                 <a href="${profile.social.github}" target="_blank" class="social-icon-link" style="color:var(--primary); font-weight:700; font-size: 1.1rem; display:flex; align-items:center; gap:8px;">
                     <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.362.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
-                    ${data.github_label || 'GitHub'}
+                    ${githubLabel}
                 </a>
             </div>
         </div>
@@ -1060,10 +1216,14 @@ function renderContact(data, locale, container, sectionId = 'contact') {
 function renderNow(data, container, sectionId = 'now') {
     if (!data || !container) return;
     const ctaHref = data.cta_link || getContactHref(cvData.profile);
+    const title = getText(sectionId, 'title', data.title);
+    const summary = getText(sectionId, 'summary', data.summary);
+    const details = getText(sectionId, 'details', data.details);
+    const ctaLabel = getText(sectionId, 'cta_label', data.cta_label);
     container.innerHTML = `
         <div class="section-container">
-            <h2 class="section-title">${data.title}</h2>
-            <p class="section-desc">${data.summary}</p>
+            <h2 class="section-title">${title}</h2>
+            <p class="section-desc">${summary}</p>
             <div class="now-layout">
                 ${data.image ? `
                     <div class="now-media">
@@ -1071,9 +1231,9 @@ function renderNow(data, container, sectionId = 'now') {
                     </div>
                 ` : ''}
                 <div class="now-card">
-                    <p>${data.details}</p>
+                    <p>${details}</p>
                     <div style="margin-top:2rem;">
-                        <a class="cta-btn" href="${ctaHref}">${data.cta_label}</a>
+                        <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
                     </div>
                 </div>
             </div>
@@ -1091,17 +1251,17 @@ function showDetail(type, index, contextSection) {
         const item = locale[contextSection].skills[index];
         const ui = locale.ui || {};
         contentHtml = `
-            <span class="dim-label">${item.focus_area}</span>
-            <h2 style="margin-top:0.5rem;">${item.title}</h2>
-            ${item.progress_status ? `<div class="status-line">${item.progress_status}${item.duration_hours ? ` · ${item.duration_hours}` : ''}</div>` : ''}
+            <span class="dim-label">${getItemText(contextSection, 'skills', item, 'focus_area', item.focus_area)}</span>
+            <h2 style="margin-top:0.5rem;">${getItemText(contextSection, 'skills', item, 'title', item.title)}</h2>
+            ${item.progress_status ? `<div class="status-line">${getItemText(contextSection, 'skills', item, 'progress_status', item.progress_status)}${item.duration_hours ? ` · ${getItemText(contextSection, 'skills', item, 'duration_hours', item.duration_hours)}` : ''}</div>` : ''}
             <div class="story-text" style="color:var(--text-main); margin-top:1.5rem;">
-                ${item.context_text}
+                ${getItemText(contextSection, 'skills', item, 'context_text', item.context_text)}
             </div>
             
             <div style="margin-top:2.5rem;">
-                <h4 style="font-size:0.85rem; text-transform:uppercase; color:var(--accent); margin-bottom:1rem;">${ui.drawer_skill_context_label || ''}</h4>
+                <h4 style="font-size:0.85rem; text-transform:uppercase; color:var(--accent); margin-bottom:1rem;">${t('ui.drawer_skill_context_label', ui.drawer_skill_context_label || '')}</h4>
                 <div style="font-size:1rem; line-height:1.7; color:var(--text-muted); font-style:italic; padding-left:1.5rem; border-left:2px solid var(--border);">
-                    ${item.background || ui.drawer_skill_default_history || ""}
+                    ${getItemText(contextSection, 'skills', item, 'background', item.background || ui.drawer_skill_default_history || "")}
                 </div>
             </div>
             ${item.rh_value ? `
@@ -1122,7 +1282,7 @@ function showDetail(type, index, contextSection) {
 
             ${item.technologies && item.technologies.length ? `
                 <div style="margin-top:2.5rem;">
-                    <h4 style="font-size:0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">${ui.technologies_label || ''}</h4>
+                    <h4 style="font-size:0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">${t('ui.technologies_label', ui.technologies_label || '')}</h4>
                     <div class="tech-chips">
                         ${item.technologies.map(tech => `<span class="tech-chip">${tech}</span>`).join('')}
                     </div>
@@ -1130,7 +1290,7 @@ function showDetail(type, index, contextSection) {
             ` : ''}
             ${(item.competencies && item.competencies.length) || (ui.skill_tags && ui.skill_tags.length) ? `
                 <div style="margin-top:2rem; padding:2rem; background:var(--bg-app); border-radius:12px;">
-                    <h4 style="margin-bottom:1rem; font-size:0.9rem;">${ui.drawer_skill_competencies_label || ''}</h4>
+                    <h4 style="margin-bottom:1rem; font-size:0.9rem;">${t('ui.drawer_skill_competencies_label', ui.drawer_skill_competencies_label || '')}</h4>
                     <ul style="list-style:none; display:flex; flex-wrap:wrap; gap:8px;">
                         ${(item.competencies && item.competencies.length ? item.competencies : ui.skill_tags || []).map(tag => `
                             <li style="padding:6px 12px; background:white; border:1px solid var(--border); border-radius:20px; font-size:0.75rem; font-weight:600;">${tag}</li>
@@ -1144,37 +1304,37 @@ function showDetail(type, index, contextSection) {
         const sectionData = locale[contextSection];
         const ui = locale.ui || {};
         contentHtml = `
-            <span class="dim-label">${item.company_name} | ${item.timeframe}</span>
-            <h2 style="margin-top:0.5rem; margin-bottom: 2rem;">${item.role_title}</h2>
+            <span class="dim-label">${getItemText(contextSection, 'experience', item, 'company_name', item.company_name)} | ${getItemText(contextSection, 'experience', item, 'timeframe', item.timeframe)}</span>
+            <h2 style="margin-top:0.5rem; margin-bottom: 2rem;">${getItemText(contextSection, 'experience', item, 'role_title', item.role_title)}</h2>
             
             <div class="narrative-section" style="margin-bottom: 2.5rem;">
                 <p style="font-size: 1.25rem; color: var(--primary); font-style: italic; margin-bottom: 1.5rem; line-height: 1.4; font-weight: 500;">
-                    "${item.intro_quote || ""}"
+                    "${getItemText(contextSection, 'experience', item, 'intro_quote', item.intro_quote || "")}"
                 </p>
                 <div style="font-size:1.05rem; line-height:1.7; color:var(--text-main);">
-                    ${item.details_text}
+                    ${getItemText(contextSection, 'experience', item, 'details_text', item.details_text)}
                 </div>
             </div>
 
             <div class="narrative-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
                 <div class="info-block">
-                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: 0.05em;">${sectionData.challenge_label || ""}</h4>
-                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted);">${item.challenge_text || ""}</p>
+                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: 0.05em;">${getText(contextSection, 'challenge_label', sectionData.challenge_label || "")}</h4>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted);">${getItemText(contextSection, 'experience', item, 'challenge_text', item.challenge_text || "")}</p>
                 </div>
                 <div class="info-block">
-                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: 0.05em;">${sectionData.learning_label || ""}</h4>
-                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted);">${item.key_learning_text || ""}</p>
+                    <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; letter-spacing: 0.05em;">${getText(contextSection, 'learning_label', sectionData.learning_label || "")}</h4>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted);">${getItemText(contextSection, 'experience', item, 'key_learning_text', item.key_learning_text || "")}</p>
                 </div>
             </div>
 
             <div style="margin-top: 2.5rem; padding: 1.5rem; background: var(--accent-soft); border-radius: 12px; border-left: 4px solid var(--accent);">
-                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-main); margin-bottom: 0.5rem; letter-spacing: 0.05em;">${sectionData.impact_label || ""}</h4>
-                <p style="font-size: 1rem; line-height: 1.6; color: var(--text-main); margin: 0;">${item.present_link || ""}</p>
+                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-main); margin-bottom: 0.5rem; letter-spacing: 0.05em;">${getText(contextSection, 'impact_label', sectionData.impact_label || "")}</h4>
+                <p style="font-size: 1rem; line-height: 1.6; color: var(--text-main); margin: 0;">${getItemText(contextSection, 'experience', item, 'present_link', item.present_link || "")}</p>
             </div>
             
             ${item.technologies && item.technologies.length ? `
                 <div style="margin-top:2.5rem;">
-                    <h4 style="font-size:0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">${ui.technologies_label || ''}</h4>
+                    <h4 style="font-size:0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">${t('ui.technologies_label', ui.technologies_label || '')}</h4>
                     <div class="tech-chips">
                         ${item.technologies.map(tech => `<span class="tech-chip">${tech}</span>`).join('')}
                     </div>
@@ -1189,26 +1349,26 @@ function showDetail(type, index, contextSection) {
         contentHtml = `
             <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 1rem;">
                 <span style="color: var(--accent); display:inline-flex;">${renderIcon(item.icon, 'icon icon-xl')}</span>
-                <span class="dim-label" style="margin:0;">${ui.drawer_mindset_label || ''}</span>
+                <span class="dim-label" style="margin:0;">${t('ui.drawer_mindset_label', ui.drawer_mindset_label || '')}</span>
             </div>
-            <h2 style="margin-top:0.5rem; margin-bottom: 2rem;">${item.title}</h2>
+            <h2 style="margin-top:0.5rem; margin-bottom: 2rem;">${getItemText(contextSection, 'blocks', item, 'title', item.title)}</h2>
             ${item.image ? `
                 <div style="margin-bottom:2.5rem;">
-                    <img src="${resolveAssetPath('photos', item.image)}" alt="${item.title}" loading="lazy" decoding="async" style="width:100%; max-width:520px; border-radius:16px; border:1px solid var(--border); box-shadow: var(--shadow-sm); object-position:${item.image_position || 'center 20%'}; ${getImageTransform(item.image_zoom)}">
+                    <img src="${resolveAssetPath('photos', item.image)}" alt="${getItemText(contextSection, 'blocks', item, 'title', item.title)}" loading="lazy" decoding="async" style="width:100%; max-width:520px; border-radius:16px; border:1px solid var(--border); box-shadow: var(--shadow-sm); object-position:${item.image_position || 'center 20%'}; ${getImageTransform(item.image_zoom)}">
                 </div>
             ` : ''}
             
             <div style="margin-bottom: 3rem;">
-                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">${ui.drawer_mindset_story_label || ''}</h4>
+                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">${t('ui.drawer_mindset_story_label', ui.drawer_mindset_story_label || '')}</h4>
                 <div style="font-size:1.15rem; line-height:1.7; color:var(--text-main); font-style: italic; background: var(--bg-app); padding: 2rem; border-radius: 16px;">
-                    "${item.story_text}"
+                    "${getItemText(contextSection, 'blocks', item, 'story_text', item.story_text)}"
                 </div>
             </div>
 
             <div style="margin-top: 3rem;">
-                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">O Princípio: ${item.principle_title}</h4>
+                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; letter-spacing: 0.05em;">O Princípio: ${getItemText(contextSection, 'blocks', item, 'principle_title', item.principle_title)}</h4>
                 <div style="font-size:1.1rem; line-height:1.7; color:var(--text-main);">
-                    ${item.engineering_note}
+                    ${getItemText(contextSection, 'blocks', item, 'engineering_note', item.engineering_note)}
                 </div>
             </div>
 
@@ -1216,7 +1376,7 @@ function showDetail(type, index, contextSection) {
                 <div style="position: absolute; top: -10px; right: -10px; opacity: 0.12; color: var(--accent);">
                     ${renderIcon(item.icon, 'icon icon-xxl')}
                 </div>
-                <p style="font-size: 0.95rem; opacity: 0.9; max-width: 85%;">${ui.mindset_trace_text || ''}</p>
+                <p style="font-size: 0.95rem; opacity: 0.9; max-width: 85%;">${t('ui.mindset_trace_text', ui.mindset_trace_text || '')}</p>
             </div>
         `;
     }

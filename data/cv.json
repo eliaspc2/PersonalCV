@@ -100,7 +100,7 @@
           "label": "Conteúdo Programático (EFA)",
           "icon": "spinner",
           "href": "efa-program-content.pdf",
-          "group": "downloads"
+          "group": "certs"
         },
       {
         "label": "Python I (Helsinki)",

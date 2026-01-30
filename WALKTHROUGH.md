@@ -43,19 +43,30 @@ Alternative (classic token):
 4. Generate and paste into **GitHub PAT** in the Admin UI.
 
 ## 4. Editing the CV
-1. Once authenticated, the UI will load your current `data/cv.json`.
+1. Once authenticated, the UI will load your current `data/cv.json` and `data/config.json`.
 2. Edit the fields in the form.
 3. The **Navegação** (nome/ícone) aparece no topo de cada secção.
 4. Os ícones podem ser escolhidos via **picker** (não é necessário escrever emojis).
-5. Os **Downloads** são editados dentro de **Contacto**.
+5. Os **Downloads** são editados dentro de **Contacto** e abrem no leitor do site.
 6. Cada secção tem **CTA label** + **CTA link** (podes apontar para mailto, tel, GitHub, etc.).
 7. Podes criar novas secções com **+ Adicionar secção** (usa templates existentes).
-8. Click **Guardar alterações**.
+8. Click **Guardar alterações** (guarda `cv.json` + `config.json`).
 
-## 5. Verifying Changes
+### Traduções (i18n)
+- Os ficheiros `data/i18n/*.json` são opcionais.
+- Se estiverem vazios, o site usa os textos do `cv.json`.
+- Quando começar a preencher, as chaves são do tipo `overview.headline`, `contact.cta_label`, etc.
+
+## 5. Export / Import
+- **Exportar JSON** gera um bundle completo (`site-bundle.json`) com `cv`, `config` e `i18n`.
+- **Importar JSON** aceita:
+  - `site-bundle.json` (restaura tudo)
+  - `cv.json` simples (compatibilidade)
+
+## 6. Verifying Changes
 - After clicking "Save", the app makes a commit to your repo.
 - **Local**: If you are running locally and have synced your repo, you will see `data/cv.json` update.
-- **Production (GitHub Pages)**: Wait approximately 1-3 minutes for GitHub to rebuild the site. Refresh your browser to see the updates.
+- **Production (GitHub Pages)**: Pode demorar até ~10 minutos para refletir. Atualiza o browser para ver as mudanças.
 
 ---
 

@@ -7,6 +7,10 @@ import * as auth from './auth-gate.js';
 import * as gh from './github-api.js';
 import { setSecureItem, getSecureItem, removeSecureItem } from './crypto-utils.js';
 import { ICON_CHOICES, renderIcon, normalizeIconValue, isIconId } from './icon-set.js';
+import { BASE_SECTIONS, CONFIG_PATH, CV_PATH, DEFAULT_PATHS, DEFAULT_THEME, LANGS, THEME_PRESETS, NAV_TYPE_ICON_IDS } from './constants.js';
+import { validateCVSchema } from '../validators/schema-validate.js';
+import { validateConsistency } from '../validators/cv-consistency.js';
+import { formatErrorMessages } from '../validators/error-messages.js';
 
 const uiNodes = {
     editor: document.getElementById('editor-ui'),
@@ -46,105 +50,29 @@ const SECTION_LABELS = {
     contact: { pt: 'Contacto', es: 'Contacto', en: 'Contact' }
 };
 
-const LANGS = ['pt', 'es', 'en'];
 const OPENAI_KEY_STORAGE = 'openai_api_key';
 const REPO_OWNER_STORAGE = 'repo_owner';
 const REPO_NAME_STORAGE = 'repo_name';
 const PREVIEW_STORAGE = 'preview_cv';
+const PREVIEW_CONFIG_STORAGE = 'preview_config';
 const PREVIEW_SECTION_MAP = {};
 
 let currentCV = null;
+let currentConfig = null;
 let currentSHA = null;
+let configSHA = null;
 let currentLang = 'pt';
 let currentSection = 'overview';
-let repoInfo = { owner: '', repo: '', path: 'data/cv.json' };
+let repoInfo = { owner: '', repo: '', path: CV_PATH };
 let currentSource = 'local';
 let currentStoryIndex = 0;
 let currentDownloadGroupIndex = 0;
 let cropperState = null;
 const pendingDownloadDeletes = new Set();
 let iconPickerState = null;
+let validationStatus = { critical: [], warnings: [] };
 
-const BASE_SECTIONS = ['overview', 'development', 'foundation', 'mindset', 'now', 'contact'];
 const NAV_SECTIONS = new Set(BASE_SECTIONS);
-const DEFAULT_PATHS = {
-    photos: 'assets/photos/',
-    downloads: 'assets/downloads/',
-    icons: 'assets/icons/'
-};
-const DEFAULT_THEME = {
-    bg_app: '#fcfcfd',
-    bg_sidebar: '#ffffff',
-    primary: '#020617',
-    accent: '#3b82f6',
-    accent_soft: 'rgba(59, 130, 246, 0.08)',
-    text_main: '#0f172a',
-    text_muted: '#64748b',
-    text_dim: '#94a3b8',
-    border: '#f1f5f9'
-};
-const THEME_PRESETS = [
-    {
-        name: 'Azul clássico',
-        theme: {
-            bg_app: '#fcfcfd',
-            bg_sidebar: '#ffffff',
-            primary: '#020617',
-            accent: '#3b82f6',
-            text_main: '#0f172a',
-            text_muted: '#64748b',
-            text_dim: '#94a3b8',
-            border: '#f1f5f9'
-        }
-    },
-    {
-        name: 'Verde atlântico',
-        theme: {
-            bg_app: '#f7faf9',
-            bg_sidebar: '#ffffff',
-            primary: '#064e3b',
-            accent: '#10b981',
-            text_main: '#0f172a',
-            text_muted: '#475569',
-            text_dim: '#94a3b8',
-            border: '#e2e8f0'
-        }
-    },
-    {
-        name: 'Âmbar quente',
-        theme: {
-            bg_app: '#fffbf5',
-            bg_sidebar: '#ffffff',
-            primary: '#7c2d12',
-            accent: '#f59e0b',
-            text_main: '#1f2937',
-            text_muted: '#6b7280',
-            text_dim: '#9ca3af',
-            border: '#e5e7eb'
-        }
-    },
-    {
-        name: 'Indigo moderno',
-        theme: {
-            bg_app: '#f5f6ff',
-            bg_sidebar: '#ffffff',
-            primary: '#1e1b4b',
-            accent: '#6366f1',
-            text_main: '#1f2937',
-            text_muted: '#6b7280',
-            text_dim: '#9ca3af',
-            border: '#e5e7eb'
-        }
-    }
-];
-const NAV_TYPE_ICON_IDS = {
-    overview: 'home',
-    development: 'code',
-    foundation: 'layers',
-    mindset: 'book',
-    now: 'compass',
-    contact: 'mail'
-};
 
 const SECTION_FIELD_ORDER = {
     overview: [
@@ -327,13 +255,49 @@ function normalizeBasePath(value, fallback) {
     return base.endsWith('/') ? base : `${base}/`;
 }
 
+function buildDefaultConfigFromCV() {
+    const meta = currentCV?.meta || {};
+    const theme = { ...DEFAULT_THEME, ...(meta.theme || {}) };
+    if (!theme.accent_soft && theme.accent) {
+        theme.accent_soft = hexToRgba(theme.accent, 0.08);
+    }
+    const paths = currentCV?.paths || {};
+    return {
+        paths: {
+            photos: normalizeBasePath(paths.photos, DEFAULT_PATHS.photos),
+            downloads: normalizeBasePath(paths.downloads, DEFAULT_PATHS.downloads),
+            icons: normalizeBasePath(paths.icons, DEFAULT_PATHS.icons)
+        },
+        site: {
+            title: meta.site_title || document.title || '',
+            description: meta.site_description || '',
+            favicon: meta.favicon || 'favicon.ico',
+            apple_icon: meta.apple_icon || 'apple-touch-icon.png'
+        },
+        theme
+    };
+}
+
+function ensureConfig() {
+    if (!currentConfig) {
+        currentConfig = buildDefaultConfigFromCV();
+    }
+    if (!currentConfig.paths) currentConfig.paths = { ...DEFAULT_PATHS };
+    currentConfig.paths.photos = normalizeBasePath(currentConfig.paths.photos, DEFAULT_PATHS.photos);
+    currentConfig.paths.downloads = normalizeBasePath(currentConfig.paths.downloads, DEFAULT_PATHS.downloads);
+    currentConfig.paths.icons = normalizeBasePath(currentConfig.paths.icons, DEFAULT_PATHS.icons);
+    if (!currentConfig.site) currentConfig.site = {};
+    if (!currentConfig.theme) currentConfig.theme = { ...DEFAULT_THEME };
+    if (!currentConfig.theme.accent_soft && currentConfig.theme.accent) {
+        currentConfig.theme.accent_soft = hexToRgba(currentConfig.theme.accent, 0.08);
+    }
+    return currentConfig;
+}
+
 function getPaths() {
-    if (!currentCV) return { ...DEFAULT_PATHS };
-    if (!currentCV.paths) currentCV.paths = { ...DEFAULT_PATHS };
-    currentCV.paths.photos = normalizeBasePath(currentCV.paths.photos, DEFAULT_PATHS.photos);
-    currentCV.paths.downloads = normalizeBasePath(currentCV.paths.downloads, DEFAULT_PATHS.downloads);
-    currentCV.paths.icons = normalizeBasePath(currentCV.paths.icons, DEFAULT_PATHS.icons);
-    return currentCV.paths;
+    if (!currentCV && !currentConfig) return { ...DEFAULT_PATHS };
+    const config = ensureConfig();
+    return config.paths;
 }
 
 function resolveAssetPath(type, value) {
@@ -354,11 +318,11 @@ function stripAssetBase(type, value) {
 
 function normalizeAssetPaths() {
     if (!currentCV) return;
-    const paths = getPaths();
+    ensureConfig();
     normalizeIconData();
-    if (currentCV.meta) {
-        if (currentCV.meta.favicon) currentCV.meta.favicon = stripAssetBase('icons', currentCV.meta.favicon);
-        if (currentCV.meta.apple_icon) currentCV.meta.apple_icon = stripAssetBase('icons', currentCV.meta.apple_icon);
+    if (currentConfig?.site) {
+        if (currentConfig.site.favicon) currentConfig.site.favicon = stripAssetBase('icons', currentConfig.site.favicon);
+        if (currentConfig.site.apple_icon) currentConfig.site.apple_icon = stripAssetBase('icons', currentConfig.site.apple_icon);
     }
     if (currentCV.profile) {
         if (currentCV.profile.photo_position === undefined) currentCV.profile.photo_position = 'center 20%';
@@ -492,10 +456,10 @@ function hexToRgba(hex, alpha = 0.08) {
 }
 
 function ensureThemeConfig() {
-    if (!currentCV) return DEFAULT_THEME;
-    if (!currentCV.meta) currentCV.meta = {};
-    if (!currentCV.meta.theme) currentCV.meta.theme = { ...DEFAULT_THEME };
-    const theme = currentCV.meta.theme;
+    if (!currentCV && !currentConfig) return DEFAULT_THEME;
+    const config = ensureConfig();
+    if (!config.theme) config.theme = { ...DEFAULT_THEME };
+    const theme = config.theme;
     Object.entries(DEFAULT_THEME).forEach(([key, value]) => {
         if (!theme[key]) theme[key] = value;
     });
@@ -506,7 +470,7 @@ function ensureThemeConfig() {
 }
 
 function applyAdminTheme() {
-    if (!currentCV) return;
+    if (!currentCV && !currentConfig) return;
     const theme = ensureThemeConfig();
     const root = document.documentElement;
     root.style.setProperty('--bg-app', theme.bg_app);
@@ -522,7 +486,7 @@ function applyAdminTheme() {
 }
 
 function renderThemeEditor(container) {
-    if (!container || !currentCV) return;
+    if (!container || (!currentCV && !currentConfig)) return;
     const theme = ensureThemeConfig();
     container.innerHTML = '';
 
@@ -541,7 +505,8 @@ function renderThemeEditor(container) {
         btn.onclick = () => {
             const next = { ...theme, ...preset.theme };
             next.accent_soft = hexToRgba(next.accent, 0.08);
-            currentCV.meta.theme = next;
+            const config = ensureConfig();
+            config.theme = next;
             renderThemeEditor(container);
             renderPreview();
             applyAdminTheme();
@@ -1908,9 +1873,32 @@ function showMessage(msg, type = 'info') {
     }, 6000);
 }
 
+async function runValidation() {
+    if (!currentCV) return { critical: [], warnings: [] };
+    const schemaResult = await validateCVSchema(currentCV);
+    const consistency = validateConsistency(currentCV);
+    const lang = currentLang || currentCV.meta?.defaultLanguage || 'pt';
+    const criticalMessages = formatErrorMessages(schemaResult.errors, lang)
+        .concat(formatErrorMessages(consistency.critical, lang));
+    const warningMessages = formatErrorMessages(consistency.warnings, lang);
+    validationStatus = {
+        critical: criticalMessages,
+        warnings: warningMessages
+    };
+    if (criticalMessages.length) {
+        showMessage(criticalMessages[0], 'error');
+    } else if (warningMessages.length) {
+        showMessage(warningMessages[0], 'info');
+    }
+    return validationStatus;
+}
+
 async function syncPreviewStorage() {
     if (!currentCV) return;
     await setSecureItem(sessionStorage, PREVIEW_STORAGE, JSON.stringify(currentCV));
+    if (currentConfig) {
+        await setSecureItem(sessionStorage, PREVIEW_CONFIG_STORAGE, JSON.stringify(currentConfig));
+    }
     const iframe = document.getElementById('page-preview');
     const previewPane = document.getElementById('preview-pane');
     const previewSection = Object.prototype.hasOwnProperty.call(PREVIEW_SECTION_MAP, currentSection)
@@ -1949,7 +1937,7 @@ function normalizeGitHubError(message) {
         return 'Token inválido ou expirado. Atualiza o PAT.';
     }
     if (text.includes('Not Found') || text.includes('404')) {
-        return 'Repositório ou caminho não encontrado. Confirma owner/repo e o caminho data/cv.json.';
+        return `Repositório ou caminho não encontrado. Confirma owner/repo e o caminho ${CV_PATH}.`;
     }
     return message;
 }
@@ -2004,9 +1992,9 @@ async function fetchJsonWithFallback(urls) {
 
 async function loadLocalCV() {
     const base = window.location.href;
-    const direct = new URL('data/cv.json', base).toString();
-    const relative = './data/cv.json';
-    const root = `${window.location.origin}${window.location.pathname.replace(/config\\.html.*$/i, '')}data/cv.json`;
+    const direct = new URL(CV_PATH, base).toString();
+    const relative = `./${CV_PATH}`;
+    const root = `${window.location.origin}${window.location.pathname.replace(/config\\.html.*$/i, '')}${CV_PATH}`;
     const data = await fetchJsonWithFallback([direct, relative, root]);
     return { data, sha: null };
 }
@@ -2016,6 +2004,30 @@ async function loadGitHubCV(token) {
         throw new Error('Indica owner e repo para carregar via GitHub.');
     }
     return gh.fetchCVData(repoInfo.owner, repoInfo.repo, repoInfo.path, token);
+}
+
+async function loadLocalConfig() {
+    const base = window.location.href;
+    const direct = new URL(CONFIG_PATH, base).toString();
+    const relative = `./${CONFIG_PATH}`;
+    const root = `${window.location.origin}${window.location.pathname.replace(/config\\.html.*$/i, '')}${CONFIG_PATH}`;
+    try {
+        const data = await fetchJsonWithFallback([direct, relative, root]);
+        return { data, sha: null };
+    } catch (err) {
+        return { data: buildDefaultConfigFromCV(), sha: null };
+    }
+}
+
+async function loadGitHubConfig(token) {
+    if (!repoInfo.owner || !repoInfo.repo) {
+        throw new Error('Indica owner e repo para carregar via GitHub.');
+    }
+    try {
+        return await gh.fetchCVData(repoInfo.owner, repoInfo.repo, CONFIG_PATH, token);
+    } catch (err) {
+        return { data: buildDefaultConfigFromCV(), sha: null };
+    }
 }
 
 async function loadCV(preferGitHub = false, lockOnFail = true) {
@@ -2028,20 +2040,27 @@ async function loadCV(preferGitHub = false, lockOnFail = true) {
         }
         if (preferGitHub && token) {
             const result = await loadGitHubCV(token);
+            const configResult = await loadGitHubConfig(token);
             currentSource = 'github';
             currentCV = result.data;
             currentSHA = result.sha;
+            currentConfig = configResult.data;
+            configSHA = configResult.sha;
             showMessage('cv.json carregado via GitHub.', 'success');
         } else {
             const result = await loadLocalCV();
+            const configResult = await loadLocalConfig();
             currentSource = 'local';
             currentCV = result.data;
             currentSHA = null;
+            currentConfig = configResult.data;
+            configSHA = null;
             showMessage('cv.json carregado localmente.', 'info');
         }
         normalizeAssetPaths();
         applyAdminTheme();
         ensureSectionDefinitions();
+        await runValidation();
         currentLang = currentCV.meta?.defaultLanguage || 'pt';
         const sections = getSectionsMeta();
         currentSection = sections.length ? sections[0].id : 'overview';
@@ -2502,18 +2521,19 @@ function renderSectionEditor() {
     };
 
     if (currentSection === 'overview') {
-        if (!currentCV.meta) currentCV.meta = {};
+        ensureConfig();
         pendingFieldsets.push(() => {
             const iconsBase = getPaths().icons;
             const metaFieldset = document.createElement('fieldset');
             const metaLegend = document.createElement('legend');
             metaLegend.textContent = 'Site (Meta)';
             metaFieldset.appendChild(metaLegend);
+            const siteConfig = currentConfig.site || {};
             const metaFields = [
-                { key: 'site_title', label: 'Título do site', defaultValue: currentCV.meta.site_title || document.title || '' },
-                { key: 'site_description', label: 'Descrição do site', multiline: true, defaultValue: currentCV.meta.site_description || (document.querySelector('meta[name="description"]')?.getAttribute('content') || '') },
-                { key: 'favicon', label: 'Favicon (path)', isImage: true, defaultValue: stripAssetBase('icons', currentCV.meta.favicon || (document.getElementById('site-favicon')?.getAttribute('href') || `${iconsBase}favicon.ico`)) },
-                { key: 'apple_icon', label: 'Apple touch icon (path)', isImage: true, defaultValue: stripAssetBase('icons', currentCV.meta.apple_icon || (document.getElementById('apple-touch-icon')?.getAttribute('href') || `${iconsBase}apple-touch-icon.png`)) }
+                { key: 'title', label: 'Título do site', defaultValue: siteConfig.title || document.title || '' },
+                { key: 'description', label: 'Descrição do site', multiline: true, defaultValue: siteConfig.description || (document.querySelector('meta[name="description"]')?.getAttribute('content') || '') },
+                { key: 'favicon', label: 'Favicon (path)', isImage: true, defaultValue: stripAssetBase('icons', siteConfig.favicon || (document.getElementById('site-favicon')?.getAttribute('href') || `${iconsBase}favicon.ico`)) },
+                { key: 'apple_icon', label: 'Apple touch icon (path)', isImage: true, defaultValue: stripAssetBase('icons', siteConfig.apple_icon || (document.getElementById('apple-touch-icon')?.getAttribute('href') || `${iconsBase}apple-touch-icon.png`)) }
             ];
             metaFields.forEach((field) => {
                 const wrapper = document.createElement('div');
@@ -2522,14 +2542,14 @@ function renderSectionEditor() {
                 label.textContent = field.label;
                 wrapper.appendChild(label);
                 if (field.isImage) {
-                    if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
-                    makeImageField(wrapper, currentCV.meta, field.key, 'meta');
+                    if (!siteConfig[field.key]) siteConfig[field.key] = field.defaultValue || '';
+                    makeImageField(wrapper, siteConfig, field.key, 'meta');
                 } else {
                     const input = field.multiline ? document.createElement('textarea') : document.createElement('input');
-                    if (!currentCV.meta[field.key]) currentCV.meta[field.key] = field.defaultValue || '';
-                    input.value = currentCV.meta[field.key] || '';
+                    if (!siteConfig[field.key]) siteConfig[field.key] = field.defaultValue || '';
+                    input.value = siteConfig[field.key] || '';
                     input.oninput = (event) => {
-                        currentCV.meta[field.key] = event.target.value;
+                        siteConfig[field.key] = event.target.value;
                         renderPreview();
                     };
                     wrapper.appendChild(input);
@@ -3196,7 +3216,14 @@ async function translateSection() {
 
 async function saveChanges() {
     if (!currentCV) return;
+    ensureConfig();
     await persistSessionFields();
+
+    await runValidation();
+    if (validationStatus.critical.length) {
+        showMessage('Dados inválidos. Corrige os erros antes de guardar.', 'error');
+        return;
+    }
 
     const token = await auth.getToken();
     if (!token) {
@@ -3231,6 +3258,31 @@ async function saveChanges() {
         );
         currentSHA = result.content.sha;
         currentSource = 'github';
+        if (currentConfig) {
+            if (!configSHA) {
+                try {
+                    const configResult = await gh.fetchCVData(
+                        repoInfo.owner,
+                        repoInfo.repo,
+                        CONFIG_PATH,
+                        token
+                    );
+                    configSHA = configResult.sha;
+                } catch (error) {
+                    configSHA = null;
+                }
+            }
+            const configResult = await gh.updateCVData(
+                repoInfo.owner,
+                repoInfo.repo,
+                CONFIG_PATH,
+                token,
+                currentConfig,
+                configSHA,
+                'Update site config via Admin UI'
+            );
+            configSHA = configResult.content.sha;
+        }
         if (pendingDownloadDeletes.size) {
             const downloads = Array.isArray(currentCV.profile?.downloads) ? currentCV.profile.downloads : [];
             const activeHrefs = new Set(downloads.map((item) => resolveAssetPath('downloads', item?.href)).filter(Boolean));
@@ -3374,27 +3426,22 @@ function bindEvents() {
 }
 
 async function downloadLocalConfigBackup() {
-    const token = await auth.getToken();
-    const openaiKey = await getOpenAIKey();
+    if (!currentConfig) {
+        currentConfig = buildDefaultConfigFromCV();
+    }
     const payload = {
         savedAt: new Date().toISOString(),
-        repo: {
-            owner: uiNodes.repoOwner?.value?.trim() || repoInfo.owner || '',
-            name: uiNodes.repoName?.value?.trim() || repoInfo.repo || '',
-            path: repoInfo.path
-        },
-        github_pat: token || '',
-        openai_api_key: openaiKey || ''
+        config: currentConfig
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'local-config-backup.json';
+    link.download = 'config.json';
     document.body.appendChild(link);
     link.click();
     URL.revokeObjectURL(link.href);
     link.remove();
-    showMessage('Backup das configurações descarregado.', 'success');
+    showMessage('Configurações exportadas.', 'success');
 }
 
 function downloadFullCVJson() {
@@ -3402,22 +3449,70 @@ function downloadFullCVJson() {
         showMessage('Sem dados carregados para exportar.', 'error');
         return;
     }
-    const blob = new Blob([JSON.stringify(currentCV, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'cv.json';
-    document.body.appendChild(link);
-    link.click();
-    URL.revokeObjectURL(link.href);
-    link.remove();
-    showMessage('cv.json exportado.', 'success');
+    const exportAll = async () => {
+        const configPayload = currentConfig || buildDefaultConfigFromCV();
+        const langs = Array.isArray(currentCV.meta?.availableLanguages)
+            ? currentCV.meta.availableLanguages
+            : LANGS;
+        const i18n = {};
+        for (const lang of langs) {
+            try {
+                const resp = await fetch(`data/i18n/${lang}.json`, { cache: 'no-store' });
+                if (resp.ok) {
+                    i18n[lang] = await resp.json();
+                } else {
+                    i18n[lang] = {};
+                }
+            } catch (err) {
+                i18n[lang] = {};
+            }
+        }
+        const payload = {
+            savedAt: new Date().toISOString(),
+            cv: currentCV,
+            config: configPayload,
+            i18n
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'site-bundle.json';
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        link.remove();
+        showMessage('Exportação completa descarregada.', 'success');
+    };
+    exportAll();
 }
 
 async function restoreFullCVJson(file) {
     try {
         const text = await file.text();
         const parsed = JSON.parse(text);
-        if (!parsed || typeof parsed !== 'object' || !parsed.localized || !parsed.profile) {
+        if (!parsed || typeof parsed !== 'object') {
+            showMessage('JSON inválido.', 'error');
+            return;
+        }
+        if (parsed.cv && parsed.config && parsed.i18n) {
+            currentCV = parsed.cv;
+            currentConfig = parsed.config;
+            currentSource = 'local';
+            currentSHA = null;
+            configSHA = null;
+            pendingDownloadDeletes.clear();
+            normalizeAssetPaths();
+            ensureSectionDefinitions();
+            await runValidation();
+            const sections = getSectionsMeta();
+            currentSection = sections.length ? sections[0].id : 'overview';
+            renderSidebar();
+            renderSectionEditor();
+            renderPreview();
+            showMessage('Bundle importado com sucesso.', 'success');
+            return;
+        }
+        if (!parsed.localized || !parsed.profile) {
             showMessage('JSON inválido: falta estrutura base do CV.', 'error');
             return;
         }
@@ -3427,6 +3522,7 @@ async function restoreFullCVJson(file) {
         pendingDownloadDeletes.clear();
         normalizeAssetPaths();
         ensureSectionDefinitions();
+        await runValidation();
         const sections = getSectionsMeta();
         currentSection = sections.length ? sections[0].id : 'overview';
         renderSidebar();
@@ -3625,26 +3721,16 @@ async function restoreLocalConfigBackup(file) {
         showMessage('Backup inválido.', 'error');
         return;
     }
-    const repo = payload.repo || {};
-    if (repo.owner) {
-        repoInfo.owner = repo.owner;
-        if (uiNodes.repoOwner) uiNodes.repoOwner.value = repo.owner;
-        await setSecureItem(localStorage, REPO_OWNER_STORAGE, repo.owner);
+    if (!payload.config || typeof payload.config !== 'object') {
+        showMessage('Config inválida.', 'error');
+        return;
     }
-    if (repo.name) {
-        repoInfo.repo = repo.name;
-        if (uiNodes.repoName) uiNodes.repoName.value = repo.name;
-        await setSecureItem(localStorage, REPO_NAME_STORAGE, repo.name);
-    }
-    if (payload.github_pat) {
-        if (uiNodes.ghToken) uiNodes.ghToken.value = payload.github_pat;
-        await auth.saveToken(payload.github_pat);
-    }
-    if (payload.openai_api_key) {
-        if (uiNodes.openaiKey) uiNodes.openaiKey.value = payload.openai_api_key;
-        await setSecureItem(localStorage, OPENAI_KEY_STORAGE, payload.openai_api_key);
-    }
-    showMessage('Backup restaurado.', 'success');
+    currentConfig = payload.config;
+    ensureConfig();
+    applyAdminTheme();
+    renderSectionEditor();
+    renderPreview();
+    showMessage('Configurações importadas.', 'success');
 }
 
 async function init() {

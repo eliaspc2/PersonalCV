@@ -5,6 +5,10 @@
  * Should be run in browser console or included in development mode.
  */
 
+import { validateCVSchema } from '../validators/schema-validate.js';
+import { validateConsistency } from '../validators/cv-consistency.js';
+import { formatErrorMessages } from '../validators/error-messages.js';
+
 async function runChecks() {
     console.log("Running Self-Checks...");
 
@@ -36,6 +40,25 @@ async function runChecks() {
             alert("Self-Check Failed! See console for details.");
         } else {
             console.log("✅ All Source-Code invariants passed.");
+        }
+
+        const cvResp = await fetch('./data/cv.json');
+        if (cvResp.ok) {
+            const cv = await cvResp.json();
+            const schemaResult = await validateCVSchema(cv);
+            const consistency = validateConsistency(cv);
+            const lang = cv?.meta?.defaultLanguage || 'pt';
+            const critical = formatErrorMessages(schemaResult.errors, lang)
+                .concat(formatErrorMessages(consistency.critical, lang));
+            const warnings = formatErrorMessages(consistency.warnings, lang);
+            if (critical.length) {
+                console.error('❌ CV Schema/Consistency errors:', critical);
+            } else {
+                console.log('✅ CV Schema OK.');
+            }
+            if (warnings.length) {
+                console.warn('⚠️ CV warnings:', warnings);
+            }
         }
 
     } catch (e) {
