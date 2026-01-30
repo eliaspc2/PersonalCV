@@ -915,16 +915,20 @@ function renderDevelopment(data, container, sectionId = 'development') {
     };
     const allTechnologies = aggregateItems(data.skills, 'technologies');
     const allCompetencies = aggregateItems(data.skills, 'competencies');
+    const showAggTech = data.show_aggregated_technologies !== false;
+    const showAggComp = data.show_aggregated_competencies !== false;
     const aggTechLabel = t('ui.technologies_label', ui.technologies_label || 'Tecnologias');
     const aggCompLabel = t('ui.drawer_skill_competencies_label', ui.drawer_skill_competencies_label || 'Competências');
     const aggregateCards = `
-        <div class="aggregate-card">
-            <div class="aggregate-title">${aggTechLabel}</div>
-            <div class="chip-list">
-                ${allTechnologies.map((tech) => `<span class="chip">${tech}</span>`).join('')}
+        ${showAggTech && allTechnologies.length ? `
+            <div class="aggregate-card">
+                <div class="aggregate-title">${aggTechLabel}</div>
+                <div class="chip-list">
+                    ${allTechnologies.map((tech) => `<span class="chip">${tech}</span>`).join('')}
+                </div>
             </div>
-        </div>
-        ${allCompetencies.length ? `
+        ` : ''}
+        ${showAggComp && allCompetencies.length ? `
             <div class="aggregate-card">
                 <div class="aggregate-title">${aggCompLabel}</div>
                 <div class="chip-list">
@@ -959,7 +963,7 @@ function renderDevelopment(data, container, sectionId = 'development') {
                         <div class="development-image">
                             <img src="${resolveAssetPath('photos', data.image)}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
                         </div>
-                        ${allTechnologies.length ? aggregateCards : ''}
+                        ${(showAggTech || showAggComp) ? aggregateCards : ''}
                     </div>
                 </div>
             ${nextText ? `

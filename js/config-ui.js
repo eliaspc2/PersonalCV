@@ -2770,6 +2770,52 @@ function renderSectionEditor() {
     let certsRendered = false;
     const sectionType = getSectionType(currentSection);
 
+    if (sectionType === 'development') {
+        const fieldset = document.createElement('fieldset');
+        const legend = document.createElement('legend');
+        legend.textContent = 'Agregados';
+        fieldset.appendChild(legend);
+
+        if (content.show_aggregated_technologies === undefined) {
+            content.show_aggregated_technologies = true;
+        }
+        if (content.show_aggregated_competencies === undefined) {
+            content.show_aggregated_competencies = true;
+        }
+
+        const techWrap = document.createElement('div');
+        techWrap.className = 'inline-input';
+        const techLabel = document.createElement('label');
+        techLabel.textContent = 'Mostrar tecnologias agregadas';
+        const techInput = document.createElement('input');
+        techInput.type = 'checkbox';
+        techInput.checked = Boolean(content.show_aggregated_technologies);
+        techInput.onchange = (event) => {
+            content.show_aggregated_technologies = event.target.checked;
+            renderPreview();
+        };
+        techWrap.appendChild(techLabel);
+        techWrap.appendChild(techInput);
+        fieldset.appendChild(techWrap);
+
+        const compWrap = document.createElement('div');
+        compWrap.className = 'inline-input';
+        const compLabel = document.createElement('label');
+        compLabel.textContent = 'Mostrar competências agregadas';
+        const compInput = document.createElement('input');
+        compInput.type = 'checkbox';
+        compInput.checked = Boolean(content.show_aggregated_competencies);
+        compInput.onchange = (event) => {
+            content.show_aggregated_competencies = event.target.checked;
+            renderPreview();
+        };
+        compWrap.appendChild(compLabel);
+        compWrap.appendChild(compInput);
+        fieldset.appendChild(compWrap);
+
+        uiNodes.editorForm.appendChild(fieldset);
+    }
+
     const renderCertificationsFieldset = () => {
         const locale = currentCV.localized?.[currentLang];
         if (!locale) return;
