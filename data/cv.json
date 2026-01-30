@@ -83,10 +83,10 @@
       "github": "https://github.com/eliaspc2",
       "email": "eliaspc2@gmail.com"
     },
-      "downloads": [
-        {
-          "label": "CV Standard",
-          "icon": "",
+    "downloads": [
+      {
+        "label": "CV Standard",
+        "icon": "",
         "href": "cv-andre-camara.pdf",
         "group": "downloads"
       },
@@ -96,12 +96,12 @@
         "href": "cv-extended-andre-camara.pdf",
         "group": "downloads"
       },
-        {
-          "label": "Conteúdo Programático (EFA)",
-          "icon": "spinner",
-          "href": "efa-program-content.pdf",
-          "group": "certs"
-        },
+      {
+        "label": "Conteúdo Programático (EFA)",
+        "icon": "spinner",
+        "href": "efa-program-content.pdf",
+        "group": "certs"
+      },
       {
         "label": "Python I (Helsinki)",
         "icon": "",
@@ -130,7 +130,11 @@
         "label": "Python Programming II (University of Helsinki)",
         "href": "cert-python-adv-helsinki.png"
       }
-    ]
+    ],
+    "photo_position": "center 20%",
+    "photo_zoom": 1,
+    "contact_photo_position": "center 20%",
+    "contact_photo_zoom": 1
   },
   "localized": {
     "pt": {
@@ -195,7 +199,9 @@
         "marketing_note": "Para além da técnica, possuo formação em Marketing Digital. Esta consciência de produto ajuda-me a pensar no utilizador final, comunicar com clareza e entregar valor antes da tecnologia.",
         "next_label": "A seguir",
         "next_text": "Quem sou aparece na forma como construo. A próxima secção mostra a engenharia que pratico hoje.",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "development": {
         "title": "Engenharia de Software",
@@ -220,7 +226,9 @@
             "context_text": "Formação estruturada e exigente pela Universidade de Helsínquia (Programming I & II). Domínio de algoritmos, estruturas de dados e OOP.",
             "background": "Transitei do suporte técnico para a computação programática através de um percurso de 540h de formação intensiva. Onde outros vêm um script, eu vejo um sistema de automação resiliente.",
             "duration_hours": "270h (2x135h)",
-            "rh_value": "Capaz de trabalhar de forma autónoma em backend e automação, com atenção a robustez e manutenção."
+            "rh_value": "Capaz de trabalhar de forma autónoma em backend e automação, com atenção a robustez e manutenção.",
+            "competencies": [],
+            "progress_status": "APTO"
           },
           {
             "technologies": [
@@ -250,7 +258,9 @@
         "next_label": "Continuidade Técnica",
         "next_text": "O que faço hoje assenta num rigor construído antes da programação. A seguir, a fundação técnica que moldou esse rigor.",
         "cta_label": "Vamos Conversar?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "foundation": {
         "title": "Fundação Técnica",
@@ -331,7 +341,9 @@
         "next_label": "A seguir",
         "next_text": "A experiência formou a minha forma de pensar. Agora, a mentalidade que aplico no código.",
         "cta_label": "Vamos Conversar?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "mindset": {
         "title": "Mentalidade & Lógica Humana",
@@ -350,7 +362,7 @@
           {
             "id": "pao",
             "title": "Pão & Dependências",
-            "icon": "🍞",
+            "icon": "bread",
             "image": "bread-making.png",
             "principle_title": "Fermentação Lenta",
             "story_text": "Fazer pão é um hobby regular meu. No pão artesanal, saltar etapas é destruir o resultado. O tempo de fermentação é uma dependência que não pode ser apressada sem comprometer a estrutura.",
@@ -359,7 +371,7 @@
           {
             "id": "pizza",
             "title": "Pizza & Iteração",
-            "icon": "🍕",
+            "icon": "pizza",
             "image": "cooking.png",
             "image_position": "center 20%",
             "principle_title": "Feedback Incremental",
@@ -369,7 +381,7 @@
           {
             "id": "manutencao",
             "title": "Manutenção & Prevenção",
-            "icon": "💅",
+            "icon": "hand",
             "image": "nails-gel.png",
             "image_position": "center 55%",
             "principle_title": "Cuidado Preventivo",
@@ -379,7 +391,7 @@
           {
             "id": "marketing",
             "title": "Marketing & Consciência de Produto",
-            "icon": "📣",
+            "icon": "megaphone",
             "image": "marketing-digital.webp",
             "principle_title": "Valor Antes da Tecnologia",
             "story_text": "O contacto inicial com marketing digital não foi planeado. Surgiu durante a formação em unhas de gel: a maioria das manicures trabalha sozinha, por isso o curso incluía noções de marketing. A exposição contínua ao tema levou-me ao estudo autónomo e à curiosidade técnica. Para mim, marketing não é carreira paralela — é consciência de produto.",
@@ -388,7 +400,7 @@
           {
             "id": "leis",
             "title": "Leis & Sistemas",
-            "icon": "🗳️",
+            "icon": "checklist",
             "image": "elections-icon.jpg",
             "principle_title": "Sistemas Determinísticos",
             "story_text": "Acompanho leis e sistemas eleitorais como interesse pessoal e estrutural, não político. É fascínio por regras explícitas, precisão processual e integridade de sistemas. Num processo eleitoral, cada passo é validado para garantir confiança no resultado.",
@@ -398,7 +410,9 @@
         "next_label": "Próximo",
         "next_text": "A seguir, o que procuro neste momento — o ponto de contacto entre história e ação.",
         "cta_label": "Vamos Conversar?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "now": {
         "title": "O que procuro neste momento",
@@ -407,7 +421,9 @@
         "image_alt": "Perfil profissional",
         "summary": "Disponível para estágio curricular (210h) em contexto real de desenvolvimento ou sistemas, com capacidade de contributo efetivo desde o início.",
         "details": "A componente teórica termina no final de junho e o estágio pode iniciar a partir de junho de 2026. O estágio é acompanhado pela entidade formadora, com plano individual e objetivos definidos. Procuro um contexto real de desenvolvimento ou sistemas, com preferência por remoto (todo o país) e alternativa híbrida na zona de Bragança. Não requer formação básica e já estou habituado a contextos reais de trabalho e sistemas com histórico. O contacto serve para alinharmos expectativas e enquadramento.",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "contact": {
         "title": "Contacte-me",
@@ -436,10 +452,18 @@
           }
         ],
         "cta_label": "Vamos Conversar?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "navigation_icons": {
-        "teste": ""
+        "teste": "",
+        "overview": "",
+        "development": "",
+        "foundation": "",
+        "mindset": "",
+        "now": "",
+        "contact": ""
       }
     },
     "es": {
@@ -504,13 +528,15 @@
         "marketing_note": "Además de la técnica, tengo formación en Marketing Digital. Esta conciencia de producto me ayuda a pensar en el usuario final, comunicar con claridad y entregar valor antes que tecnología.",
         "next_label": "A continuación",
         "next_text": "Quién soy aparece en cómo construyo. La próxima sección muestra la ingeniería que practico hoy.",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "development": {
         "title": "Ingeniería de Software",
-        "description": "Foco en Python y en el arte de simplificar lo complejo. Para mí, el código es una herramienta de estabilidad.",
+        "description": "Enfoque en Python y en el arte de simplificar lo complejo. Para mí, el código es una herramienta de estabilidad.",
         "image": "work-desk.png",
-        "image_alt": "Entorno de trabajo",
+        "image_alt": "Ambiente de trabajo",
         "skills": [
           {
             "technologies": [
@@ -524,10 +550,14 @@
               "href": "https://programming-25.mooc.fi/",
               "viewer": false
             },
-            "title": "Python Ecosystem (I & II)",
+            "title": "Ecosistema Python (I & II)",
             "focus_area": "Backend & Automatización",
             "context_text": "Formación estructurada y exigente por la Universidad de Helsinki (Programming I & II). Dominio de algoritmos, estructuras de datos y OOP.",
-            "background": "Transité del soporte técnico a la computación programática a través de un recorrido intensivo de 540h. Donde otros ven un script, yo veo un sistema de automatización resiliente."
+            "background": "Transité del soporte técnico a la computación programática a través de un recorrido de 540h de formación intensiva. Donde otros ven un script, yo veo un sistema de automatización resiliente.",
+            "duration_hours": "270h (2x135h)",
+            "rh_value": "Capaz de trabajar de forma autónoma en backend y automatización, con atención a robustez y mantenimiento.",
+            "competencies": [],
+            "progress_status": "APTO"
           },
           {
             "technologies": [
@@ -547,16 +577,19 @@
             },
             "title": "Formación EFA Programador",
             "focus_area": "Desarrollo Fullstack",
-            "context_text": "Recorrido de 1416h enfocado en tecnologías modernas y buenas prácticas de ingeniería. En curso.",
+            "context_text": "Recorrido de 1416h centrado en tecnologías modernas y buenas prácticas de ingeniería. En curso.",
             "background": "Actualmente consolidando conocimientos en arquitecturas modernas, garantizando que la base técnica sólida se traduzca en aplicaciones web robustas y escalables.",
             "progress_status": "EN CURSO",
-            "duration_hours": "1416h"
+            "duration_hours": "1416h",
+            "rh_value": "Contribución sólida en desarrollo fullstack con enfoque en calidad, mantenimiento y estabilidad operacional."
           }
         ],
-        "next_label": "Transición",
-        "next_text": "Lo que hago hoy se apoya en un rigor construido antes de la programación. A continuación, la base técnica que lo moldeó.",
-        "cta_label": "¿Conversamos?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "next_label": "Continuidad Técnica",
+        "next_text": "Lo que hago hoy se basa en un rigor construido antes de la programación. A continuación, la base técnica que moldeó ese rigor.",
+        "cta_label": "¿Hablamos?",
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "foundation": {
         "title": "Fundación Técnica",
@@ -637,7 +670,9 @@
         "next_label": "A continuación",
         "next_text": "La experiencia formó mi manera de pensar. Ahora, la mentalidad que aplico al código.",
         "cta_label": "¿Conversamos?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "mindset": {
         "title": "Mentalidad & Lógica Humana",
@@ -656,7 +691,7 @@
           {
             "id": "pao",
             "title": "Pan & Dependencias",
-            "icon": "🍞",
+            "icon": "bread",
             "image": "bread-making.png",
             "principle_title": "Fermentación Lenta",
             "story_text": "En el pan artesanal, saltarse etapas destruye el resultado. El tiempo de fermentación es una dependencia que no se puede acelerar sin comprometer la estructura.",
@@ -665,7 +700,7 @@
           {
             "id": "pizza",
             "title": "Pizza & Iteración",
-            "icon": "🍕",
+            "icon": "pizza",
             "image": "cooking.png",
             "image_position": "center 20%",
             "principle_title": "Feedback Incremental",
@@ -675,7 +710,7 @@
           {
             "id": "manutencao",
             "title": "Mantenimiento & Prevención",
-            "icon": "💅",
+            "icon": "hand",
             "image": "nails-gel.png",
             "image_position": "center 55%",
             "principle_title": "Cuidado Preventivo",
@@ -685,7 +720,7 @@
           {
             "id": "marketing",
             "title": "Marketing & Conciencia de Producto",
-            "icon": "📣",
+            "icon": "megaphone",
             "image": "marketing-digital.webp",
             "principle_title": "Valor Antes de la Tecnología",
             "story_text": "El contacto inicial con el marketing digital no fue planeado. Surgió durante la formación en uñas de gel: la mayoría de las manicuras trabaja sola, por eso el curso incluía nociones de marketing. La exposición continua al tema me llevó al estudio autónomo y a la curiosidad técnica. Para mí, el marketing no es una carrera paralela: es conciencia de producto.",
@@ -694,7 +729,7 @@
           {
             "id": "leis",
             "title": "Leyes & Sistemas",
-            "icon": "🗳️",
+            "icon": "checklist",
             "image": "elections-icon.jpg",
             "principle_title": "Sistemas Deterministas",
             "story_text": "Mi interés por leyes y sistemas electorales no es político. Es fascinación por reglas explícitas, precisión procesal e integridad de sistemas. En un proceso electoral, cada paso se valida para garantizar confianza en el resultado.",
@@ -704,7 +739,9 @@
         "next_label": "Siguiente",
         "next_text": "A continuación, lo que busco en este momento: el punto de contacto entre historia y acción.",
         "cta_label": "¿Conversamos?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "now": {
         "title": "Qué busco en este momento",
@@ -713,7 +750,9 @@
         "image_alt": "Perfil profesional",
         "summary": "Busco una entidad acogedora para las prácticas curriculares obligatorias (210h) del EFA – Programador Informático.",
         "details": "La parte teórica termina a finales de junio y las prácticas pueden comenzar a partir de junio de 2026. Las prácticas están acompañadas por la entidad formadora, con plan individual y objetivos definidos. Busco un contexto real de desarrollo o sistemas, con preferencia por remoto (todo el país) y alternativa híbrida en la zona de Bragança. A lo largo de la formación ya tuve contacto práctico con programación, así que las prácticas no empiezan de cero. El contacto sirve para alinear expectativas y encuadre.",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "contact": {
         "title": "Contáctame",
@@ -742,10 +781,18 @@
           }
         ],
         "cta_label": "¿Conversamos?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "navigation_icons": {
-        "teste": ""
+        "teste": "",
+        "overview": "",
+        "development": "",
+        "foundation": "",
+        "mindset": "",
+        "now": "",
+        "contact": ""
       }
     },
     "en": {
@@ -810,11 +857,13 @@
         "marketing_note": "Alongside the technical path, I have training in Digital Marketing. That product awareness helps me think about the end user, communicate clearly, and deliver value before technology.",
         "next_label": "Next",
         "next_text": "Who I am shows up in how I build. The next section lays out the engineering I practice today.",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "development": {
         "title": "Software Engineering",
-        "description": "Focused on Python and on simplifying the complex. To me, code is a tool for stability.",
+        "description": "Focus on Python and the art of simplifying the complex. For me, code is a tool for stability.",
         "image": "work-desk.png",
         "image_alt": "Work environment",
         "skills": [
@@ -832,8 +881,12 @@
             },
             "title": "Python Ecosystem (I & II)",
             "focus_area": "Backend & Automation",
-            "context_text": "Structured, demanding training from the University of Helsinki (Programming I & II). Solid grasp of algorithms, data structures, and OOP.",
-            "background": "I moved from technical support to programmatic computing through an intensive 540h training path. Where others see a script, I see a resilient automation system."
+            "context_text": "Structured and demanding training from the University of Helsinki (Programming I & II). Mastery of algorithms, data structures, and OOP.",
+            "background": "I transitioned from technical support to programmatic computing through a 540h intensive training path. Where others see a script, I see a resilient automation system.",
+            "duration_hours": "270h (2x135h)",
+            "rh_value": "Able to work independently in backend and automation, with attention to robustness and maintenance.",
+            "competencies": [],
+            "progress_status": "READY"
           },
           {
             "technologies": [
@@ -843,26 +896,29 @@
               "C#",
               "ASP.NET Core MVC",
               "Python",
-              "Networking",
+              "Networks",
               "Operating Systems"
             ],
             "resource": {
-              "label": "Training provider",
+              "label": "Training entity",
               "href": "https://tecnisign.pt/",
               "viewer": false
             },
-            "title": "EFA Programmer Program",
+            "title": "EFA Programmer Training",
             "focus_area": "Fullstack Development",
-            "context_text": "1416h program focused on modern technologies and engineering best practices. In progress.",
-            "background": "Currently consolidating knowledge in modern architectures, ensuring a solid technical base translates into robust, scalable web applications.",
+            "context_text": "1416h course focused on modern technologies and good engineering practices. In progress.",
+            "background": "Currently consolidating knowledge in modern architectures, ensuring that a solid technical foundation translates into robust and scalable web applications.",
             "progress_status": "IN PROGRESS",
-            "duration_hours": "1416h"
+            "duration_hours": "1416h",
+            "rh_value": "Solid contribution to fullstack development with a focus on quality, maintenance, and operational stability."
           }
         ],
-        "next_label": "Transition",
-        "next_text": "What I do today rests on rigor built before programming. Next, the technical foundation that shaped it.",
-        "cta_label": "Let’s Talk?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "next_label": "Technical Continuity",
+        "next_text": "What I do today is based on a rigor built before programming. Next, the technical foundation that shaped that rigor.",
+        "cta_label": "Shall we talk?",
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "foundation": {
         "title": "Technical Foundation",
@@ -943,7 +999,9 @@
         "next_label": "Next",
         "next_text": "Experience shaped how I think. Now, the mindset I bring to code.",
         "cta_label": "Let’s Talk?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "mindset": {
         "title": "Mindset & Human Logic",
@@ -962,7 +1020,7 @@
           {
             "id": "pao",
             "title": "Bread & Dependencies",
-            "icon": "🍞",
+            "icon": "bread",
             "image": "bread-making.png",
             "principle_title": "Slow Fermentation",
             "story_text": "In artisanal bread, skipping steps destroys the result. Fermentation time is a dependency that cannot be rushed without compromising structure.",
@@ -971,7 +1029,7 @@
           {
             "id": "pizza",
             "title": "Pizza & Iteration",
-            "icon": "🍕",
+            "icon": "pizza",
             "image": "cooking.png",
             "image_position": "center 20%",
             "principle_title": "Incremental Feedback",
@@ -981,7 +1039,7 @@
           {
             "id": "manutencao",
             "title": "Maintenance & Prevention",
-            "icon": "💅",
+            "icon": "hand",
             "image": "nails-gel.png",
             "image_position": "center 55%",
             "principle_title": "Preventive Care",
@@ -991,7 +1049,7 @@
           {
             "id": "marketing",
             "title": "Marketing & Product Awareness",
-            "icon": "📣",
+            "icon": "megaphone",
             "image": "marketing-digital.webp",
             "principle_title": "Value Before Technology",
             "story_text": "My first contact with digital marketing was unplanned. It emerged during gel nail training: most nail technicians work alone, so the course included marketing basics. Continued exposure led me to self-study and technical curiosity. For me, marketing is not a parallel career — it is product awareness.",
@@ -1000,7 +1058,7 @@
           {
             "id": "leis",
             "title": "Laws & Systems",
-            "icon": "🗳️",
+            "icon": "checklist",
             "image": "elections-icon.jpg",
             "principle_title": "Deterministic Systems",
             "story_text": "My interest in laws and electoral systems is not political. It’s a fascination with explicit rules, procedural precision, and system integrity. In an electoral process, every step is validated to ensure trust in the outcome.",
@@ -1010,7 +1068,9 @@
         "next_label": "Next",
         "next_text": "Next, what I’m looking for right now — the bridge between story and action.",
         "cta_label": "Let’s Talk?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "now": {
         "title": "What I’m looking for right now",
@@ -1019,7 +1079,9 @@
         "image_alt": "Professional portrait",
         "summary": "I’m looking for a host organization for the mandatory 210-hour curricular internship in the EFA – Programmer program.",
         "details": "The theoretical phase ends at the end of June, and the internship can start from June 2026. It is supervised by the training entity, with an individual plan and defined objectives. I’m looking for a real development or systems context, preferably remote (nationwide) with a hybrid alternative in the Bragança area. I’ve already had practical programming contact during the course, so the internship doesn’t start from zero. The contact is to align expectations and fit.",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "contact": {
         "title": "Contact Me",
@@ -1048,10 +1110,18 @@
           }
         ],
         "cta_label": "Let’s Talk?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
+        "cta_link": "mailto:eliaspc2@gmail.com",
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "navigation_icons": {
-        "teste": ""
+        "teste": "",
+        "overview": "",
+        "development": "",
+        "foundation": "",
+        "mindset": "",
+        "now": "",
+        "contact": ""
       }
     }
   }
