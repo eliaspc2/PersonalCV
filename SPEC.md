@@ -4,7 +4,7 @@
 Develop a personal CV website hosted on GitHub Pages, consisting of:
 - **Public CV**: Static frontend displaying the CV data.
 - **Config Interface (Admin UI)**: Controlled access static frontend to edit CV data.
-- **Data Source**: `data/cv.json` (content), `data/config.json` (behavior), `data/i18n/*.json` (optional translations).
+- **Data Source**: `data/cv.json` (content), `data/config.json` (behavior).
 
 **Constraints**:
 - No backend.
@@ -26,7 +26,6 @@ This structure is mandatory.
 ├── data/
 │   ├── cv.json             # Content structure + values
 │   ├── config.json         # Behavior/config (paths, theme, meta)
-│   └── i18n/               # Optional translations (key/value)
 │       ├── pt.json
 │       ├── es.json
 │       └── en.json
@@ -68,8 +67,7 @@ This structure is mandatory.
 ## 4. Data Rules (Source of Truth)
 - `data/cv.json` holds **content** (structure + values).
 - `data/config.json` holds **behavior/config** (paths, theme, meta).
-- `data/i18n/*.json` holds **translations** (key/value). If empty, fallback to `cv.json`.
-- Public CV reads `cv.json` + `config.json` + `i18n`.
+- Public CV reads `cv.json` + `config.json`.
 - Config UI edits both `cv.json` and `config.json` and commits changes via API.
 
 **`cv.json` Schema (current)**:

@@ -52,13 +52,8 @@ Alternative (classic token):
 7. Podes criar novas secções com **+ Adicionar secção** (usa templates existentes).
 8. Click **Guardar alterações** (guarda `cv.json` + `config.json`).
 
-### Traduções (i18n)
-- Os ficheiros `data/i18n/*.json` são opcionais.
-- Se estiverem vazios, o site usa os textos do `cv.json`.
-- Quando começar a preencher, as chaves são do tipo `overview.headline`, `contact.cta_label`, etc.
-
 ## 5. Export / Import
-- **Exportar JSON** gera um bundle completo (`site-bundle.json`) com `cv`, `config` e `i18n`.
+- **Exportar JSON** gera um bundle completo (`site-bundle.json`) com `cv` e `config`.
 - **Importar JSON** aceita:
   - `site-bundle.json` (restaura tudo)
   - `cv.json` simples (compatibilidade)

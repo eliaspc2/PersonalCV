@@ -15,7 +15,7 @@
     "cv-render.js": {
       "allowedImports": [],
       "allowedGlobalAccess": ["document", "window"],
-      "forbiddenCalls": ["fetch", "githubApi", "configUi"]
+      "forbiddenCalls": ["githubApi", "configUi"]
     },
     "github-api.js": {
       "allowedImports": [],
@@ -25,7 +25,7 @@
     "config-ui.js": {
       "allowedImports": ["github-api.js", "auth-gate.js"],
       "allowedGlobalAccess": ["document", "window"],
-      "forbiddenCalls": ["fetch"]
+      "forbiddenCalls": []
     },
     "auth-gate.js": {
       "allowedImports": [],

@@ -5,8 +5,8 @@ A 100% static narrative profile site with a built-in configuration interface, de
 ## 🎯 Architecture Overview
 
 The project is built on the concept of **Static Frontend as Admin**. 
-- **Persistence**: Content in `data/cv.json`, behavior in `data/config.json`, i18n in `data/i18n/*.json`.
-- **Single Source of Truth**: CV content lives in `data/cv.json` (structure + values). Config/i18n are separate.
+- **Persistence**: Content in `data/cv.json`, behavior in `data/config.json`.
+- **Single Source of Truth**: CV content lives in `data/cv.json` (structure + values). Config is separate.
 - **Admin Flow**: A hidden configuration page (`config.html`) allows the user to edit the JSON data and commit changes back to GitHub using a Personal Access Token (PAT).
 - **Security**: Access to the config page is obscured (3-click trigger). Write operations require a valid GitHub PAT (stored encrypted in localStorage).
 
@@ -23,10 +23,6 @@ The project is built on the concept of **Static Frontend as Admin**.
 ├── data/
 │   ├── cv.json             # Content (structure + values)
 │   ├── config.json         # Behavior/config (paths, theme, meta)
-│   └── i18n/               # Optional translations (key/value)
-│       ├── pt.json
-│       ├── es.json
-│       └── en.json
 ├── schema/
 │   └── cv.schema.json      # JSON Schema (validation)
 ├── validators/
@@ -81,4 +77,4 @@ See [FORK_SETUP.md](./FORK_SETUP.md) for a step‑by‑step guide to forking, Gi
 - Image crop/zoom tooling for photo framing.
 - Downloads managed inside Contacto with groups and links (viewer inside the site).
 - Add new sections using existing templates (visual picker).
-- Export/Import bundle (cv + config + i18n) via the Admin UI.
+- Export/Import bundle (cv + config) via the Admin UI.

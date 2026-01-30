@@ -151,6 +151,64 @@ export async function deleteFile(owner, repo, path, token, message) {
     return handleResponse(response);
 }
 
+function encodeBase64(bytes) {
+    let binary = '';
+    const len = bytes.length;
+    for (let i = 0; i < len; i += 1) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
+
+async function getFileSha(owner, repo, path, token) {
+    const headers = {
+        "Accept": "application/vnd.github.v3+json"
+    };
+    if (token) {
+        headers["Authorization"] = `token ${token}`;
+    }
+    const url = `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${path}`;
+    const response = await fetch(url, { headers });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.sha || null;
+}
+
+/**
+ * Uploads a file to the repository (creates or overwrites).
+ * @param {string} owner
+ * @param {string} repo
+ * @param {string} path
+ * @param {File} file
+ * @param {string} token
+ * @param {string} message
+ * @returns {Promise<Object>}
+ */
+export async function uploadFile(owner, repo, path, file, token, message) {
+    if (!token) throw new Error("Token is required for uploading.");
+    if (!file) throw new Error("File is required.");
+    const arrayBuffer = await file.arrayBuffer();
+    const base64Content = encodeBase64(new Uint8Array(arrayBuffer));
+    const url = `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${path}`;
+    const headers = {
+        "Authorization": `token ${token}`,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+    };
+    const body = {
+        message: message || `Upload ${path}`,
+        content: base64Content
+    };
+    const sha = await getFileSha(owner, repo, path, token);
+    if (sha) body.sha = sha;
+    const response = await fetch(url, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(body)
+    });
+    return handleResponse(response);
+}
+
 /**
  * Simple check if token is valid (by getting user info)
  * @param {string} token 
@@ -166,4 +224,32 @@ export async function validateToken(token) {
     } catch (e) {
         return false;
     }
+}
+
+/**
+ * Lists files inside a repository path.
+ * @param {string} owner
+ * @param {string} repo
+ * @param {string} path
+ * @param {string} token
+ * @returns {Promise<Array<{name: string, path: string, type: string}>>}
+ */
+export async function listRepoFiles(owner, repo, path, token = null) {
+    if (!owner || !repo || !path) return [];
+    const headers = {
+        "Accept": "application/vnd.github.v3+json"
+    };
+    if (token) {
+        headers["Authorization"] = `token ${token}`;
+    }
+    const cleanPath = String(path).replace(/^\/+/, '').replace(/\/+$/, '');
+    const url = `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${cleanPath}`;
+    const response = await fetch(url, { headers });
+    const data = await handleResponse(response);
+    if (!Array.isArray(data)) return [];
+    return data.map((item) => ({
+        name: item.name,
+        path: item.path,
+        type: item.type
+    }));
 }

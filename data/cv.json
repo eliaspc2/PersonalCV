@@ -100,7 +100,17 @@
         "label": "Conteúdo Programático (EFA)",
         "icon": "spinner",
         "href": "efa-program-content.pdf",
-        "group": "certs"
+        "group": "certs",
+        "type": "programmatic_content",
+        "level": "EFA"
+      },
+      {
+        "label": "Conteúdo Programático (CET – Técnico/a Especialista em Cibersegurança)",
+        "icon": "spinner",
+        "href": "q481ra057_referencial-competencias-tecnologica_cet.pdf",
+        "group": "certs",
+        "type": "programmatic_content",
+        "level": "CET"
       },
       {
         "label": "Python I (Helsinki)",
@@ -221,14 +231,14 @@
               "href": "https://programming-25.mooc.fi/",
               "viewer": false
             },
-            "title": "Python Ecosystem (I & II)",
+            "title": "Python Ecosystem (Programming I & II – Universidade de Helsínquia)",
             "focus_area": "Backend & Automação",
             "context_text": "Formação estruturada e exigente pela Universidade de Helsínquia (Programming I & II). Domínio de algoritmos, estruturas de dados e OOP.",
             "background": "Transitei do suporte técnico para a computação programática através de um percurso de 540h de formação intensiva. Onde outros vêm um script, eu vejo um sistema de automação resiliente.",
-            "duration_hours": "270h (2x135h)",
+            "duration_hours": "270h (2×135h)",
             "rh_value": "Capaz de trabalhar de forma autónoma em backend e automação, com atenção a robustez e manutenção.",
             "competencies": [],
-            "progress_status": "APTO"
+            "progress_status": "CONCLUÍDO"
           },
           {
             "technologies": [
@@ -246,13 +256,38 @@
               "href": "https://tecnisign.pt/",
               "viewer": false
             },
-            "title": "Formação EFA Programador",
+            "title": "EFA Programador/a de Informática",
             "focus_area": "Desenvolvimento Fullstack",
-            "context_text": "Percurso de 1416h focado em tecnologias modernas e boas práticas de engenharia. Em curso.",
+            "context_text": "Percurso de 1416h focado em tecnologias modernas e boas práticas de engenharia. Nível QNQ / EQF 4. Inclui estágio curricular obrigatório (FCT) de 210h. Em curso.",
             "background": "Actualmente a consolidar conhecimentos em arquitecturas modernas, garantindo que a base técnica sólida se traduz em aplicações web robustas e escaláveis.",
             "progress_status": "EM CURSO",
             "duration_hours": "1416h",
             "rh_value": "Contribuição sólida em desenvolvimento fullstack com foco em qualidade, manutenção e estabilidade operacional."
+          },
+          {
+            "technologies": [],
+            "resource": {
+              "label": "Entidade formadora",
+              "href": "https://multiformactiva.pt/",
+              "viewer": false
+            },
+            "title": "Técnico/a Especialista em Cibersegurança (CET)",
+            "focus_area": "Cibersegurança",
+            "context_text": "Curso de especialização tecnológica de nível 5, focado em cibersegurança, com forte componente prática e estágio extensivo (485h), complementando a base de sistemas críticos e engenharia de software. Início previsto: 04/02/2026.",
+            "background": "Este CET reforça a continuidade técnica na trajetória, aprofundando competências de segurança e operações sem representar mudança de área.",
+            "duration_hours": "1510h",
+            "progress_status": "Selecionado / Início confirmado",
+            "competencies": [],
+            "type": "CET",
+            "level": 5,
+            "provider": "MultiFormactiva",
+            "providerUrl": "https://multiformactiva.pt/",
+            "startDate": "2026-02-04",
+            "durationHours": 1510,
+            "internshipHours": 485,
+            "status": "selected",
+            "status_display": "Selecionado / Início confirmado",
+            "format": "Não indicado"
           }
         ],
         "next_label": "Continuidade Técnica",
@@ -420,6 +455,14 @@
         "image": "now-portrait.png",
         "image_alt": "Perfil profissional",
         "summary": "Disponível para estágio curricular (210h) em contexto real de desenvolvimento ou sistemas, com capacidade de contributo efetivo desde o início.",
+        "resources": [
+          {
+            "label": "Conteúdo Programático (Curso Programação)",
+            "href": "efa-program-content.pdf",
+            "icon": "spinner",
+            "viewer": true
+          }
+        ],
         "details": "A componente teórica termina no final de junho e o estágio pode iniciar a partir de junho de 2026. O estágio é acompanhado pela entidade formadora, com plano individual e objetivos definidos. Procuro um contexto real de desenvolvimento ou sistemas, com preferência por remoto (todo o país) e alternativa híbrida na zona de Bragança. Não requer formação básica e já estou habituado a contextos reais de trabalho e sistemas com histórico. O contacto serve para alinharmos expectativas e enquadramento.",
         "cta_link": "mailto:eliaspc2@gmail.com",
         "image_position": "center 20%",
@@ -550,14 +593,14 @@
               "href": "https://programming-25.mooc.fi/",
               "viewer": false
             },
-            "title": "Ecosistema Python (I & II)",
+            "title": "Ecosistema Python (Programming I & II – Universidad de Helsinki)",
             "focus_area": "Backend & Automatización",
             "context_text": "Formación estructurada y exigente por la Universidad de Helsinki (Programming I & II). Dominio de algoritmos, estructuras de datos y OOP.",
             "background": "Transité del soporte técnico a la computación programática a través de un recorrido de 540h de formación intensiva. Donde otros ven un script, yo veo un sistema de automatización resiliente.",
-            "duration_hours": "270h (2x135h)",
+            "duration_hours": "270h (2×135h)",
             "rh_value": "Capaz de trabajar de forma autónoma en backend y automatización, con atención a robustez y mantenimiento.",
             "competencies": [],
-            "progress_status": "APTO"
+            "progress_status": "CONCLUIDO"
           },
           {
             "technologies": [
@@ -575,13 +618,38 @@
               "href": "https://tecnisign.pt/",
               "viewer": false
             },
-            "title": "Formación EFA Programador",
+            "title": "EFA Programador/a de Informática",
             "focus_area": "Desarrollo Fullstack",
-            "context_text": "Recorrido de 1416h centrado en tecnologías modernas y buenas prácticas de ingeniería. En curso.",
+            "context_text": "Recorrido de 1416h centrado en tecnologías modernas y buenas prácticas de ingeniería. Nivel QNQ / EQF 4. Incluye prácticas curriculares obligatorias (FCT) de 210h. En curso.",
             "background": "Actualmente consolidando conocimientos en arquitecturas modernas, garantizando que la base técnica sólida se traduzca en aplicaciones web robustas y escalables.",
             "progress_status": "EN CURSO",
             "duration_hours": "1416h",
             "rh_value": "Contribución sólida en desarrollo fullstack con enfoque en calidad, mantenimiento y estabilidad operacional."
+          },
+          {
+            "technologies": [],
+            "resource": {
+              "label": "Entidad formadora",
+              "href": "https://multiformactiva.pt/",
+              "viewer": false
+            },
+            "title": "Técnico/a Especialista en Ciberseguridad (CET)",
+            "focus_area": "Ciberseguridad",
+            "context_text": "Curso de especialización tecnológica de nivel 5, centrado en ciberseguridad, con fuerte componente práctica y prácticas extensas (485h), complementando la base de sistemas críticos e ingeniería de software. Inicio previsto: 04/02/2026.",
+            "background": "Este CET refuerza la continuidad técnica en la trayectoria, profundizando competencias de seguridad y operaciones sin suponer un cambio de área.",
+            "duration_hours": "1510h",
+            "progress_status": "Seleccionado / Inicio confirmado",
+            "competencies": [],
+            "type": "CET",
+            "level": 5,
+            "provider": "MultiFormactiva",
+            "providerUrl": "https://multiformactiva.pt/",
+            "startDate": "2026-02-04",
+            "durationHours": 1510,
+            "internshipHours": 485,
+            "status": "selected",
+            "status_display": "Seleccionado / Inicio confirmado",
+            "format": "No indicado"
           }
         ],
         "next_label": "Continuidad Técnica",
@@ -749,6 +817,14 @@
         "image": "now-portrait.png",
         "image_alt": "Perfil profesional",
         "summary": "Busco una entidad acogedora para las prácticas curriculares obligatorias (210h) del EFA – Programador Informático.",
+        "resources": [
+          {
+            "label": "Contenido Programático (Curso de Programación)",
+            "href": "efa-program-content.pdf",
+            "icon": "spinner",
+            "viewer": true
+          }
+        ],
         "details": "La parte teórica termina a finales de junio y las prácticas pueden comenzar a partir de junio de 2026. Las prácticas están acompañadas por la entidad formadora, con plan individual y objetivos definidos. Busco un contexto real de desarrollo o sistemas, con preferencia por remoto (todo el país) y alternativa híbrida en la zona de Bragança. A lo largo de la formación ya tuve contacto práctico con programación, así que las prácticas no empiezan de cero. El contacto sirve para alinear expectativas y encuadre.",
         "cta_link": "mailto:eliaspc2@gmail.com",
         "image_position": "center 20%",
@@ -879,14 +955,14 @@
               "href": "https://programming-25.mooc.fi/",
               "viewer": false
             },
-            "title": "Python Ecosystem (I & II)",
+            "title": "Python Ecosystem (Programming I & II – University of Helsinki)",
             "focus_area": "Backend & Automation",
             "context_text": "Structured and demanding training from the University of Helsinki (Programming I & II). Mastery of algorithms, data structures, and OOP.",
             "background": "I transitioned from technical support to programmatic computing through a 540h intensive training path. Where others see a script, I see a resilient automation system.",
-            "duration_hours": "270h (2x135h)",
+            "duration_hours": "270h (2×135h)",
             "rh_value": "Able to work independently in backend and automation, with attention to robustness and maintenance.",
             "competencies": [],
-            "progress_status": "READY"
+            "progress_status": "COMPLETED"
           },
           {
             "technologies": [
@@ -904,13 +980,38 @@
               "href": "https://tecnisign.pt/",
               "viewer": false
             },
-            "title": "EFA Programmer Training",
+            "title": "EFA IT Programmer",
             "focus_area": "Fullstack Development",
-            "context_text": "1416h course focused on modern technologies and good engineering practices. In progress.",
+            "context_text": "1416h course focused on modern technologies and good engineering practices. Level QNQ / EQF 4. Includes mandatory curricular internship (FCT) of 210h. In progress.",
             "background": "Currently consolidating knowledge in modern architectures, ensuring that a solid technical foundation translates into robust and scalable web applications.",
             "progress_status": "IN PROGRESS",
             "duration_hours": "1416h",
             "rh_value": "Solid contribution to fullstack development with a focus on quality, maintenance, and operational stability."
+          },
+          {
+            "technologies": [],
+            "resource": {
+              "label": "Training provider",
+              "href": "https://multiformactiva.pt/",
+              "viewer": false
+            },
+            "title": "Cybersecurity Specialist Technician (CET)",
+            "focus_area": "Cybersecurity",
+            "context_text": "Level 5 technological specialization course focused on cybersecurity, with a strong practical component and an extensive internship (485h), complementing the base in critical systems and software engineering. Expected start: 2026-02-04.",
+            "background": "This CET reinforces technical continuity in the trajectory, deepening security and operations skills without a change of area.",
+            "duration_hours": "1510h",
+            "progress_status": "Selected / Start confirmed",
+            "competencies": [],
+            "type": "CET",
+            "level": 5,
+            "provider": "MultiFormactiva",
+            "providerUrl": "https://multiformactiva.pt/",
+            "startDate": "2026-02-04",
+            "durationHours": 1510,
+            "internshipHours": 485,
+            "status": "selected",
+            "status_display": "Selected / Start confirmed",
+            "format": "Not indicated"
           }
         ],
         "next_label": "Technical Continuity",
@@ -1078,6 +1179,14 @@
         "image": "now-portrait.png",
         "image_alt": "Professional portrait",
         "summary": "I’m looking for a host organization for the mandatory 210-hour curricular internship in the EFA – Programmer program.",
+        "resources": [
+          {
+            "label": "Program Content (Programming Course)",
+            "href": "efa-program-content.pdf",
+            "icon": "spinner",
+            "viewer": true
+          }
+        ],
         "details": "The theoretical phase ends at the end of June, and the internship can start from June 2026. It is supervised by the training entity, with an individual plan and defined objectives. I’m looking for a real development or systems context, preferably remote (nationwide) with a hybrid alternative in the Bragança area. I’ve already had practical programming contact during the course, so the internship doesn’t start from zero. The contact is to align expectations and fit.",
         "cta_link": "mailto:eliaspc2@gmail.com",
         "image_position": "center 20%",

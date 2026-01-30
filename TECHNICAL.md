@@ -55,5 +55,5 @@ This project is designed for **maximum portability and zero cost**.
 
 ## 📦 Service Worker & Cache
 - **Versioned cache**: SW cache uses a version from `data/config.json` (fallback to `meta.version`).
-- **Network-first for JSON**: `cv.json`, `config.json` and `i18n/*.json` try network first to avoid stale content.
-- **Precache**: Core entrypoints + schema/validators + i18n files are precached.
+- **Network-first for JSON**: `cv.json` and `config.json` try network first to avoid stale content.
+- **Precache**: Core entrypoints + schema/validators are precached.

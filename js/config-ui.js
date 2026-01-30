@@ -71,6 +71,8 @@ let cropperState = null;
 const pendingDownloadDeletes = new Set();
 let iconPickerState = null;
 let validationStatus = { critical: [], warnings: [] };
+const availableFilesCache = { downloads: null, photos: null, icons: null };
+let uploadQueue = Promise.resolve();
 
 const NAV_SECTIONS = new Set(BASE_SECTIONS);
 
@@ -126,6 +128,7 @@ const SECTION_FIELD_ORDER = {
     now: [
         'title',
         'summary',
+        'resources',
         'details',
         'image',
         'image_alt',
@@ -199,6 +202,123 @@ const SECTION_TEMPLATES = [
 
 function normalizeFileName(name) {
     return name ? name.replace(/\s+/g, '-').toLowerCase() : 'image';
+}
+
+function normalizePathBase(value) {
+    if (!value) return '';
+    return value.endsWith('/') ? value.slice(0, -1) : value;
+}
+
+async function uploadDownloadFile(file, targetName) {
+    const token = await auth.getToken();
+    if (!token || !repoInfo?.owner || !repoInfo?.repo) {
+        showMessage('Token GitHub em falta: ficheiro não foi carregado.', 'error');
+        return;
+    }
+    const base = normalizePathBase(getPaths().downloads);
+    const repoPath = base ? `${base}/${targetName}` : targetName;
+    try {
+        await gh.uploadFile(repoInfo.owner, repoInfo.repo, repoPath, file, token, `Upload ${targetName} via Admin UI`);
+        showMessage(`Ficheiro carregado: ${targetName}`, 'success');
+        availableFilesCache.downloads = null;
+    } catch (err) {
+        showMessage(`Erro ao carregar ficheiro: ${err.message || err}`, 'error');
+    }
+}
+
+function collectKnownDownloadFiles() {
+    const files = new Set();
+    if (currentCV?.profile?.downloads) {
+        currentCV.profile.downloads.forEach((item) => {
+            if (item?.href) files.add(stripAssetBase('downloads', item.href));
+        });
+    }
+    if (currentCV?.localized) {
+        Object.values(currentCV.localized).forEach((locale) => {
+            if (!locale || typeof locale !== 'object') return;
+            if (Array.isArray(locale.certifications)) {
+                locale.certifications.forEach((cert) => {
+                    if (cert?.href) files.add(stripAssetBase('downloads', cert.href));
+                });
+            }
+            Object.values(locale).forEach((section) => {
+                if (!section || typeof section !== 'object') return;
+                if (Array.isArray(section.resources)) {
+                    section.resources.forEach((res) => {
+                        if (res?.href) files.add(stripAssetBase('downloads', res.href));
+                    });
+                }
+                if (Array.isArray(section.skills)) {
+                    section.skills.forEach((item) => {
+                        if (item?.resource?.href) files.add(stripAssetBase('downloads', item.resource.href));
+                    });
+                }
+            });
+        });
+    }
+    return Array.from(files).filter(Boolean).sort();
+}
+
+async function loadAvailableFiles(kind) {
+    if (availableFilesCache[kind]) return availableFilesCache[kind];
+    let list = [];
+    if (kind === 'downloads') {
+        list = collectKnownDownloadFiles();
+    }
+    try {
+        const token = await auth.getToken();
+        if (token && repoInfo?.owner && repoInfo?.repo) {
+            const basePath = getPaths()[kind] || '';
+            const repoPath = normalizePathBase(basePath);
+            if (repoPath) {
+                const files = await gh.listRepoFiles(repoInfo.owner, repoInfo.repo, repoPath, token);
+                const repoList = files
+                    .filter((item) => item.type === 'file')
+                    .map((item) => item.name);
+                list = Array.from(new Set([...list, ...repoList]));
+            }
+        }
+    } catch (err) {
+        // ignore and keep fallback list
+    }
+    availableFilesCache[kind] = list;
+    return list;
+}
+
+function buildFilePicker(kind, onSelect) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'inline-input';
+    const label = document.createElement('label');
+    label.textContent = 'Ficheiros existentes';
+    const select = document.createElement('select');
+    select.innerHTML = '<option value="">Escolher ficheiro…</option>';
+    const reload = document.createElement('button');
+    reload.type = 'button';
+    reload.className = 'toggle-visibility';
+    reload.textContent = 'Atualizar';
+
+    const populate = async () => {
+        select.innerHTML = '<option value="">Escolher ficheiro…</option>';
+        const list = await loadAvailableFiles(kind);
+        list.forEach((file) => {
+            const option = document.createElement('option');
+            option.value = file;
+            option.textContent = file;
+            select.appendChild(option);
+        });
+    };
+
+    select.onchange = () => {
+        const value = select.value;
+        if (value) onSelect(value);
+    };
+    reload.onclick = populate;
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(select);
+    wrapper.appendChild(reload);
+    populate();
+    return wrapper;
 }
 
 function slugifyLabel(label) {
@@ -1352,6 +1472,9 @@ function makeImageField(wrapper, targetObj, key, sectionKey) {
         input.value = safeName;
         targetObj[key] = safeName;
         renderPreview();
+        if (baseFolder && baseFolder.includes('downloads')) {
+            uploadQueue = uploadQueue.then(() => uploadDownloadFile(file, safeName));
+        }
     };
     const adjustBtn = document.createElement('button');
     adjustBtn.type = 'button';
@@ -1468,6 +1591,7 @@ function makeResourceListField(wrapper, targetObj, key, values = [], options = {
                 const safeName = normalizeFileName(file.name);
                 hrefInput.value = safeName;
                 hrefInput.dispatchEvent(new Event('input', { bubbles: true }));
+                uploadQueue = uploadQueue.then(() => uploadDownloadFile(file, safeName));
             };
 
             const sync = () => {
@@ -1490,6 +1614,12 @@ function makeResourceListField(wrapper, targetObj, key, values = [], options = {
             inputs.appendChild(hrefInput);
             inputs.appendChild(typeSelect);
             inputs.appendChild(fileInput);
+
+            const picker = buildFilePicker('downloads', (value) => {
+                hrefInput.value = value;
+                hrefInput.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            inputs.appendChild(picker);
 
             if (withViewer) {
                 const viewerWrap = document.createElement('div');
@@ -1681,6 +1811,13 @@ function makeFileField(wrapper, targetObj, key, labelText, baseFolder) {
     };
     row.appendChild(input);
     row.appendChild(fileInput);
+    if (baseFolder && baseFolder.includes('downloads')) {
+        const picker = buildFilePicker('downloads', (value) => {
+            input.value = value;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        row.appendChild(picker);
+    }
     wrapper.appendChild(label);
     wrapper.appendChild(row);
 }
@@ -2704,6 +2841,19 @@ function renderSectionEditor() {
             renderDownloadsEditor();
             return;
         }
+        if (currentSection === 'now' && key === 'resources') {
+            const fieldset = document.createElement('fieldset');
+            const legend = document.createElement('legend');
+            legend.textContent = 'Recursos';
+            fieldset.appendChild(legend);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-group';
+            if (!Array.isArray(content.resources)) content.resources = [];
+            makeResourceListField(wrapper, content, 'resources', [...content.resources], { withViewer: true });
+            fieldset.appendChild(wrapper);
+            uiNodes.editorForm.appendChild(fieldset);
+            return;
+        }
         if ((sectionType === 'development' && key === 'skills')
             || (sectionType === 'foundation' && key === 'experience')
             || (sectionType === 'mindset' && (key === 'blocks' || key === 'adoption'))) {
@@ -3477,27 +3627,10 @@ function downloadFullCVJson() {
     }
     const exportAll = async () => {
         const configPayload = currentConfig || buildDefaultConfigFromCV();
-        const langs = Array.isArray(currentCV.meta?.availableLanguages)
-            ? currentCV.meta.availableLanguages
-            : LANGS;
-        const i18n = {};
-        for (const lang of langs) {
-            try {
-                const resp = await fetch(`data/i18n/${lang}.json`, { cache: 'no-store' });
-                if (resp.ok) {
-                    i18n[lang] = await resp.json();
-                } else {
-                    i18n[lang] = {};
-                }
-            } catch (err) {
-                i18n[lang] = {};
-            }
-        }
         const payload = {
             savedAt: new Date().toISOString(),
             cv: currentCV,
-            config: configPayload,
-            i18n
+            config: configPayload
         };
         const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
         const link = document.createElement('a');
@@ -3520,7 +3653,7 @@ async function restoreFullCVJson(file) {
             showMessage('JSON inválido.', 'error');
             return;
         }
-        if (parsed.cv && parsed.config && parsed.i18n) {
+        if (parsed.cv && parsed.config) {
             currentCV = parsed.cv;
             currentConfig = parsed.config;
             currentSource = 'local';

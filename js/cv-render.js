@@ -19,7 +19,6 @@ const dom = {
 
 let cvData = null;
 let configData = null;
-const i18nData = {};
 let currentLang = 'pt';
 let currentSection = null;
 let sectionObserver = null;
@@ -39,60 +38,16 @@ const BASE_SECTIONS = [
 const NAV_TYPE_ICONS = Object.fromEntries(
     Object.entries(NAV_TYPE_ICON_IDS).map(([key, iconId]) => [key, renderIcon(iconId, 'nav-icon')])
 );
-const missingI18nKeys = new Set();
-
-async function loadI18n(lang) {
-    if (!lang) return;
-    if (i18nData[lang]) return;
-    try {
-        const response = await fetch(`data/i18n/${lang}.json`, { cache: 'no-store' });
-        if (response.ok) {
-            i18nData[lang] = await response.json();
-            return;
-        }
-    } catch (err) {
-        // ignore
-    }
-    i18nData[lang] = {};
-}
-
-function t(key, fallback = '', lang = currentLang) {
-    if (!key) return fallback;
-    const dict = i18nData[lang] || {};
-    const hasI18n = dict && Object.keys(dict).length > 0;
-    if (Object.prototype.hasOwnProperty.call(dict, key)) {
-        const value = dict[key];
-        return value !== undefined && value !== null ? value : fallback;
-    }
-    if (hasI18n && !missingI18nKeys.has(key)) {
-        missingI18nKeys.add(key);
-        showI18nWarning(key);
-        console.warn(`[i18n] Missing key "${key}" for ${lang}`);
-    }
+function t(_key, fallback = '') {
     return fallback;
 }
 
-function getText(sectionId, field, fallback = '') {
-    return t(`${sectionId}.${field}`, fallback);
+function getText(_sectionId, _field, fallback = '') {
+    return fallback;
 }
 
-function getItemText(sectionId, collectionKey, item, field, fallback = '') {
-    const id = item?.id;
-    if (!id) return fallback;
-    return t(`${sectionId}.${collectionKey}.${id}.${field}`, fallback);
-}
-
-function showI18nWarning(key) {
-    const container = document.querySelector('.app-content');
-    if (!container) return;
-    let banner = document.getElementById('i18n-banner');
-    if (!banner) {
-        banner = document.createElement('div');
-        banner.id = 'i18n-banner';
-        banner.className = 'validation-banner warning';
-        container.prepend(banner);
-    }
-    banner.innerHTML = `<strong>Tradução em falta</strong><span>${key}</span>`;
+function getItemText(_sectionId, _collectionKey, _item, _field, fallback = '') {
+    return fallback;
 }
 
 function normalizeBasePath(value, fallback) {
@@ -414,7 +369,6 @@ async function bootstrap() {
             showValidationBanner(warningMessages, 'warning');
         }
         currentLang = cvData.meta.defaultLanguage || 'pt';
-        await loadI18n(currentLang);
 
         // sync language switchers to current lang
         if (dom.langSwitcher) dom.langSwitcher.value = currentLang;
@@ -1123,14 +1077,26 @@ function renderContact(data, locale, container, sectionId = 'contact') {
         const normalized = normalizeIconValue(iconId || '');
         return isIconId(normalized) ? renderIcon(normalized, 'nav-icon') : fallbackIcon;
     };
+    const getDownloadLabel = (item) => {
+        if (!item) return '';
+        const contactLabels = locale?.contact || {};
+        if (item.type === 'programmatic_content' && item.level === 'CET' && contactLabels.cet_label) {
+            return contactLabels.cet_label;
+        }
+        if (item.type === 'programmatic_content' && item.level === 'EFA' && contactLabels.efa_label) {
+            return contactLabels.efa_label;
+        }
+        return item.label || item.href || '';
+    };
     const renderDownloadItem = (item, fallbackIcon) => {
         if (!item.href) return '';
         const href = resolveAssetPath('downloads', item.href);
         const viewer = item.viewer !== false;
+        const label = getDownloadLabel(item);
         return `
-            <a ${buildViewerAttrs({ href, label: item.label || item.href, viewer })} class="download-item nav-item">
+            <a ${buildViewerAttrs({ href, label, viewer })} class="download-item nav-item">
                 ${renderDownloadIcon(item.icon, fallbackIcon)}
-                <span>${item.label || item.href}</span>
+                <span>${label}</span>
             </a>
         `;
     };
@@ -1180,7 +1146,7 @@ function renderContact(data, locale, container, sectionId = 'contact') {
                 <h2 style="margin-bottom:1rem;">${title}</h2>
                 <p style="color:var(--text-muted); font-size:1.1rem; max-width:600px; margin-left:auto; margin-right:auto;">${description}</p>
                 ${ctaLabel ? `
-                    <div style="margin-top:2rem;">
+                    <div style="margin-top:1rem;">
                         <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
                     </div>
                 ` : ''}
@@ -1220,6 +1186,7 @@ function renderNow(data, container, sectionId = 'now') {
     const summary = getText(sectionId, 'summary', data.summary);
     const details = getText(sectionId, 'details', data.details);
     const ctaLabel = getText(sectionId, 'cta_label', data.cta_label);
+    const resources = Array.isArray(data.resources) ? data.resources : [];
     container.innerHTML = `
         <div class="section-container">
             <h2 class="section-title">${title}</h2>
@@ -1231,6 +1198,21 @@ function renderNow(data, container, sectionId = 'now') {
                     </div>
                 ` : ''}
                 <div class="now-card">
+                    ${resources.length ? `
+                        <div class="cert-badges" style="margin-top:0; margin-bottom:1.5rem;">
+                            ${resources.map((item) => {
+                                if (!item?.href) return '';
+                                const href = resolveAssetPath('downloads', item.href);
+                                const viewer = item.viewer !== false;
+                                return `
+                                    <a ${buildViewerAttrs({ href, label: item.label || item.href, viewer })} class="cert-chip">
+                                        ${renderIcon(item.icon || 'file', 'nav-icon')}
+                                        ${item.label || item.href}
+                                    </a>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : ''}
                     <p>${details}</p>
                     <div style="margin-top:2rem;">
                         <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
@@ -1257,7 +1239,7 @@ function showDetail(type, index, contextSection) {
             <div class="story-text" style="color:var(--text-main); margin-top:1.5rem;">
                 ${getItemText(contextSection, 'skills', item, 'context_text', item.context_text)}
             </div>
-            
+
             <div style="margin-top:2.5rem;">
                 <h4 style="font-size:0.85rem; text-transform:uppercase; color:var(--accent); margin-bottom:1rem;">${t('ui.drawer_skill_context_label', ui.drawer_skill_context_label || '')}</h4>
                 <div style="font-size:1rem; line-height:1.7; color:var(--text-muted); font-style:italic; padding-left:1.5rem; border-left:2px solid var(--border);">
