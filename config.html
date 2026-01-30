@@ -762,6 +762,34 @@
             color: #64748b;
         }
 
+        .icon-input {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .icon-input-preview {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid #cbd5f5;
+            background: #f8fafc;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .icon-input-preview .nav-icon {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
         .nav-icon-preview {
             display: inline-flex;
             align-items: center;
@@ -917,11 +945,11 @@
         <div class="emoji-modal">
             <div class="emoji-header">
                 <h3 style="margin:0;">Escolher emoji</h3>
-                <button id="emoji-close" type="button" class="panel-action emoji-close">Fechar</button>
             </div>
             <div id="emoji-grid" class="emoji-grid"></div>
             <div class="emoji-actions">
                 <button id="emoji-clear" type="button" class="panel-action">Sem ícone</button>
+                <button id="emoji-close" type="button" class="panel-action">Fechar</button>
             </div>
         </div>
     </div>

@@ -625,9 +625,16 @@ function closeEmojiPicker() {
     emojiPickerState = null;
 }
 
-function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭') {
+function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭', options = {}) {
+    const config = typeof options === 'object' && options ? options : {};
     const row = document.createElement('div');
-    row.className = 'inline-input';
+    row.className = config.showPreview ? 'icon-input' : 'inline-input';
+    let preview = null;
+    if (config.showPreview) {
+        preview = document.createElement('span');
+        preview.className = 'icon-input-preview';
+        row.appendChild(preview);
+    }
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = placeholder;
@@ -635,6 +642,16 @@ function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭') {
     input.oninput = (event) => {
         targetObj[key] = event.target.value;
         renderPreview();
+        if (preview) {
+            const value = String(input.value || '').trim();
+            if (value) {
+                preview.innerHTML = `<span class="nav-emoji">${value}</span>`;
+            } else if (config.defaultIcon) {
+                preview.innerHTML = config.defaultIcon;
+            } else {
+                preview.textContent = '';
+            }
+        }
     };
     const pickBtn = document.createElement('button');
     pickBtn.type = 'button';
@@ -646,6 +663,14 @@ function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭') {
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
     };
+    if (preview) {
+        const value = String(input.value || '').trim();
+        if (value) {
+            preview.innerHTML = `<span class="nav-emoji">${value}</span>`;
+        } else if (config.defaultIcon) {
+            preview.innerHTML = config.defaultIcon;
+        }
+    }
     row.appendChild(input);
     row.appendChild(pickBtn);
     wrapper.appendChild(row);
@@ -970,41 +995,14 @@ function appendNavigationFields(sectionKey) {
     typeWrapper.appendChild(typeSelect);
     fieldset.appendChild(typeWrapper);
 
-    const iconFieldset = document.createElement('fieldset');
-    iconFieldset.className = 'inline-fieldset';
-    const iconLegend = document.createElement('legend');
-    iconLegend.textContent = 'Ícone do menu';
-    iconFieldset.appendChild(iconLegend);
-
     const iconWrapper = document.createElement('div');
     iconWrapper.className = 'form-group';
-    const input = makeEmojiField(iconWrapper, icons, sectionKey, 'ex: 🧭');
-    const hint = document.createElement('div');
-    hint.className = 'nav-icon-hint';
-    const preview = document.createElement('span');
-    preview.className = 'nav-icon-preview';
-    const hintText = document.createElement('span');
-    hint.appendChild(preview);
-    hint.appendChild(hintText);
+    const iconLabel = document.createElement('label');
+    iconLabel.textContent = 'Ícone do menu';
+    iconWrapper.appendChild(iconLabel);
     const defaultIcon = NAV_DEFAULT_ICONS[sectionType] || '';
-    const updateHint = () => {
-        const value = String(input.value || '').trim();
-        if (value) {
-            preview.innerHTML = `<span class="nav-emoji">${value}</span>`;
-            hintText.textContent = 'Emoji definido';
-        } else if (defaultIcon) {
-            preview.innerHTML = defaultIcon;
-            hintText.textContent = 'Sem emoji → usa ícone padrão';
-        } else {
-            preview.textContent = '';
-            hintText.textContent = 'Sem ícone definido';
-        }
-    };
-    updateHint();
-    input.addEventListener('input', updateHint);
-    iconWrapper.appendChild(hint);
-    iconFieldset.appendChild(iconWrapper);
-    fieldset.appendChild(iconFieldset);
+    makeEmojiField(iconWrapper, icons, sectionKey, 'ex: 🧭', { showPreview: true, defaultIcon });
+    fieldset.appendChild(iconWrapper);
 
     uiNodes.editorForm.appendChild(fieldset);
 }
@@ -2413,7 +2411,8 @@ function renderStoryEditor(config, { append = false } = {}) {
     if (!targetEntry) return;
     const targetItem = config.type === 'mindset' ? targetEntry.item : targetEntry;
     if (config.type === 'skills' && !Array.isArray(targetItem.competencies)) {
-        targetItem.competencies = [];
+        const fallback = currentCV?.localized?.[currentLang]?.ui?.skill_tags;
+        targetItem.competencies = Array.isArray(fallback) ? [...fallback] : [];
     }
 
     const fieldsetTitle = document.createElement('div');
