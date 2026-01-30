@@ -310,7 +310,9 @@
         "cta_label": "Vamos Conversar?",
         "cta_link": "mailto:eliaspc2@gmail.com",
         "image_position": "center 20%",
-        "image_zoom": 1
+        "image_zoom": 1,
+        "show_aggregated_technologies": true,
+        "show_aggregated_competencies": false
       },
       "foundation": {
         "title": "Fundação Técnica",
