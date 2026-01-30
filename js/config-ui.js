@@ -6,6 +6,7 @@
 import * as auth from './auth-gate.js';
 import * as gh from './github-api.js';
 import { setSecureItem, getSecureItem, removeSecureItem } from './crypto-utils.js';
+import { ICON_CHOICES, renderIcon, normalizeIconValue, isIconId } from './icon-set.js';
 
 const uiNodes = {
     editor: document.getElementById('editor-ui'),
@@ -61,7 +62,7 @@ let currentStoryIndex = 0;
 let currentDownloadGroupIndex = 0;
 let cropperState = null;
 const pendingDownloadDeletes = new Set();
-let emojiPickerState = null;
+let iconPickerState = null;
 
 const BASE_SECTIONS = ['overview', 'development', 'foundation', 'mindset', 'now', 'contact'];
 const NAV_SECTIONS = new Set(BASE_SECTIONS);
@@ -70,20 +71,78 @@ const DEFAULT_PATHS = {
     downloads: 'assets/downloads/',
     icons: 'assets/icons/'
 };
-const EMOJI_CHOICES = [
-    '🏠', '🧭', '🧠', '🧩', '🧱', '⚙️', '🛠️', '🧪', '🧰', '📚',
-    '📌', '📍', '📎', '📝', '📄', '📂', '📁', '🗂️', '🧾', '🔖',
-    '🌐', '💡', '🚀', '✨', '⭐', '🔥', '💬', '☎️', '✉️', '🔗',
-    '🏆', '🎓', '🧑‍🍳', '🍞', '🍕', '🗳️', '🛡️', '🧘', '📷', '👤'
+const DEFAULT_THEME = {
+    bg_app: '#fcfcfd',
+    bg_sidebar: '#ffffff',
+    primary: '#020617',
+    accent: '#3b82f6',
+    accent_soft: 'rgba(59, 130, 246, 0.08)',
+    text_main: '#0f172a',
+    text_muted: '#64748b',
+    text_dim: '#94a3b8',
+    border: '#f1f5f9'
+};
+const THEME_PRESETS = [
+    {
+        name: 'Azul clássico',
+        theme: {
+            bg_app: '#fcfcfd',
+            bg_sidebar: '#ffffff',
+            primary: '#020617',
+            accent: '#3b82f6',
+            text_main: '#0f172a',
+            text_muted: '#64748b',
+            text_dim: '#94a3b8',
+            border: '#f1f5f9'
+        }
+    },
+    {
+        name: 'Verde atlântico',
+        theme: {
+            bg_app: '#f7faf9',
+            bg_sidebar: '#ffffff',
+            primary: '#064e3b',
+            accent: '#10b981',
+            text_main: '#0f172a',
+            text_muted: '#475569',
+            text_dim: '#94a3b8',
+            border: '#e2e8f0'
+        }
+    },
+    {
+        name: 'Âmbar quente',
+        theme: {
+            bg_app: '#fffbf5',
+            bg_sidebar: '#ffffff',
+            primary: '#7c2d12',
+            accent: '#f59e0b',
+            text_main: '#1f2937',
+            text_muted: '#6b7280',
+            text_dim: '#9ca3af',
+            border: '#e5e7eb'
+        }
+    },
+    {
+        name: 'Indigo moderno',
+        theme: {
+            bg_app: '#f5f6ff',
+            bg_sidebar: '#ffffff',
+            primary: '#1e1b4b',
+            accent: '#6366f1',
+            text_main: '#1f2937',
+            text_muted: '#6b7280',
+            text_dim: '#9ca3af',
+            border: '#e5e7eb'
+        }
+    }
 ];
-
-const NAV_DEFAULT_ICONS = {
-    overview: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/></svg>`,
-    development: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><polyline points=\"16 18 22 12 16 6\"/><polyline points=\"8 6 2 12 8 18\"/></svg>`,
-    foundation: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><rect x=\"2\" y=\"2\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"/><rect x=\"2\" y=\"14\" width=\"20\" height=\"8\" rx=\"2\" ry=\"2\"/><line x1=\"6\" y1=\"6\" x2=\"6.01\" y2=\"6\"/><line x1=\"6\" y1=\"18\" x2=\"6.01\" y2=\"18\"/></svg>`,
-    mindset: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/></svg>`,
-    now: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M3 12h7l2 3h9\"/><path d=\"M3 12l2-3h6\"/><circle cx=\"19\" cy=\"12\" r=\"2\"/></svg>`,
-    contact: `<svg class=\"nav-icon\" viewBox=\"0 0 24 24\"><path d=\"M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z\"/><polyline points=\"22,6 12,13 2,6\"/></svg>`
+const NAV_TYPE_ICON_IDS = {
+    overview: 'home',
+    development: 'code',
+    foundation: 'layers',
+    mindset: 'book',
+    now: 'compass',
+    contact: 'mail'
 };
 
 const SECTION_FIELD_ORDER = {
@@ -107,8 +166,6 @@ const SECTION_FIELD_ORDER = {
         'description',
         'image',
         'image_alt',
-        'image_position',
-        'image_zoom',
         'skills',
         'next_label',
         'next_text',
@@ -120,8 +177,6 @@ const SECTION_FIELD_ORDER = {
         'description',
         'image',
         'image_alt',
-        'image_position',
-        'image_zoom',
         'experience',
         'next_label',
         'next_text',
@@ -145,8 +200,6 @@ const SECTION_FIELD_ORDER = {
         'details',
         'image',
         'image_alt',
-        'image_position',
-        'image_zoom',
         'cta_label',
         'cta_link'
     ],
@@ -156,11 +209,17 @@ const SECTION_FIELD_ORDER = {
         'description',
         'cta_label',
         'cta_link',
-        'download_groups',
         'downloads_title',
         'certifications_title',
+        'cv_label',
+        'extended_cv_label',
+        'efa_label',
+        'python_1_label',
+        'python_2_label',
+        'marketing_label',
         'linkedin_label',
-        'github_label'
+        'github_label',
+        'download_groups'
     ]
 };
 
@@ -172,6 +231,7 @@ const STORY_FIELD_ORDER = {
         'duration_hours',
         'context_text',
         'background',
+        'rh_value',
         'resource',
         'competencies',
         'technologies'
@@ -193,8 +253,6 @@ const STORY_FIELD_ORDER = {
         'icon',
         'title',
         'image',
-        'image_position',
-        'image_zoom',
         'principle_title',
         'story_text',
         'engineering_note'
@@ -296,6 +354,7 @@ function stripAssetBase(type, value) {
 function normalizeAssetPaths() {
     if (!currentCV) return;
     const paths = getPaths();
+    normalizeIconData();
     if (currentCV.meta) {
         if (currentCV.meta.favicon) currentCV.meta.favicon = stripAssetBase('icons', currentCV.meta.favicon);
         if (currentCV.meta.apple_icon) currentCV.meta.apple_icon = stripAssetBase('icons', currentCV.meta.apple_icon);
@@ -360,6 +419,105 @@ function normalizeAssetPaths() {
             });
         });
     }
+}
+
+function normalizeIconData() {
+    if (!currentCV?.localized) return;
+    Object.values(currentCV.localized).forEach((locale) => {
+        if (!locale || typeof locale !== 'object') return;
+        if (locale.navigation_icons) {
+            Object.keys(locale.navigation_icons).forEach((key) => {
+                const value = normalizeIconValue(locale.navigation_icons[key]);
+                locale.navigation_icons[key] = isIconId(value) ? value : '';
+            });
+        }
+        Object.values(locale).forEach((section) => {
+            if (!section || typeof section !== 'object') return;
+            Object.entries(section).forEach(([key, val]) => {
+                if (key === 'icon' && typeof val === 'string') {
+                    const normalized = normalizeIconValue(val);
+                    section[key] = isIconId(normalized) ? normalized : '';
+                }
+            });
+            if (Array.isArray(section.skills)) {
+                section.skills.forEach((item) => {
+                    if (item?.icon) {
+                        const normalized = normalizeIconValue(item.icon);
+                        item.icon = isIconId(normalized) ? normalized : '';
+                    }
+                });
+            }
+            if (Array.isArray(section.experience)) {
+                section.experience.forEach((item) => {
+                    if (item?.icon) {
+                        const normalized = normalizeIconValue(item.icon);
+                        item.icon = isIconId(normalized) ? normalized : '';
+                    }
+                });
+            }
+            if (Array.isArray(section.blocks)) {
+                section.blocks.forEach((item) => {
+                    if (item?.icon) {
+                        const normalized = normalizeIconValue(item.icon);
+                        item.icon = isIconId(normalized) ? normalized : '';
+                    }
+                });
+            }
+        });
+    });
+
+    if (currentCV.profile && Array.isArray(currentCV.profile.downloads)) {
+        currentCV.profile.downloads.forEach((item) => {
+            if (item?.icon) {
+                const normalized = normalizeIconValue(item.icon);
+                item.icon = isIconId(normalized) ? normalized : '';
+            }
+        });
+    }
+}
+
+function hexToRgba(hex, alpha = 0.08) {
+    const clean = String(hex || '').replace('#', '').trim();
+    if (![3, 6].includes(clean.length)) return `rgba(59, 130, 246, ${alpha})`;
+    const value = clean.length === 3
+        ? clean.split('').map((ch) => ch + ch).join('')
+        : clean;
+    const int = parseInt(value, 16);
+    if (Number.isNaN(int)) return `rgba(59, 130, 246, ${alpha})`;
+    const r = (int >> 16) & 255;
+    const g = (int >> 8) & 255;
+    const b = int & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function ensureThemeConfig() {
+    if (!currentCV) return DEFAULT_THEME;
+    if (!currentCV.meta) currentCV.meta = {};
+    if (!currentCV.meta.theme) currentCV.meta.theme = { ...DEFAULT_THEME };
+    const theme = currentCV.meta.theme;
+    Object.entries(DEFAULT_THEME).forEach(([key, value]) => {
+        if (!theme[key]) theme[key] = value;
+    });
+    if (!theme.accent_soft && theme.accent) {
+        theme.accent_soft = hexToRgba(theme.accent, 0.08);
+    }
+    return theme;
+}
+
+function applyAdminTheme() {
+    if (!currentCV) return;
+    const theme = ensureThemeConfig();
+    const root = document.documentElement;
+    root.style.setProperty('--bg-app', theme.bg_app);
+    root.style.setProperty('--bg-sidebar', theme.bg_sidebar);
+    root.style.setProperty('--primary', theme.primary);
+    root.style.setProperty('--accent', theme.accent);
+    root.style.setProperty('--accent-soft', theme.accent_soft || hexToRgba(theme.accent, 0.08));
+    root.style.setProperty('--text-main', theme.text_main);
+    root.style.setProperty('--text-muted', theme.text_muted);
+    root.style.setProperty('--text-dim', theme.text_dim);
+    root.style.setProperty('--border', theme.border);
+    document.body.classList.add('config-themed');
 }
 
 function ensureSectionDefinitions() {
@@ -458,7 +616,7 @@ function getOrderedEntries(sectionKey, content) {
             entries.push([key, content[key]]);
         }
     });
-    return entries;
+    return entries.filter(([key]) => !isHiddenFieldKey(key));
 }
 
 function getStoryOrderedKeys(type, item) {
@@ -475,7 +633,7 @@ function getStoryOrderedKeys(type, item) {
     Object.keys(item).forEach((key) => {
         if (!seen.has(key)) keys.push(key);
     });
-    return keys;
+    return keys.filter((key) => !isHiddenFieldKey(key));
 }
 
 function getStoryFieldLabel(type, key) {
@@ -486,6 +644,7 @@ function getStoryFieldLabel(type, key) {
         duration_hours: 'Duração',
         context_text: 'Contexto',
         background: 'Histórico',
+        rh_value: 'Valor para RH',
         resource: 'Recurso',
         competencies: 'Competências (pop-up)',
         technologies: 'Tecnologias'
@@ -507,8 +666,6 @@ function getStoryFieldLabel(type, key) {
         icon: 'Ícone',
         title: 'Título',
         image: 'Imagem',
-        image_position: 'Recorte (posição)',
-        image_zoom: 'Zoom da imagem',
         principle_title: 'Princípio',
         story_text: 'História',
         engineering_note: 'Nota de engenharia'
@@ -574,17 +731,28 @@ function getFieldLabel(key) {
         downloads_title: 'Título do grupo Downloads',
         certifications_title: 'Título do grupo Certificações',
         download_groups: 'Grupos de downloads',
+        cv_label: 'Etiqueta do CV',
+        extended_cv_label: 'Etiqueta do CV extendido',
+        efa_label: 'Etiqueta do conteúdo programático',
+        python_1_label: 'Etiqueta do certificado Python I',
+        python_2_label: 'Etiqueta do certificado Python II',
+        marketing_label: 'Etiqueta do certificado Marketing',
         cta_label: 'Texto do CTA',
         cta_link: 'Link do CTA',
+        challenge_label: 'Etiqueta “Desafio”',
+        learning_label: 'Etiqueta “Aprendizagem”',
+        impact_label: 'Etiqueta “Impacto”',
         image: 'Imagem',
         image_alt: 'Legenda da imagem',
-        image_position: 'Recorte (posição)',
-        image_zoom: 'Zoom da imagem',
         photo: 'Foto',
         contact_photo: 'Foto',
         work_photo: 'Foto'
     };
     return map[key] || key;
+}
+
+function isHiddenFieldKey(key) {
+    return typeof key === 'string' && (key.endsWith('_position') || key.endsWith('_zoom'));
 }
 
 function getImageZoomKey(key) {
@@ -608,24 +776,24 @@ function ensureNavigationConfig(locale) {
     return { nav: locale.navigation, icons: locale.navigation_icons };
 }
 
-function openEmojiPicker(onSelect) {
-    const overlay = document.getElementById('emoji-overlay');
+function openIconPicker(onSelect) {
+    const overlay = document.getElementById('icon-overlay');
     if (!overlay) return;
-    emojiPickerState = { onSelect };
+    iconPickerState = { onSelect };
     overlay.classList.remove('hidden');
     overlay.setAttribute('aria-hidden', 'false');
 }
 
-function closeEmojiPicker() {
-    const overlay = document.getElementById('emoji-overlay');
+function closeIconPicker() {
+    const overlay = document.getElementById('icon-overlay');
     if (overlay) {
         overlay.classList.add('hidden');
         overlay.setAttribute('aria-hidden', 'true');
     }
-    emojiPickerState = null;
+    iconPickerState = null;
 }
 
-function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭', options = {}) {
+function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', options = {}) {
     const config = typeof options === 'object' && options ? options : {};
     const row = document.createElement('div');
     row.className = config.showPreview ? 'icon-input' : 'inline-input';
@@ -638,14 +806,18 @@ function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭', optio
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = placeholder;
+    const initialValue = normalizeIconValue(targetObj[key] || '');
+    targetObj[key] = isIconId(initialValue) ? initialValue : '';
     input.value = targetObj[key] || '';
     input.oninput = (event) => {
-        targetObj[key] = event.target.value;
+        const normalized = normalizeIconValue(event.target.value);
+        targetObj[key] = isIconId(normalized) ? normalized : '';
+        input.value = targetObj[key];
         renderPreview();
         if (preview) {
             const value = String(input.value || '').trim();
             if (value) {
-                preview.innerHTML = `<span class="nav-emoji">${value}</span>`;
+                preview.innerHTML = renderIcon(value, 'nav-icon');
             } else if (config.defaultIcon) {
                 preview.innerHTML = config.defaultIcon;
             } else {
@@ -658,15 +830,16 @@ function makeEmojiField(wrapper, targetObj, key, placeholder = 'ex: 🧭', optio
     pickBtn.className = 'toggle-visibility';
     pickBtn.textContent = 'Escolher';
     pickBtn.onclick = () => {
-        openEmojiPicker((emoji) => {
-            input.value = emoji;
+        openIconPicker((iconId) => {
+            const normalized = normalizeIconValue(iconId);
+            input.value = isIconId(normalized) ? normalized : '';
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
     };
     if (preview) {
         const value = String(input.value || '').trim();
         if (value) {
-            preview.innerHTML = `<span class="nav-emoji">${value}</span>`;
+            preview.innerHTML = renderIcon(value, 'nav-icon');
         } else if (config.defaultIcon) {
             preview.innerHTML = config.defaultIcon;
         }
@@ -1000,8 +1173,8 @@ function appendNavigationFields(sectionKey) {
     const iconLabel = document.createElement('label');
     iconLabel.textContent = 'Ícone do menu';
     iconWrapper.appendChild(iconLabel);
-    const defaultIcon = NAV_DEFAULT_ICONS[sectionType] || '';
-    makeEmojiField(iconWrapper, icons, sectionKey, 'ex: 🧭', { showPreview: true, defaultIcon });
+    const defaultIcon = renderIcon(NAV_TYPE_ICON_IDS[sectionType] || NAV_TYPE_ICON_IDS.overview, 'nav-icon');
+    makeIconField(iconWrapper, icons, sectionKey, 'ex: home', { showPreview: true, defaultIcon });
     fieldset.appendChild(iconWrapper);
 
     uiNodes.editorForm.appendChild(fieldset);
@@ -1163,10 +1336,11 @@ function makeArrayField(wrapper, targetObj, key, values = []) {
     wrapper.appendChild(addBtn);
 }
 
-function makeResourceListField(wrapper, targetObj, key, values = []) {
+function makeResourceListField(wrapper, targetObj, key, values = [], options = {}) {
     const list = document.createElement('div');
     list.className = 'story-list';
     const downloadsBase = getPaths().downloads;
+    const withViewer = Boolean(options.withViewer);
 
     const renderItems = () => {
         list.innerHTML = '';
@@ -1199,7 +1373,10 @@ function makeResourceListField(wrapper, targetObj, key, values = []) {
             const sync = () => {
                 const normalizedHref = stripAssetBase('downloads', hrefInput.value);
                 if (hrefInput.value !== normalizedHref) hrefInput.value = normalizedHref;
-                values[index] = { ...entry, label: labelInput.value, href: normalizedHref };
+                const viewer = withViewer ? entry.viewer !== false : undefined;
+                values[index] = withViewer
+                    ? { ...entry, label: labelInput.value, href: normalizedHref, viewer }
+                    : { ...entry, label: labelInput.value, href: normalizedHref };
                 targetObj[key] = values;
                 renderPreview();
             };
@@ -1210,6 +1387,23 @@ function makeResourceListField(wrapper, targetObj, key, values = []) {
             inputs.appendChild(labelInput);
             inputs.appendChild(hrefInput);
             inputs.appendChild(fileInput);
+
+            if (withViewer) {
+                const viewerWrap = document.createElement('div');
+                viewerWrap.className = 'inline-input';
+                const viewerLabel = document.createElement('label');
+                viewerLabel.textContent = 'Abrir no leitor do site';
+                const viewerInput = document.createElement('input');
+                viewerInput.type = 'checkbox';
+                viewerInput.checked = entry.viewer !== false;
+                viewerInput.onchange = (event) => {
+                    entry.viewer = event.target.checked;
+                    sync();
+                };
+                viewerWrap.appendChild(viewerLabel);
+                viewerWrap.appendChild(viewerInput);
+                inputs.appendChild(viewerWrap);
+            }
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -1277,6 +1471,21 @@ function makeResourceField(wrapper, targetObj, key, value = {}) {
     hrefRow.appendChild(hrefInput);
     wrapper.appendChild(labelRow);
     wrapper.appendChild(hrefRow);
+
+    const viewerRow = document.createElement('div');
+    viewerRow.className = 'form-group';
+    const viewerLabel = document.createElement('label');
+    viewerLabel.textContent = 'Abrir no leitor do site';
+    const viewerInput = document.createElement('input');
+    viewerInput.type = 'checkbox';
+    viewerInput.checked = resource.viewer !== false;
+    viewerInput.onchange = (event) => {
+        resource.viewer = event.target.checked;
+        sync();
+    };
+    viewerRow.appendChild(viewerLabel);
+    viewerRow.appendChild(viewerInput);
+    wrapper.appendChild(viewerRow);
 }
 
 function makeFileField(wrapper, targetObj, key, labelText, baseFolder) {
@@ -1335,30 +1544,26 @@ function getDownloadGroups(contact, downloads = []) {
         if (contact.downloads_title || hasDownloads) {
             groups.push({
                 id: 'downloads',
-                label: contact.downloads_title || 'Downloads',
-                open_in_new_tab: false
+                label: contact.downloads_title || 'Downloads'
             });
         }
         if (contact.certifications_title || hasCerts) {
             groups.push({
                 id: 'certs',
-                label: contact.certifications_title || 'Certificações',
-                open_in_new_tab: true
+                label: contact.certifications_title || 'Certificações'
             });
         }
         if (!groups.length) {
             groups.push({
                 id: 'downloads',
-                label: contact.downloads_title || 'Downloads',
-                open_in_new_tab: false
+                label: contact.downloads_title || 'Downloads'
             });
         }
         contact.download_groups = groups;
     }
     contact.download_groups = contact.download_groups.map((group, index) => ({
         id: group?.id || `grupo-${index + 1}`,
-        label: group?.label || group?.id || `Grupo ${index + 1}`,
-        open_in_new_tab: Boolean(group?.open_in_new_tab)
+        label: group?.label || group?.id || `Grupo ${index + 1}`
     }));
     return contact.download_groups;
 }
@@ -1650,6 +1855,7 @@ async function loadCV(preferGitHub = false, lockOnFail = true) {
             showMessage('cv.json carregado localmente.', 'info');
         }
         normalizeAssetPaths();
+        applyAdminTheme();
         ensureSectionDefinitions();
         currentLang = currentCV.meta?.defaultLanguage || 'pt';
         const sections = getSectionsMeta();
@@ -1847,20 +2053,6 @@ function renderDownloadsEditor() {
         labelGroup.appendChild(labelLabel);
         labelGroup.appendChild(labelInput);
 
-        const openGroup = document.createElement('div');
-        openGroup.className = 'form-group';
-        const openLabel = document.createElement('label');
-        openLabel.textContent = 'Abrir links em nova aba';
-        const openInput = document.createElement('input');
-        openInput.type = 'checkbox';
-        openInput.checked = Boolean(group.open_in_new_tab);
-        openInput.onchange = (event) => {
-            group.open_in_new_tab = event.target.checked;
-            renderPreview();
-        };
-        openGroup.appendChild(openLabel);
-        openGroup.appendChild(openInput);
-
         const removeGroupBtn = document.createElement('button');
         removeGroupBtn.type = 'button';
         removeGroupBtn.className = 'toggle-visibility';
@@ -1882,7 +2074,6 @@ function renderDownloadsEditor() {
 
         groupEditor.appendChild(idGroup);
         groupEditor.appendChild(labelGroup);
-        groupEditor.appendChild(openGroup);
         groupEditor.appendChild(removeGroupBtn);
     };
 
@@ -1918,9 +2109,9 @@ function renderDownloadsEditor() {
             const iconGroup = document.createElement('div');
             iconGroup.className = 'form-group';
             const iconLabel = document.createElement('label');
-            iconLabel.textContent = 'Ícone (emoji)';
+            iconLabel.textContent = 'Ícone';
             iconGroup.appendChild(iconLabel);
-            makeEmojiField(iconGroup, entry, 'icon', 'ex: 📁');
+            makeIconField(iconGroup, entry, 'icon', 'ex: folder');
             fieldset.appendChild(iconGroup);
 
             const groupWrapper = document.createElement('div');
@@ -1957,6 +2148,21 @@ function renderDownloadsEditor() {
             makeFileField(fileWrapper, entry, 'href', `Ficheiro (${downloadsBase})`, downloadsBase);
             fieldset.appendChild(fileWrapper);
 
+            const viewerGroup = document.createElement('div');
+            viewerGroup.className = 'form-group';
+            const viewerLabel = document.createElement('label');
+            viewerLabel.textContent = 'Abrir no leitor do site';
+            const viewerInput = document.createElement('input');
+            viewerInput.type = 'checkbox';
+            viewerInput.checked = entry.viewer !== false;
+            viewerInput.onchange = (event) => {
+                entry.viewer = event.target.checked;
+                renderPreview();
+            };
+            viewerGroup.appendChild(viewerLabel);
+            viewerGroup.appendChild(viewerInput);
+            fieldset.appendChild(viewerGroup);
+
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'toggle-visibility';
@@ -1989,8 +2195,7 @@ function renderDownloadsEditor() {
         const nextIndex = downloadGroups.length + 1;
         downloadGroups.push({
             id: `grupo-${nextIndex}`,
-            label: `Grupo ${nextIndex}`,
-            open_in_new_tab: false
+            label: `Grupo ${nextIndex}`
         });
         currentDownloadGroupIndex = downloadGroups.length - 1;
         renderAll();
@@ -2106,6 +2311,91 @@ function renderSectionEditor() {
             uiNodes.editorForm.appendChild(metaFieldset);
         });
 
+        pendingFieldsets.push(() => {
+            const theme = ensureThemeConfig();
+            const themeFieldset = document.createElement('fieldset');
+            const themeLegend = document.createElement('legend');
+            themeLegend.textContent = 'Tema (cores)';
+            themeFieldset.appendChild(themeLegend);
+
+            const presetRow = document.createElement('div');
+            presetRow.className = 'form-group';
+            const presetLabel = document.createElement('label');
+            presetLabel.textContent = 'Sugestões';
+            presetRow.appendChild(presetLabel);
+            const presetList = document.createElement('div');
+            presetList.className = 'preset-row';
+            THEME_PRESETS.forEach((preset) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'toggle-visibility';
+                btn.textContent = preset.name;
+                btn.onclick = () => {
+                    const next = { ...theme, ...preset.theme };
+                    next.accent_soft = hexToRgba(next.accent, 0.08);
+                    currentCV.meta.theme = next;
+                    renderSectionEditor();
+                    renderPreview();
+                    applyAdminTheme();
+                };
+                presetList.appendChild(btn);
+            });
+            presetRow.appendChild(presetList);
+            themeFieldset.appendChild(presetRow);
+
+            const colorFields = [
+                { key: 'accent', label: 'Cor principal (accent)' },
+                { key: 'primary', label: 'Cor de destaque (primary)' },
+                { key: 'bg_app', label: 'Fundo da app' },
+                { key: 'bg_sidebar', label: 'Fundo do menu' },
+                { key: 'text_main', label: 'Texto principal' },
+                { key: 'text_muted', label: 'Texto secundário' },
+                { key: 'text_dim', label: 'Texto suave' },
+                { key: 'border', label: 'Bordas' }
+            ];
+
+            let softInput = null;
+            colorFields.forEach((field) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'form-group';
+                const label = document.createElement('label');
+                label.textContent = field.label;
+                const input = document.createElement('input');
+                input.type = 'color';
+                input.value = theme[field.key] || DEFAULT_THEME[field.key];
+                input.oninput = (event) => {
+                    theme[field.key] = event.target.value;
+                    if (field.key === 'accent') {
+                        theme.accent_soft = hexToRgba(theme.accent, 0.08);
+                        if (softInput) softInput.value = theme.accent_soft;
+                    }
+                    renderPreview();
+                    applyAdminTheme();
+                };
+                wrapper.appendChild(label);
+                wrapper.appendChild(input);
+                themeFieldset.appendChild(wrapper);
+            });
+
+            const softWrapper = document.createElement('div');
+            softWrapper.className = 'form-group';
+            const softLabel = document.createElement('label');
+            softLabel.textContent = 'Accent suave (auto)';
+            softInput = document.createElement('input');
+            softInput.type = 'text';
+            softInput.value = theme.accent_soft || hexToRgba(theme.accent, 0.08);
+            softInput.oninput = (event) => {
+                theme.accent_soft = event.target.value;
+                renderPreview();
+                applyAdminTheme();
+            };
+            softWrapper.appendChild(softLabel);
+            softWrapper.appendChild(softInput);
+            themeFieldset.appendChild(softWrapper);
+
+            uiNodes.editorForm.appendChild(themeFieldset);
+        });
+
         pendingFieldsets.push(() => addUiFieldset('Textos de Identidade', [
             { key: 'marketing_label', label: 'Etiqueta de marketing' }
         ]));
@@ -2180,7 +2470,7 @@ function renderSectionEditor() {
         fieldset.appendChild(legend);
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
-        makeResourceListField(wrapper, locale, 'certifications', [...locale.certifications]);
+        makeResourceListField(wrapper, locale, 'certifications', [...locale.certifications], { withViewer: true });
         fieldset.appendChild(wrapper);
         uiNodes.editorForm.appendChild(fieldset);
         certsRendered = true;
@@ -2218,6 +2508,7 @@ function renderSectionEditor() {
     };
 
     orderedEntries.forEach(([key, value]) => {
+        if (isHiddenFieldKey(key)) return;
         if (currentSection === 'overview' && key === 'intro_text' && !certsRendered) {
             renderCertificationsFieldset();
         }
@@ -2261,7 +2552,7 @@ function renderSectionEditor() {
             if (key === 'image' || key.endsWith('_image') || key.endsWith('photo')) {
                 makeImageField(wrapper, content, key, currentSection);
             } else if (key === 'icon') {
-                makeEmojiField(wrapper, content, key, 'ex: ⭐');
+                makeIconField(wrapper, content, key, 'ex: star');
             } else {
                 const input = isLongText(key, value) ? document.createElement('textarea') : document.createElement('input');
                 input.value = value || '';
@@ -2411,9 +2702,11 @@ function renderStoryEditor(config, { append = false } = {}) {
     if (!targetEntry) return;
     const targetItem = config.type === 'mindset' ? targetEntry.item : targetEntry;
     if (config.type === 'skills' && !Array.isArray(targetItem.competencies)) {
-        const fallback = currentCV?.localized?.[currentLang]?.ui?.skill_tags;
-        targetItem.competencies = Array.isArray(fallback) ? [...fallback] : [];
+        targetItem.competencies = [];
     }
+    const skillsFallback = config.type === 'skills'
+        ? (currentCV?.localized?.[currentLang]?.ui?.skill_tags || [])
+        : [];
 
     const fieldsetTitle = document.createElement('div');
     fieldsetTitle.className = 'form-group';
@@ -2457,6 +2750,7 @@ function renderStoryEditor(config, { append = false } = {}) {
     };
 
     getStoryOrderedKeys(config.type, targetItem).forEach((key) => {
+        if (isHiddenFieldKey(key)) return;
         const value = targetItem[key];
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
@@ -2466,12 +2760,16 @@ function renderStoryEditor(config, { append = false } = {}) {
         wrapper.appendChild(label);
 
         if (Array.isArray(value)) {
-            makeArrayField(wrapper, targetItem, key, [...value]);
+            if (config.type === 'skills' && key === 'competencies' && value.length === 0 && Array.isArray(skillsFallback) && skillsFallback.length) {
+                makeArrayField(wrapper, targetItem, key, [...skillsFallback]);
+            } else {
+                makeArrayField(wrapper, targetItem, key, [...value]);
+            }
         } else if (typeof value === 'string') {
             if (key === 'image' || key.endsWith('_image') || key.endsWith('photo')) {
                 makeImageField(wrapper, targetItem, key, currentSection);
             } else if (key === 'icon') {
-                makeEmojiField(wrapper, targetItem, key, 'ex: ⭐');
+                makeIconField(wrapper, targetItem, key, 'ex: star');
             } else {
                 const input = isLongText(key, value) ? document.createElement('textarea') : document.createElement('input');
                 input.value = value || '';
@@ -3112,36 +3410,37 @@ function bindCropperEvents() {
     });
 }
 
-function bindEmojiPickerEvents() {
-    const overlay = document.getElementById('emoji-overlay');
-    const grid = document.getElementById('emoji-grid');
-    const closeBtn = document.getElementById('emoji-close');
-    const clearBtn = document.getElementById('emoji-clear');
+function bindIconPickerEvents() {
+    const overlay = document.getElementById('icon-overlay');
+    const grid = document.getElementById('icon-grid');
+    const closeBtn = document.getElementById('icon-close');
+    const clearBtn = document.getElementById('icon-clear');
     if (!overlay || !grid || !closeBtn || !clearBtn) return;
 
     grid.innerHTML = '';
-    EMOJI_CHOICES.forEach((emoji) => {
+    ICON_CHOICES.forEach((icon) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'emoji-btn';
-        btn.textContent = emoji;
+        btn.className = 'icon-btn';
+        btn.title = icon.label?.[currentLang] || icon.id;
+        btn.innerHTML = renderIcon(icon.id, 'icon');
         btn.onclick = () => {
-            if (emojiPickerState?.onSelect) emojiPickerState.onSelect(emoji);
-            closeEmojiPicker();
+            if (iconPickerState?.onSelect) iconPickerState.onSelect(icon.id);
+            closeIconPicker();
         };
         grid.appendChild(btn);
     });
 
-    closeBtn.addEventListener('click', closeEmojiPicker);
+    closeBtn.addEventListener('click', closeIconPicker);
     clearBtn.addEventListener('click', () => {
-        if (emojiPickerState?.onSelect) emojiPickerState.onSelect('');
-        closeEmojiPicker();
+        if (iconPickerState?.onSelect) iconPickerState.onSelect('');
+        closeIconPicker();
     });
     overlay.addEventListener('click', (event) => {
-        if (event.target === overlay) closeEmojiPicker();
+        if (event.target === overlay) closeIconPicker();
     });
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && emojiPickerState) closeEmojiPicker();
+        if (event.key === 'Escape' && iconPickerState) closeIconPicker();
     });
 }
 async function restoreLocalConfigBackup(file) {
@@ -3179,7 +3478,7 @@ async function init() {
     await detectRepoInfo();
     bindEvents();
     bindCropperEvents();
-    bindEmojiPickerEvents();
+    bindIconPickerEvents();
     switchView('editor');
     await hydrateSessionFields();
     await loadCV(false, false);

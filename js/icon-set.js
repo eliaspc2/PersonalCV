@@ -1,0 +1,144 @@
+const BASE_SVG_ATTRS = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+
+export const ICON_SET = {
+    home: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>`,
+    compass: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="12" cy="12" r="10"/><polygon points="16 8 13 13 8 16 11 11 16 8"/></svg>`,
+    brain: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M8 4a3 3 0 0 0-3 3v1a3 3 0 0 0 0 6v1a3 3 0 0 0 6 0v-1"/><path d="M16 4a3 3 0 0 1 3 3v1a3 3 0 0 1 0 6v1a3 3 0 0 1-6 0v-1"/><path d="M9 9h6"/><path d="M9 14h6"/></svg>`,
+    puzzle: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M9 3h6v4a2 2 0 1 1-4 0H9z"/><path d="M3 9h4a2 2 0 1 0 0-4H3z"/><path d="M9 9h6v6H9z"/><path d="M21 9h-4a2 2 0 1 1 0-4h4z"/><path d="M9 21v-4a2 2 0 1 1 4 0v4z"/><path d="M15 15h6v6h-6z"/></svg>`,
+    layers: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><polygon points="12 2 22 7 12 12 2 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>`,
+    code: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    settings: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.08a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.08a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01A1.65 1.65 0 0 0 9 3.08V3a2 2 0 1 1 4 0v.08a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01A1.65 1.65 0 0 0 20.92 11H21a2 2 0 1 1 0 4h-.08a1.65 1.65 0 0 0-1.52 1z"/></svg>`,
+    tools: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M14.7 6.3a4 4 0 0 0-5.66 5.66l-6.36 6.36a2 2 0 1 0 2.83 2.83l6.36-6.36a4 4 0 0 0 5.66-5.66l-2 2-2.83-2.83 2-2z"/></svg>`,
+    flask: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M10 2v6l-5 9a3 3 0 0 0 2.6 4.5h8.8A3 3 0 0 0 19 17l-5-9V2"/><path d="M8 8h8"/></svg>`,
+    briefcase: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a3 3 0 0 1 3-3h0a3 3 0 0 1 3 3v2"/><path d="M3 13h18"/></svg>`,
+    book: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+    pin: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 21v-7"/><path d="M12 14a5 5 0 1 0-5-5"/><circle cx="12" cy="7" r="3"/></svg>`,
+    mapPin: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>`,
+    paperclip: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M21.44 11.05l-8.49 8.49a5 5 0 0 1-7.07-7.07l8.49-8.49a3 3 0 0 1 4.24 4.24l-8.49 8.49a1 1 0 0 1-1.41-1.41l8.49-8.49"/></svg>`,
+    pencil: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`,
+    file: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+    folder: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`,
+    bookmark: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M6 3h12a2 2 0 0 1 2 2v16l-8-4-8 4V5a2 2 0 0 1 2-2z"/></svg>`,
+    globe: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20"/><path d="M12 2a15 15 0 0 0 0 20"/></svg>`,
+    lightbulb: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14a6 6 0 1 1 8 0c-1 1-2 2-2 4h-4c0-2-1-3-2-4z"/></svg>`,
+    rocket: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M14 4l6 6-4 1-3 3-1 4-6-6 4-1 3-3z"/><circle cx="15" cy="9" r="1.5"/><path d="M5 15l-2 6 6-2"/></svg>`,
+    sparkles: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"/><path d="M5 17l.5 1.5L7 19l-1.5.5L5 21l-.5-1.5L3 19l1.5-.5z"/><path d="M18 16l.5 1.5L20 18l-1.5.5L18 20l-.5-1.5L16 18l1.5-.5z"/></svg>`,
+    star: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><polygon points="12 2 15 9 22 9 16.5 13.5 18.5 21 12 16.5 5.5 21 7.5 13.5 2 9 9 9 12 2"/></svg>`,
+    flame: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 2s4 4 4 8-2 6-4 6-4-2-4-6 4-8 4-8z"/><path d="M8 16a4 4 0 0 0 8 0"/></svg>`,
+    chat: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>`,
+    phone: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 8.81 19.8 19.8 0 0 1 1.08.98 2 2 0 0 1 3.06 0h3a2 2 0 0 1 2 1.72c.12.86.32 1.7.59 2.5a2 2 0 0 1-.45 2.11L7.1 7.9a16 16 0 0 0 9 9l1.57-1.1a2 2 0 0 1 2.11-.45c.8.27 1.64.47 2.5.59a2 2 0 0 1 1.72 1.98z"/></svg>`,
+    mail: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,7 12,13 21,7"/></svg>`,
+    link: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 4"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L13 20"/></svg>`,
+    trophy: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M8 4h8v4a4 4 0 0 1-8 0z"/><path d="M6 4H4a2 2 0 0 0 2 2"/><path d="M18 4h2a2 2 0 0 1-2 2"/><path d="M12 12v4"/><path d="M8 20h8"/></svg>`,
+    graduation: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M22 10L12 4 2 10l10 6 10-6z"/><path d="M6 12v5c0 1.1 2.7 2 6 2s6-.9 6-2v-5"/><path d="M22 10v5"/></svg>`,
+    user: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>`,
+    camera: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M4 7h3l2-3h6l2 3h3v12H4z"/><circle cx="12" cy="13" r="3"/></svg>`,
+    shield: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/></svg>`,
+    megaphone: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M3 11v2a3 3 0 0 0 3 3h3l5 4V4L9 8H6a3 3 0 0 0-3 3z"/><path d="M21 8v8"/><path d="M14 6h7"/></svg>`,
+    hand: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M7 11V5a2 2 0 1 1 4 0v6"/><path d="M11 11V4a2 2 0 1 1 4 0v7"/><path d="M15 11V6a2 2 0 1 1 4 0v9a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-3a2 2 0 1 1 4 0v1"/></svg>`,
+    utensils: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M4 3v7"/><path d="M8 3v7"/><path d="M4 10c0 1.7 4 1.7 4 0"/><path d="M15 3v18"/><path d="M20 3l-3 7h4"/></svg>`,
+    checklist: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6l1.5 1.5L7 6"/><path d="M4 12l1.5 1.5L7 12"/><path d="M4 18l1.5 1.5L7 18"/></svg>`
+};
+
+export const ICON_CHOICES = [
+    { id: 'home', label: { pt: 'Casa', es: 'Casa', en: 'Home' } },
+    { id: 'compass', label: { pt: 'Direção', es: 'Dirección', en: 'Compass' } },
+    { id: 'brain', label: { pt: 'Mentalidade', es: 'Mentalidad', en: 'Mindset' } },
+    { id: 'puzzle', label: { pt: 'Padrões', es: 'Patrones', en: 'Patterns' } },
+    { id: 'layers', label: { pt: 'Fundação', es: 'Fundación', en: 'Foundation' } },
+    { id: 'code', label: { pt: 'Código', es: 'Código', en: 'Code' } },
+    { id: 'settings', label: { pt: 'Config', es: 'Config', en: 'Settings' } },
+    { id: 'tools', label: { pt: 'Ferramentas', es: 'Herramientas', en: 'Tools' } },
+    { id: 'flask', label: { pt: 'Experiência', es: 'Experiencia', en: 'Experiment' } },
+    { id: 'briefcase', label: { pt: 'Profissional', es: 'Profesional', en: 'Work' } },
+    { id: 'book', label: { pt: 'Leitura', es: 'Lectura', en: 'Read' } },
+    { id: 'pin', label: { pt: 'Nota', es: 'Nota', en: 'Pin' } },
+    { id: 'mapPin', label: { pt: 'Local', es: 'Local', en: 'Location' } },
+    { id: 'paperclip', label: { pt: 'Anexo', es: 'Adjunto', en: 'Attachment' } },
+    { id: 'pencil', label: { pt: 'Escrever', es: 'Escribir', en: 'Write' } },
+    { id: 'file', label: { pt: 'Ficheiro', es: 'Archivo', en: 'File' } },
+    { id: 'folder', label: { pt: 'Pasta', es: 'Carpeta', en: 'Folder' } },
+    { id: 'bookmark', label: { pt: 'Marcador', es: 'Marcador', en: 'Bookmark' } },
+    { id: 'checklist', label: { pt: 'Checklist', es: 'Checklist', en: 'Checklist' } },
+    { id: 'globe', label: { pt: 'Global', es: 'Global', en: 'Global' } },
+    { id: 'lightbulb', label: { pt: 'Ideia', es: 'Idea', en: 'Idea' } },
+    { id: 'rocket', label: { pt: 'Lançar', es: 'Lanzar', en: 'Launch' } },
+    { id: 'sparkles', label: { pt: 'Detalhe', es: 'Detalle', en: 'Spark' } },
+    { id: 'star', label: { pt: 'Destaque', es: 'Destacado', en: 'Star' } },
+    { id: 'flame', label: { pt: 'Energia', es: 'Energía', en: 'Energy' } },
+    { id: 'chat', label: { pt: 'Conversar', es: 'Conversar', en: 'Chat' } },
+    { id: 'phone', label: { pt: 'Telefone', es: 'Teléfono', en: 'Phone' } },
+    { id: 'mail', label: { pt: 'Email', es: 'Email', en: 'Mail' } },
+    { id: 'link', label: { pt: 'Ligação', es: 'Enlace', en: 'Link' } },
+    { id: 'trophy', label: { pt: 'Conquista', es: 'Logro', en: 'Trophy' } },
+    { id: 'graduation', label: { pt: 'Formação', es: 'Formación', en: 'Graduation' } },
+    { id: 'user', label: { pt: 'Pessoa', es: 'Persona', en: 'User' } },
+    { id: 'camera', label: { pt: 'Foto', es: 'Foto', en: 'Camera' } },
+    { id: 'shield', label: { pt: 'Proteção', es: 'Protección', en: 'Shield' } },
+    { id: 'megaphone', label: { pt: 'Anúncio', es: 'Anuncio', en: 'Announcement' } },
+    { id: 'hand', label: { pt: 'Mãos', es: 'Manos', en: 'Hands' } },
+    { id: 'utensils', label: { pt: 'Cozinha', es: 'Cocina', en: 'Kitchen' } }
+];
+
+export const ICON_ALIAS = {
+    '🏠': 'home',
+    '🧭': 'compass',
+    '🧠': 'brain',
+    '🧩': 'puzzle',
+    '🧱': 'layers',
+    '⚙️': 'settings',
+    '🛠️': 'tools',
+    '🧪': 'flask',
+    '🧰': 'briefcase',
+    '📚': 'book',
+    '📌': 'pin',
+    '📍': 'mapPin',
+    '📎': 'paperclip',
+    '📝': 'pencil',
+    '📄': 'file',
+    '📂': 'folder',
+    '📁': 'folder',
+    '🗂️': 'checklist',
+    '🧾': 'file',
+    '🔖': 'bookmark',
+    '🌐': 'globe',
+    '💡': 'lightbulb',
+    '🚀': 'rocket',
+    '✨': 'sparkles',
+    '⭐': 'star',
+    '🔥': 'flame',
+    '💬': 'chat',
+    '☎️': 'phone',
+    '✉️': 'mail',
+    '🔗': 'link',
+    '🏆': 'trophy',
+    '🎓': 'graduation',
+    '🧑‍🍳': 'utensils',
+    '🍞': 'utensils',
+    '🍕': 'utensils',
+    '🗳️': 'checklist',
+    '🛡️': 'shield',
+    '📣': 'megaphone',
+    '💅': 'hand',
+    '🧘': 'sparkles',
+    '📷': 'camera',
+    '👤': 'user'
+};
+
+export function normalizeIconValue(value) {
+    if (!value) return '';
+    const text = String(value);
+    return ICON_ALIAS[text] || text;
+}
+
+export function renderIcon(id, className = 'icon') {
+    const key = normalizeIconValue(id);
+    const svg = ICON_SET[key];
+    if (!svg) return '';
+    return svg.replace('class="icon"', `class="${className}"`);
+}
+
+export function isIconId(id) {
+    const key = normalizeIconValue(id);
+    return Boolean(ICON_SET[key]);
+}

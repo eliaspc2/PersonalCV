@@ -54,7 +54,18 @@
     "site_title": "André Câmara | Software Engineer",
     "site_description": "Portfolio of André Câmara - Software Developer with a Systems Engineering background.",
     "favicon": "favicon.ico",
-    "apple_icon": "apple-touch-icon.png"
+    "apple_icon": "apple-touch-icon.png",
+    "theme": {
+      "bg_app": "#fcfcfd",
+      "bg_sidebar": "#ffffff",
+      "primary": "#020617",
+      "accent": "#3b82f6",
+      "accent_soft": "rgba(59, 130, 246, 0.08)",
+      "text_main": "#0f172a",
+      "text_muted": "#64748b",
+      "text_dim": "#94a3b8",
+      "border": "#f1f5f9"
+    }
   },
   "paths": {
     "photos": "assets/photos/",
@@ -178,9 +189,9 @@
         ],
         "cta_label": "Vamos Conversar?",
         "location": "Quintanilha, Bragança PT",
-        "headline": "Software Developer & Systems Architect",
-        "intro_text": "Construo soluções onde a elegância do código encontra a robustez da infraestrutura. O meu foco é a estabilidade, a automação e a tradução de necessidades críticas em arquitectura sustentável.",
-        "bio": "O meu percurso com a tecnologia começou no final dos anos 90. Foi um início entusiasmante que seguiu um caminho não linear, com uma pausa significativa que me permitiu ganhar uma perspectiva de vida mais ampla. Regressei ao sector com a maturidade e o foco de quem sabe que o software é, acima de tudo, um compromisso com a continuidade. Sou casado, pai de um filho de 13 anos e vivo em Bragança — essa estabilidade traduz-se em foco, previsibilidade e fiabilidade técnica em cada projecto. Não sou apenas um programador; trago a disciplina de quem passou mais de uma década a garantir que sistemas críticos 24/7 nunca falhavam.",
+        "headline": "Software Developer focado em estabilidade, automação e sistemas existentes",
+        "intro_text": "Desenvolvo software com foco em estabilidade, automação e redução de entropia técnica. Trabalho bem em sistemas já em produção, com histórico, dependências e necessidade de previsibilidade.",
+        "bio": "Trabalho com tecnologia desde o final dos anos 90, com forte base em sistemas críticos, automação e infraestrutura 24/7. Reentrei no desenvolvimento de software com foco em continuidade, previsibilidade e qualidade técnica. Trago para o código a disciplina de ambientes onde falhar não era opção.",
         "marketing_note": "Para além da técnica, possuo formação em Marketing Digital. Esta consciência de produto ajuda-me a pensar no utilizador final, comunicar com clareza e entregar valor antes da tecnologia.",
         "next_label": "A seguir",
         "next_text": "Quem sou aparece na forma como construo. A próxima secção mostra a engenharia que pratico hoje.",
@@ -202,7 +213,8 @@
             "title": "Python Ecosystem (I & II)",
             "focus_area": "Backend & Automação",
             "context_text": "Formação estruturada e exigente pela Universidade de Helsínquia (Programming I & II). Domínio de algoritmos, estruturas de dados e OOP.",
-            "background": "Transitei do suporte técnico para a computação programática através de um percurso de 540h de formação intensiva. Onde outros vêm um script, eu vejo um sistema de automação resiliente."
+            "background": "Transitei do suporte técnico para a computação programática através de um percurso de 540h de formação intensiva. Onde outros vêm um script, eu vejo um sistema de automação resiliente.",
+            "rh_value": "Capaz de trabalhar de forma autónoma em backend e automação, com atenção a robustez e manutenção."
           },
           {
             "technologies": [
@@ -224,10 +236,11 @@
             "context_text": "Percurso de 1416h focado em tecnologias modernas e boas práticas de engenharia. Em curso.",
             "background": "Actualmente a consolidar conhecimentos em arquitecturas modernas, garantindo que a base técnica sólida se traduz em aplicações web robustas e escaláveis.",
             "progress_status": "EM CURSO",
-            "duration_hours": "1416h"
+            "duration_hours": "1416h",
+            "rh_value": "Contribuição sólida em desenvolvimento fullstack com foco em qualidade, manutenção e estabilidade operacional."
           }
         ],
-        "next_label": "Transição",
+        "next_label": "Continuidade Técnica",
         "next_text": "O que faço hoje assenta num rigor construído antes da programação. A seguir, a fundação técnica que moldou esse rigor.",
         "cta_label": "Vamos Conversar?",
         "cta_link": "mailto:eliaspc2@gmail.com"
@@ -256,7 +269,7 @@
             "intro_quote": "O auge da responsabilidade. Oito anos no coração financeiro onde a tolerância ao erro era zero.",
             "challenge_text": "Ambiente bancário 24/7. A automação com PowerShell tornou-se vital para gerir milhares de servidores com estabilidade absoluta.",
             "key_learning_text": "Zero Downtime Mindset. Rigor absoluto e a compreensão de que a estabilidade é um processo de automação contínua.",
-            "present_link": "Aplico esta disciplina no desenvolvimento: código resiliente, testado e focado em disponibilidade inquestionável."
+            "present_link": "Aplico este rigor no desenvolvimento de software orientado a disponibilidade e previsibilidade."
           },
           {
             "technologies": [
@@ -273,7 +286,7 @@
             "intro_quote": "Robustez industrial. Cada sistema parado tinha um custo físico imediato e tangível.",
             "challenge_text": "Ambiente de refinaria e logística pesada. Pressão física por resolução rápida sob condições adversas.",
             "key_learning_text": "Obsessão por Robustez. Software e sistemas têm de sobreviver aos piores cenários, não apenas ao caminho feliz.",
-            "present_link": "Escrevo software preparado para falhas parciais, garantindo previsibilidade e segurança nos meus sistemas."
+            "present_link": "Aplico este rigor no desenvolvimento de software preparado para falhas parciais, com previsibilidade e segurança."
           },
           {
             "technologies": [
@@ -289,7 +302,7 @@
             "intro_quote": "A era da escala. Onde aprendi que as grandes infraestruturas são construídas com camadas de abstração.",
             "challenge_text": "Gerir complexidade em escala. Entender como instâncias virtuais interagem sem conflitos físicos.",
             "key_learning_text": "Pensamento Sistémico. Ver a arquitectura completa antes de actuar em componentes isolados.",
-            "present_link": "Esta visão abstrata permite-me desenhar arquitecturas de software modulares e escaláveis."
+            "present_link": "Aplico esta visão sistémica no desenho de software modular e escalável."
           },
           {
             "technologies": [
@@ -305,7 +318,7 @@
             "intro_quote": "A fundação humana. Entre a técnica inicial e a gestão multicultural em Oslo, aprendi o valor da comunicação.",
             "challenge_text": "Ambientes multiculturais de alta rotatividade. Gestão de expectativas e diagnóstico rápido de problemas sob pressão social.",
             "key_learning_text": "Empatia como Diagnóstico. Entender a dor do utilizador é metade da solução técnica.",
-            "present_link": "Traduzo necessidades de negócio complexas em código que resolve problemas reais para pessoas reais."
+            "present_link": "Traduzo necessidades de negócio complexas em código que resolve problemas reais."
           }
         ],
         "next_label": "A seguir",
@@ -324,7 +337,7 @@
           "image": "adoption-family.png",
           "principle_title": "Estabilidade e Processo",
           "story_text": "O meu filho foi adotado há 4 anos. A adoção foi um processo longo, estruturado, exigente e regulado, que exige paciência, previsibilidade, estabilidade emocional e consistência de rotinas.",
-          "engineering_note": "Para mim, isto é prova de competências humanas elevadas — compromisso a longo prazo, organização, disciplina e cumprimento rigoroso de processos. As mesmas competências que aplico em sistemas críticos, projetos longos e código que não pode falhar."
+          "engineering_note": "Este percurso reforçou competências críticas para projetos longos: consistência, previsibilidade e compromisso com processos."
         },
         "blocks": [
           {
@@ -385,8 +398,8 @@
         "cta_label": "Vamos conversar",
         "image": "now-portrait.png",
         "image_alt": "Perfil profissional",
-        "summary": "Procuro uma entidade acolhedora para o estágio curricular obrigatório (210h) do EFA – Programador Informático.",
-        "details": "A componente teórica termina no final de junho e o estágio pode iniciar a partir de junho de 2026. O estágio é acompanhado pela entidade formadora, com plano individual e objetivos definidos. Procuro um contexto real de desenvolvimento ou sistemas, com preferência por remoto (todo o país) e alternativa híbrida na zona de Bragança. Ao longo da formação já tive contacto prático com programação, por isso o estágio não começa do zero. O contacto serve para alinharmos expectativas e enquadramento.",
+        "summary": "Disponível para estágio curricular (210h) em contexto real de desenvolvimento ou sistemas, com capacidade de contributo efetivo desde o início.",
+        "details": "A componente teórica termina no final de junho e o estágio pode iniciar a partir de junho de 2026. O estágio é acompanhado pela entidade formadora, com plano individual e objetivos definidos. Procuro um contexto real de desenvolvimento ou sistemas, com preferência por remoto (todo o país) e alternativa híbrida na zona de Bragança. Não requer formação básica e já estou habituado a contextos reais de trabalho e sistemas com histórico. O contacto serve para alinharmos expectativas e enquadramento.",
         "cta_link": "mailto:eliaspc2@gmail.com"
       },
       "contact": {

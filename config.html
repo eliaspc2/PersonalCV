@@ -263,6 +263,67 @@
             align-items: center;
         }
 
+        .preset-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Theme overrides (config UI) */
+        body.config-themed {
+            background: var(--bg-app);
+            color: var(--text-main);
+        }
+
+        body.config-themed .container {
+            background: var(--bg-sidebar);
+        }
+
+        body.config-themed .message.info {
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        body.config-themed fieldset {
+            border-color: var(--border);
+        }
+
+        body.config-themed label,
+        body.config-themed .nav-icon-hint,
+        body.config-themed .header-breadcrumb {
+            color: var(--text-main);
+        }
+
+        body.config-themed input,
+        body.config-themed textarea,
+        body.config-themed select {
+            border-color: var(--border);
+            color: var(--text-main);
+            background: #ffffff;
+        }
+
+        body.config-themed .toggle-visibility,
+        body.config-themed .panel-action,
+        body.config-themed .section-move,
+        body.config-themed .section-remove {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        body.config-themed .story-button.active,
+        body.config-themed .section-item button.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        body.config-themed .icon-btn {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: #ffffff;
+        }
+
         .toggle-visibility {
             border: 1px solid #cbd5f5;
             background: #eef2ff;
@@ -573,7 +634,7 @@
             margin-top: 1rem;
         }
 
-        .emoji-overlay {
+        .icon-overlay {
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.55);
@@ -583,11 +644,11 @@
             z-index: 2000;
         }
 
-        .emoji-overlay.hidden {
+        .icon-overlay.hidden {
             display: none;
         }
 
-        .emoji-modal {
+        .icon-modal {
             width: min(520px, 90vw);
             background: white;
             border-radius: 12px;
@@ -595,7 +656,7 @@
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
         }
 
-        .emoji-header {
+        .icon-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -603,7 +664,7 @@
             margin-bottom: 1rem;
         }
 
-        .emoji-grid {
+        .icon-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
             gap: 0.5rem;
@@ -615,30 +676,40 @@
             background: #f8fafc;
         }
 
-        .emoji-btn {
+        .icon-btn {
             border: 1px solid #cbd5f5;
             background: white;
             border-radius: 10px;
-            font-size: 1.4rem;
-            line-height: 1;
             padding: 0.4rem;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
         }
 
-        .emoji-actions {
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .icon-actions {
             display: flex;
             justify-content: flex-end;
             gap: 0.5rem;
             margin-top: 0.75rem;
         }
 
-        .emoji-modal .panel-action {
+        .icon-modal .panel-action {
             width: auto;
             text-align: center;
             padding: 0.55rem 1rem;
         }
 
-        .emoji-close {
+        .icon-close {
             background: #f8fafc;
         }
 
@@ -799,11 +870,6 @@
             color: var(--accent);
         }
 
-        .nav-icon-preview .nav-emoji {
-            font-size: 1.1rem;
-            line-height: 1;
-        }
-
         .nav-default-icon svg,
         .nav-icon-preview svg {
             width: 18px;
@@ -941,15 +1007,15 @@
             </div>
         </div>
     </div>
-    <div id="emoji-overlay" class="emoji-overlay hidden" aria-hidden="true">
-        <div class="emoji-modal">
-            <div class="emoji-header">
-                <h3 style="margin:0;">Escolher emoji</h3>
+    <div id="icon-overlay" class="icon-overlay hidden" aria-hidden="true">
+        <div class="icon-modal">
+            <div class="icon-header">
+                <h3 style="margin:0;">Escolher ícone</h3>
             </div>
-            <div id="emoji-grid" class="emoji-grid"></div>
-            <div class="emoji-actions">
-                <button id="emoji-clear" type="button" class="panel-action">Sem ícone</button>
-                <button id="emoji-close" type="button" class="panel-action">Fechar</button>
+            <div id="icon-grid" class="icon-grid"></div>
+            <div class="icon-actions">
+                <button id="icon-clear" type="button" class="panel-action">Sem ícone</button>
+                <button id="icon-close" type="button" class="panel-action icon-close">Fechar</button>
             </div>
         </div>
     </div>

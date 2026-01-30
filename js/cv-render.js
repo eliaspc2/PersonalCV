@@ -1,4 +1,5 @@
 import { getSecureItem } from './crypto-utils.js';
+import { renderIcon, normalizeIconValue, isIconId } from './icon-set.js';
 
 const dom = {
     sidebar: document.querySelector('.sidebar'),
@@ -35,13 +36,25 @@ const DEFAULT_PATHS = {
     icons: 'assets/icons/'
 };
 
+const DEFAULT_THEME = {
+    bg_app: '#fcfcfd',
+    bg_sidebar: '#ffffff',
+    primary: '#020617',
+    accent: '#3b82f6',
+    accent_soft: 'rgba(59, 130, 246, 0.08)',
+    text_main: '#0f172a',
+    text_muted: '#64748b',
+    text_dim: '#94a3b8',
+    border: '#f1f5f9'
+};
+
 const NAV_TYPE_ICONS = {
-    overview: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
-    development: `<svg class="nav-icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
-    foundation: `<svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`,
-    mindset: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
-    now: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 12h7l2 3h9"/><path d="M3 12l2-3h6"/><circle cx="19" cy="12" r="2"/></svg>`,
-    contact: `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`
+    overview: renderIcon('home', 'nav-icon'),
+    development: renderIcon('code', 'nav-icon'),
+    foundation: renderIcon('layers', 'nav-icon'),
+    mindset: renderIcon('book', 'nav-icon'),
+    now: renderIcon('compass', 'nav-icon'),
+    contact: renderIcon('mail', 'nav-icon')
 };
 
 function normalizeBasePath(value, fallback) {
@@ -68,6 +81,37 @@ function resolveAssetPath(type, value) {
     return `${paths[type] || ''}${text}`;
 }
 
+function hexToRgba(hex, alpha = 0.08) {
+    const clean = String(hex || '').replace('#', '').trim();
+    if (![3, 6].includes(clean.length)) return `rgba(59, 130, 246, ${alpha})`;
+    const value = clean.length === 3
+        ? clean.split('').map((ch) => ch + ch).join('')
+        : clean;
+    const int = parseInt(value, 16);
+    if (Number.isNaN(int)) return `rgba(59, 130, 246, ${alpha})`;
+    const r = (int >> 16) & 255;
+    const g = (int >> 8) & 255;
+    const b = int & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function applyTheme(theme) {
+    const root = document.documentElement;
+    const payload = { ...DEFAULT_THEME, ...(theme || {}) };
+    if (!payload.accent_soft && payload.accent) {
+        payload.accent_soft = hexToRgba(payload.accent, 0.08);
+    }
+    root.style.setProperty('--bg-app', payload.bg_app);
+    root.style.setProperty('--bg-sidebar', payload.bg_sidebar);
+    root.style.setProperty('--primary', payload.primary);
+    root.style.setProperty('--accent', payload.accent);
+    root.style.setProperty('--accent-soft', payload.accent_soft);
+    root.style.setProperty('--text-main', payload.text_main);
+    root.style.setProperty('--text-muted', payload.text_muted);
+    root.style.setProperty('--text-dim', payload.text_dim);
+    root.style.setProperty('--border', payload.border);
+}
+
 function getContactHref(profile) {
     const email = profile?.social?.email || 'eliaspc2@gmail.com';
     return email ? `mailto:${email}` : '#contact';
@@ -79,6 +123,21 @@ function getImageTransform(zoom) {
     return `transform: scale(${scale}); transform-origin: center;`;
 }
 
+function escapeAttr(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function buildViewerAttrs({ href, label, viewer = true }) {
+    if (!viewer) {
+        return `href="${href}" download`;
+    }
+    return `href="${href}" data-viewer-file="${href}" data-viewer-label="${escapeAttr(label || '')}"`;
+}
+
 function normalizeDownloads(profile, locale) {
     if (!profile) return [];
     const downloads = profile.downloads;
@@ -87,7 +146,8 @@ function normalizeDownloads(profile, locale) {
             label: item?.label || '',
             icon: item?.icon || '',
             href: item?.href || '',
-            group: item?.group || 'downloads'
+            group: item?.group || 'downloads',
+            viewer: item?.viewer !== false
         }));
     }
     if (downloads && typeof downloads === 'object') {
@@ -112,7 +172,8 @@ function normalizeDownloads(profile, locale) {
             label: labelMap[key] || key,
             icon: '',
             href: href || '',
-            group: groupMap[key] || 'downloads'
+            group: groupMap[key] || 'downloads',
+            viewer: true
         }));
     }
     return [];
@@ -329,6 +390,8 @@ function setupGlobalEvents() {
         }
     });
 
+    initFileViewer();
+
     if (isPreviewMode) {
         window.addEventListener('message', async (event) => {
             if (!event.data || event.data.type !== 'previewUpdate') return;
@@ -348,6 +411,72 @@ function setupGlobalEvents() {
     }
 }
 
+function initFileViewer() {
+    const viewer = document.getElementById('file-viewer');
+    const titleEl = document.getElementById('file-viewer-title');
+    const bodyEl = document.getElementById('file-viewer-body');
+    const closeBtn = document.getElementById('file-viewer-close');
+    const downloadBtn = document.getElementById('file-viewer-download');
+    if (!viewer || !titleEl || !bodyEl || !closeBtn || !downloadBtn) return;
+
+    const close = () => {
+        viewer.classList.add('hidden');
+        viewer.setAttribute('aria-hidden', 'true');
+        bodyEl.innerHTML = '';
+    };
+
+    const open = (href, label) => {
+        titleEl.textContent = label || 'Ficheiro';
+        downloadBtn.href = href;
+        downloadBtn.setAttribute('download', '');
+        bodyEl.innerHTML = '';
+
+        const url = href.split('?')[0].toLowerCase();
+        if (url.endsWith('.pdf')) {
+            const iframe = document.createElement('iframe');
+            iframe.src = href;
+            iframe.title = label || 'Documento';
+            iframe.className = 'file-viewer-frame';
+            bodyEl.appendChild(iframe);
+        } else if (url.match(/\.(png|jpg|jpeg|webp|gif)$/)) {
+            const img = document.createElement('img');
+            img.src = href;
+            img.alt = label || 'Imagem';
+            img.className = 'file-viewer-image';
+            bodyEl.appendChild(img);
+        } else {
+            const info = document.createElement('div');
+            info.className = 'file-viewer-fallback';
+            info.innerHTML = `
+                <p>Pré-visualização não disponível.</p>
+                <a href="${href}" download>Descarregar ficheiro</a>
+            `;
+            bodyEl.appendChild(info);
+        }
+
+        viewer.classList.remove('hidden');
+        viewer.setAttribute('aria-hidden', 'false');
+    };
+
+    document.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-viewer-file]');
+        if (!trigger) return;
+        event.preventDefault();
+        const href = trigger.getAttribute('data-viewer-file');
+        if (!href) return;
+        const label = trigger.getAttribute('data-viewer-label') || trigger.textContent?.trim();
+        open(href, label);
+    });
+
+    closeBtn.onclick = close;
+    viewer.addEventListener('click', (event) => {
+        if (event.target === viewer) close();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !viewer.classList.contains('hidden')) close();
+    });
+}
+
 function navigateTo(sectionId) {
     const target = document.getElementById(`section-${sectionId}`);
     if (!target) return;
@@ -359,6 +488,7 @@ function navigateTo(sectionId) {
 
 function render() {
     if (!cvData) return;
+    applyTheme(cvData.meta?.theme || cvData.theme || {});
     const locale = cvData.localized[currentLang];
     ensureDynamicSections(locale);
     updateNavigationLabels(locale);
@@ -457,20 +587,20 @@ function updateNavigationLabels(locale) {
             label.textContent = locale.navigation[key];
         }
         const navItem = label.closest('.nav-item');
-        const iconValue = locale.navigation_icons && locale.navigation_icons[key];
+        const iconValue = normalizeIconValue(locale.navigation_icons && locale.navigation_icons[key]);
         if (navItem) {
-            let emoji = navItem.querySelector('.nav-emoji');
             const svgIcon = navItem.querySelector('.nav-icon');
-            if (iconValue) {
-                if (!emoji) {
-                    emoji = document.createElement('span');
-                    emoji.className = 'nav-emoji';
-                    navItem.insertBefore(emoji, navItem.firstChild);
+            let customIcon = navItem.querySelector('.nav-custom-icon');
+            if (iconValue && isIconId(iconValue)) {
+                if (!customIcon) {
+                    customIcon = document.createElement('span');
+                    customIcon.className = 'nav-custom-icon';
+                    navItem.insertBefore(customIcon, navItem.firstChild);
                 }
-                emoji.textContent = iconValue;
+                customIcon.innerHTML = renderIcon(iconValue, 'nav-icon');
                 if (svgIcon) svgIcon.style.display = 'none';
             } else {
-                if (emoji) emoji.remove();
+                if (customIcon) customIcon.remove();
                 if (svgIcon) svgIcon.style.display = '';
             }
         }
@@ -610,11 +740,15 @@ function renderOverview(data, container, sectionId = 'overview') {
                     </p>
                     ${certifications.length ? `
                         <div class="cert-badges">
-                            ${certifications.map(cert => `
-                                <a class="cert-chip" href="${resolveAssetPath('downloads', cert.href)}" target="_blank" rel="noopener">
-                                    ${cert.label}
-                                </a>
-                            `).join('')}
+                            ${certifications.map(cert => {
+                                const href = resolveAssetPath('downloads', cert.href);
+                                const viewer = cert.viewer !== false;
+                                return `
+                                    <a class="cert-chip" ${buildViewerAttrs({ href, label: cert.label, viewer })}>
+                                        ${cert.label}
+                                    </a>
+                                `;
+                            }).join('')}
                         </div>
                     ` : ''}
                 </div>
@@ -777,7 +911,9 @@ function renderMindset(data, container, sectionId = 'mindset') {
                     <div class="rich-card mindset-card ${block.id === 'adocao' || block.id === 'adopcion' || block.id === 'adoption' ? 'adoption-card' : ''}" onclick="app.showDetail('mindset', ${index}, '${sectionId}')" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="height: 200px; background: var(--border); overflow: hidden; position: relative;">
                             ${block.image ? `<img src="${resolveAssetPath('photos', block.image)}" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover; object-position: ${block.image_position || 'center 20%'}; ${getImageTransform(block.image_zoom)} opacity: 0.8; transition: var(--transition);">` : `
-                                <div style="display:flex; align-items:center; justify-content:center; height:100%; font-size: 5rem;">${block.icon}</div>
+                                <div style="display:flex; align-items:center; justify-content:center; height:100%; color: var(--accent);">
+                                    ${renderIcon(block.icon, 'icon icon-xxl')}
+                                </div>
                             `}
                             <div style="position: absolute; bottom: 1rem; left: 1rem; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;">
                                 ${block.principle_title}
@@ -785,7 +921,7 @@ function renderMindset(data, container, sectionId = 'mindset') {
                         </div>
                         <div style="padding: 2rem;">
                             <div style="display:flex; align-items:center; gap:12px; margin-bottom: 1rem;">
-                                <span style="font-size: 1.5rem;">${block.icon}</span>
+                                <span style="color: var(--accent); display:inline-flex;">${renderIcon(block.icon, 'icon icon-lg')}</span>
                                 <h3 style="margin:0;">${block.title}</h3>
                             </div>
                             <p style="color:var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
@@ -817,18 +953,19 @@ function renderContact(data, locale, container, sectionId = 'contact') {
     const ctaLabel = data.cta_label || ui.cta_contact_label;
     const downloads = normalizeDownloads(profile, locale);
     const ctaHref = data.cta_link || `mailto:${profile.social.email}`;
-    const downloadIcon = `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
-    const certIcon = `<svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-    const renderDownloadIcon = (item, fallbackIcon) => {
-        return item.icon ? `<span class="nav-emoji">${item.icon}</span>` : fallbackIcon;
+    const downloadIcon = renderIcon('file', 'nav-icon');
+    const certIcon = renderIcon('graduation', 'nav-icon');
+    const renderDownloadIcon = (iconId, fallbackIcon) => {
+        const normalized = normalizeIconValue(iconId || '');
+        return isIconId(normalized) ? renderIcon(normalized, 'nav-icon') : fallbackIcon;
     };
-    const renderDownloadItem = (item, fallbackIcon, { openInNewTab = false } = {}) => {
+    const renderDownloadItem = (item, fallbackIcon) => {
         if (!item.href) return '';
-        const attrs = openInNewTab ? 'target="_blank" rel="noopener"' : 'download';
         const href = resolveAssetPath('downloads', item.href);
+        const viewer = item.viewer !== false;
         return `
-            <a href="${href}" ${attrs} class="download-item nav-item">
-                ${renderDownloadIcon(item, fallbackIcon)}
+            <a ${buildViewerAttrs({ href, label: item.label || item.href, viewer })} class="download-item nav-item">
+                ${renderDownloadIcon(item.icon, fallbackIcon)}
                 <span>${item.label || item.href}</span>
             </a>
         `;
@@ -841,19 +978,16 @@ function renderContact(data, locale, container, sectionId = 'contact') {
             if (!group?.id) return;
             groupMap.set(group.id, {
                 label: group.label || group.id,
-                openInNewTab: Boolean(group.open_in_new_tab),
                 icon: group.icon || ''
             });
         });
     } else {
         groupMap.set('downloads', {
             label: data.downloads_title,
-            openInNewTab: false,
             icon: ''
         });
         groupMap.set('certs', {
             label: data.certifications_title,
-            openInNewTab: true,
             icon: ''
         });
     }
@@ -862,15 +996,13 @@ function renderContact(data, locale, container, sectionId = 'contact') {
     groupIds.forEach((groupId) => {
         const groupItems = downloads.filter(item => (item.group || 'downloads') === groupId);
         if (!groupItems.length) return;
-        const groupDef = groupMap.get(groupId) || { label: groupId, openInNewTab: false, icon: '' };
-        const fallbackIcon = groupDef.icon
-            ? `<span class="nav-emoji">${groupDef.icon}</span>`
-            : (groupId === 'certs' ? certIcon : downloadIcon);
+        const groupDef = groupMap.get(groupId) || { label: groupId, icon: '' };
+        const fallbackIcon = renderDownloadIcon(groupDef.icon, (groupId === 'certs' ? certIcon : downloadIcon));
         downloadGroups.push({
             label: groupDef.label || groupId,
             items: groupItems,
             icon: fallbackIcon,
-            openInNewTab: groupDef.openInNewTab
+            openInNewTab: false
         });
     });
 
@@ -896,7 +1028,7 @@ function renderContact(data, locale, container, sectionId = 'contact') {
                         <div class="download-group">
                             <p class="dim-label">${group.label || ''}</p>
                             <div class="download-list">
-                                ${group.items.map(item => renderDownloadItem(item, group.icon, { openInNewTab: group.openInNewTab })).join('')}
+                                ${group.items.map(item => renderDownloadItem(item, group.icon)).join('')}
                             </div>
                         </div>
                     `).join('')}
@@ -964,11 +1096,21 @@ function showDetail(type, index, contextSection) {
                     ${item.background || ui.drawer_skill_default_history || ""}
                 </div>
             </div>
-            ${item.resource ? `
-                <div style="margin-top:2.5rem;">
-                    <a href="${resolveAssetPath('downloads', item.resource.href)}" class="resource-btn" target="_blank" rel="noopener" download>${item.resource.label}</a>
+            ${item.rh_value ? `
+                <div style="margin-top:2rem; padding:1rem 1.25rem; border-radius:12px; background:var(--accent-soft); border-left:3px solid var(--accent);">
+                    <div style="font-size:0.8rem; text-transform:uppercase; color:var(--accent); letter-spacing:0.08em; margin-bottom:0.5rem;">Valor para equipas</div>
+                    <div style="color:var(--text-main); font-size:0.95rem;">${item.rh_value}</div>
                 </div>
             ` : ''}
+            ${item.resource ? (() => {
+                const href = resolveAssetPath('downloads', item.resource.href);
+                const viewer = item.resource.viewer !== false;
+                return `
+                    <div style="margin-top:2.5rem;">
+                        <a ${buildViewerAttrs({ href, label: item.resource.label, viewer })} class="resource-btn">${item.resource.label}</a>
+                    </div>
+                `;
+            })() : ''}
 
             ${item.technologies && item.technologies.length ? `
                 <div style="margin-top:2.5rem;">
@@ -1038,7 +1180,7 @@ function showDetail(type, index, contextSection) {
         const ui = locale.ui || {};
         contentHtml = `
             <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 1rem;">
-                <span style="font-size: 2.5rem;">${item.icon}</span>
+                <span style="color: var(--accent); display:inline-flex;">${renderIcon(item.icon, 'icon icon-xl')}</span>
                 <span class="dim-label" style="margin:0;">${ui.drawer_mindset_label || ''}</span>
             </div>
             <h2 style="margin-top:0.5rem; margin-bottom: 2rem;">${item.title}</h2>
@@ -1063,7 +1205,9 @@ function showDetail(type, index, contextSection) {
             </div>
 
             <div style="margin-top:4rem; padding:2rem; background:var(--primary); color:white; border-radius:16px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: -10px; right: -10px; font-size: 6rem; opacity: 0.1;">${item.icon}</div>
+                <div style="position: absolute; top: -10px; right: -10px; opacity: 0.12; color: var(--accent);">
+                    ${renderIcon(item.icon, 'icon icon-xxl')}
+                </div>
                 <p style="font-size: 0.95rem; opacity: 0.9; max-width: 85%;">${ui.mindset_trace_text || ''}</p>
             </div>
         `;
