@@ -927,7 +927,7 @@ function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', option
     if (!preview) {
         preview = document.createElement('span');
         preview.className = 'icon-input-preview';
-        row.insertBefore(preview, input);
+        row.appendChild(preview);
         const value = String(input.value || '').trim();
         if (value) {
             preview.innerHTML = renderIcon(value, 'nav-icon');
