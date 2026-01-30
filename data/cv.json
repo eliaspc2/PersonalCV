@@ -277,17 +277,7 @@
             "background": "Este CET reforça a continuidade técnica na trajetória, aprofundando competências de segurança e operações sem representar mudança de área.",
             "duration_hours": "1510h",
             "progress_status": "Selecionado / Início confirmado",
-            "competencies": [],
-            "type": "CET",
-            "level": 5,
-            "provider": "MultiFormactiva",
-            "providerUrl": "https://multiformactiva.pt/",
-            "startDate": "2026-02-04",
-            "durationHours": 1510,
-            "internshipHours": 485,
-            "status": "selected",
-            "status_display": "Selecionado / Início confirmado",
-            "format": "Não indicado"
+            "competencies": []
           }
         ],
         "next_label": "Continuidade Técnica",
@@ -639,17 +629,7 @@
             "background": "Este CET refuerza la continuidad técnica en la trayectoria, profundizando competencias de seguridad y operaciones sin suponer un cambio de área.",
             "duration_hours": "1510h",
             "progress_status": "Seleccionado / Inicio confirmado",
-            "competencies": [],
-            "type": "CET",
-            "level": 5,
-            "provider": "MultiFormactiva",
-            "providerUrl": "https://multiformactiva.pt/",
-            "startDate": "2026-02-04",
-            "durationHours": 1510,
-            "internshipHours": 485,
-            "status": "selected",
-            "status_display": "Seleccionado / Inicio confirmado",
-            "format": "No indicado"
+            "competencies": []
           }
         ],
         "next_label": "Continuidad Técnica",
@@ -1001,17 +981,7 @@
             "background": "This CET reinforces technical continuity in the trajectory, deepening security and operations skills without a change of area.",
             "duration_hours": "1510h",
             "progress_status": "Selected / Start confirmed",
-            "competencies": [],
-            "type": "CET",
-            "level": 5,
-            "provider": "MultiFormactiva",
-            "providerUrl": "https://multiformactiva.pt/",
-            "startDate": "2026-02-04",
-            "durationHours": 1510,
-            "internshipHours": 485,
-            "status": "selected",
-            "status_display": "Selected / Start confirmed",
-            "format": "Not indicated"
+            "competencies": []
           }
         ],
         "next_label": "Technical Continuity",
