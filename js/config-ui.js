@@ -998,8 +998,6 @@ function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', option
     const row = document.createElement('div');
     row.className = 'icon-input';
     let preview = null;
-    const nameHint = document.createElement('div');
-    nameHint.className = 'icon-input-name';
     preview = document.createElement('span');
     preview.className = 'icon-input-preview';
     row.appendChild(preview);
@@ -1019,11 +1017,6 @@ function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', option
             preview.innerHTML = config.defaultIcon;
         } else {
             preview.textContent = '';
-        }
-        if (iconId) {
-            nameHint.textContent = value ? `Ícone: ${iconId}` : `Ícone: ${iconId} (padrão)`;
-        } else {
-            nameHint.textContent = 'Ícone: (sem ícone)';
         }
     };
 
@@ -1049,7 +1042,6 @@ function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', option
     row.appendChild(input);
     row.appendChild(pickBtn);
     wrapper.appendChild(row);
-    wrapper.appendChild(nameHint);
     return input;
 }
 

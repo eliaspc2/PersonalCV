@@ -904,6 +904,33 @@ function renderDevelopment(data, container, sectionId = 'development') {
     const description = getText(sectionId, 'description', data.description);
     const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
     const nextText = getText(sectionId, 'next_text', data.next_text || '');
+    const aggregateItems = (items, key) => {
+        const values = new Set();
+        (items || []).forEach((item) => {
+            (item?.[key] || []).forEach((value) => {
+                if (value) values.add(String(value));
+            });
+        });
+        return Array.from(values);
+    };
+    const allTechnologies = aggregateItems(data.skills, 'technologies');
+    const allCompetencies = aggregateItems(data.skills, 'competencies');
+    const aggTechLabel = t('ui.technologies_label', ui.technologies_label || 'Tecnologias');
+    const aggCompLabel = t('ui.drawer_skill_competencies_label', ui.drawer_skill_competencies_label || 'Competências');
+    const aggregateCard = `
+        <div class="aggregate-card">
+            <div class="aggregate-title">${aggTechLabel}</div>
+            <div class="chip-list">
+                ${allTechnologies.map((tech) => `<span class="chip">${tech}</span>`).join('')}
+            </div>
+            ${allCompetencies.length ? `
+                <div class="aggregate-title" style="margin-top:1rem;">${aggCompLabel}</div>
+                <div class="chip-list">
+                    ${allCompetencies.map((comp) => `<span class="chip">${comp}</span>`).join('')}
+                </div>
+            ` : ''}
+        </div>
+    `;
     const skillsHtml = data.skills.map((skill, index) => `
         <div class="rich-card" onclick="app.showDetail('skill', ${index}, '${sectionId}')">
             <div class="card-tags">
@@ -926,6 +953,7 @@ function renderDevelopment(data, container, sectionId = 'development') {
                     <div class="development-image">
                         <img src="${resolveAssetPath('photos', data.image)}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
                     </div>
+                    ${allTechnologies.length ? aggregateCard : ''}
                     <div class="development-cards">
                         ${skillsHtml}
                     </div>

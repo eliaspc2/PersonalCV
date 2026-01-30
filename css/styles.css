@@ -789,6 +789,39 @@ h3,
     max-width: 520px;
 }
 
+.aggregate-card {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+}
+
+.aggregate-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.6rem;
+}
+
+.chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: #fff;
+}
+
 .development-image img {
     width: 100%;
     aspect-ratio: 4 / 5;
@@ -1217,7 +1250,7 @@ h3,
 /* Utilities */
 .view-section {
     display: block;
-    padding: 0 0 1.5rem 0;
+    padding: 3rem 0;
     min-height: 100vh;
     scroll-snap-align: start;
     scroll-margin-top: calc(var(--header-height) - 20px);
