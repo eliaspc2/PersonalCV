@@ -262,23 +262,20 @@
             "background": "Actualmente a consolidar conhecimentos em arquitecturas modernas, garantindo que a base técnica sólida se traduz em aplicações web robustas e escaláveis.",
             "progress_status": "EM CURSO",
             "duration_hours": "1416h",
-            "rh_value": "Contribuição sólida em desenvolvimento fullstack com foco em qualidade, manutenção e estabilidade operacional."
+            "rh_value": "Contribuição sólida em desenvolvimento fullstack com foco em qualidade, manutenção e estabilidade operacional.",
+            "competencies": []
           },
           {
-            "technologies": ["Segurança de Sistemas", "Gestão de Risco", "Controlo de Acessos", "Boas Práticas de Segurança", "Ambientes Regulados", "Operações e Continuidade"],
-            "resource": {
-              "label": "Entidade formadora",
-              "href": "https://multiformactiva.pt/",
-              "viewer": false
-            },
-            "title": "CET Técnico/a Especialista em Cibersegurança",
-            "focus_area": "Cibersegurança",
-            "context_text": "Curso de especialização tecnológica de nível 5, focado em cibersegurança, com forte componente prática e estágio extensivo (485h), complementando a base de sistemas críticos e engenharia de software. Início previsto: 04/02/2026.",
-            "background": "Este CET reforça a continuidade técnica na trajetória, aprofundando competências de segurança e operações sem representar mudança de área.",
-            "duration_hours": "1510h",
-            "rh_value": "Reforço formal em cibersegurança e conformidade sobre uma base comprovada em sistemas críticos.",
-            "progress_status": "Selecionado / Início confirmado",
-            "competencies": ["Análise de risco e impacto em sistemas", "Aplicação de princípios de segurança em ambientes operacionais", "Compreensão de requisitos de conformidade e boas práticas", "Proteção de sistemas e informação em contextos críticos", "Integração da segurança no ciclo operacional e de desenvolvimento"]
+            "title": "To change",
+            "focus_area": "",
+            "context_text": "",
+            "technologies": [],
+            "competencies": [],
+            "background": "",
+            "progress_status": "",
+            "duration_hours": "",
+            "rh_value": "",
+            "resource": null
           }
         ],
         "next_label": "Continuidade Técnica",
@@ -378,7 +375,7 @@
         "adoption": {
           "id": "adocao",
           "title": "Responsabilidade Estrutural e Compromisso a Longo Prazo",
-          "icon": "🧭",
+          "icon": "compass",
           "image": "adoption-family.png",
           "principle_title": "Estabilidade e Processo",
           "story_text": "Sou casado e tenho um filho de 13 anos. A adoção foi um processo longo, estruturado, exigente e regulado, que exige paciência, previsibilidade, estabilidade emocional e consistência de rotinas.",
