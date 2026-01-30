@@ -17,8 +17,42 @@
       "contact"
     ],
     "custom_sections": [],
-    "site_title": "CV Configuration",
-    "site_description": "",
+    "sections": [
+      {
+        "id": "overview",
+        "type": "overview"
+      },
+      {
+        "id": "development",
+        "type": "development"
+      },
+      {
+        "id": "foundation",
+        "type": "foundation"
+      },
+      {
+        "id": "mindset",
+        "type": "mindset"
+      },
+      {
+        "id": "now",
+        "type": "now"
+      },
+      {
+        "id": "contact",
+        "type": "contact"
+      }
+    ],
+    "section_types": {
+      "overview": "overview",
+      "development": "development",
+      "foundation": "foundation",
+      "mindset": "mindset",
+      "now": "now",
+      "contact": "contact"
+    },
+    "site_title": "André Câmara | Software Engineer",
+    "site_description": "Portfolio of André Câmara - Software Developer with a Systems Engineering background.",
     "favicon": "favicon.ico",
     "apple_icon": "apple-touch-icon.png"
   },
@@ -28,6 +62,8 @@
     "icons": "assets/icons/"
   },
   "profile": {
+    "name": "André Câmara",
+    "role": "Software Developer",
     "photo": "profile-main.png",
     "contact_photo": "portrait-casual-2.png",
     "work_photo": "work-desk.png",
@@ -97,6 +133,8 @@
       },
       "ui": {
         "marketing_label": "Estratégia de Produto",
+        "menu_label": "Menu",
+        "language_label": "Idioma",
         "technologies_label": "Tecnologias utilizadas",
         "cta_contact_label": "Vamos Conversar?",
         "explore_skill_label": "Ver Contexto e Evolução →",
@@ -355,6 +393,8 @@
         "title": "Contacte-me",
         "description": "Disponível para projectos onde a maturidade técnica e o compromisso humano façam a diferença.",
         "email_label": "Diga Olá",
+        "linkedin_label": "LinkedIn",
+        "github_label": "GitHub",
         "cv_label": "CV Standard",
         "extended_cv_label": "Extended CV",
         "efa_label": "Conteúdo Programático (Curso Programação)",
@@ -393,6 +433,8 @@
       },
       "ui": {
         "marketing_label": "Estrategia de Producto",
+        "menu_label": "Menú",
+        "language_label": "Idioma",
         "technologies_label": "Tecnologías utilizadas",
         "cta_contact_label": "¿Conversamos?",
         "explore_skill_label": "Ver Contexto y Evolución →",
@@ -651,6 +693,8 @@
         "title": "Contáctame",
         "description": "Disponible para proyectos donde la madurez técnica y el compromiso humano marquen la diferencia.",
         "email_label": "Di Hola",
+        "linkedin_label": "LinkedIn",
+        "github_label": "GitHub",
         "cv_label": "CV Estándar",
         "extended_cv_label": "CV Extendido",
         "efa_label": "Contenido Programático (Curso de Programación)",
@@ -689,6 +733,8 @@
       },
       "ui": {
         "marketing_label": "Product Strategy",
+        "menu_label": "Menu",
+        "language_label": "Language",
         "technologies_label": "Technologies used",
         "cta_contact_label": "Let’s Talk?",
         "explore_skill_label": "Explore Context & Evolution →",
@@ -947,6 +993,8 @@
         "title": "Contact Me",
         "description": "Available for projects where technical maturity and human commitment make the difference.",
         "email_label": "Say Hello",
+        "linkedin_label": "LinkedIn",
+        "github_label": "GitHub",
         "cv_label": "Standard CV",
         "extended_cv_label": "Extended CV",
         "efa_label": "Program Content (Programming Course)",

@@ -118,43 +118,26 @@ function normalizeDownloads(profile, locale) {
     return [];
 }
 
-function getCustomSections() {
-    if (!cvData?.meta?.custom_sections) return [];
-    return Array.isArray(cvData.meta.custom_sections) ? cvData.meta.custom_sections : [];
-}
-
-function getSectionOrder() {
-    const custom = getCustomSections();
-    const customIds = custom.map((section) => section.id);
-    const baseIds = BASE_SECTIONS.map((section) => section.id);
-    const expected = [...baseIds, ...customIds];
-    if (!cvData?.meta?.section_order || !Array.isArray(cvData.meta.section_order)) {
-        return expected;
+function getSectionsMeta() {
+    if (Array.isArray(cvData?.meta?.sections)) {
+        return cvData.meta.sections;
     }
-    const seen = new Set();
-    const ordered = [];
-    cvData.meta.section_order.forEach((id) => {
-        if (expected.includes(id) && !seen.has(id)) {
-            ordered.push(id);
-            seen.add(id);
-        }
-    });
-    expected.forEach((id) => {
-        if (!seen.has(id)) {
-            ordered.push(id);
-            seen.add(id);
-        }
-    });
-    return ordered;
+    const legacyCustom = Array.isArray(cvData?.meta?.custom_sections) ? cvData.meta.custom_sections : [];
+    if (Array.isArray(cvData?.meta?.section_order) && cvData.meta.section_order.length) {
+        const types = cvData.meta.section_types || {};
+        return cvData.meta.section_order.map((id) => ({ id, type: types[id] || id }));
+    }
+    if (cvData?.meta?.section_types) {
+        return Object.entries(cvData.meta.section_types).map(([id, type]) => ({ id, type }));
+    }
+    return [
+        ...BASE_SECTIONS.map((section) => ({ id: section.id, type: section.type })),
+        ...legacyCustom.map((section) => ({ id: section.id, type: section.type }))
+    ];
 }
 
 function getSectionMetaList() {
-    const custom = getCustomSections();
-    const customMap = new Map(custom.map((section) => [section.id, section.type]));
-    return getSectionOrder().map((id) => ({
-        id,
-        type: customMap.get(id) || id
-    }));
+    return getSectionsMeta();
 }
 
 function ensureDynamicSections(locale) {
@@ -163,6 +146,21 @@ function ensureDynamicSections(locale) {
     if (!nav || !content) return;
 
     const sectionList = getSectionMetaList();
+    const sectionIds = new Set(sectionList.map((section) => section.id));
+
+    nav.querySelectorAll('.nav-item').forEach((item) => {
+        const id = item.getAttribute('data-section');
+        if (id && !sectionIds.has(id)) {
+            item.remove();
+        }
+    });
+    content.querySelectorAll('.view-section').forEach((section) => {
+        const id = section.dataset.section;
+        if (id && !sectionIds.has(id)) {
+            section.remove();
+        }
+    });
+
     sectionList.forEach((section) => {
         const existingSection = document.getElementById(`section-${section.id}`);
         if (!existingSection) {
@@ -184,12 +182,22 @@ function ensureDynamicSections(locale) {
             nav.appendChild(link);
         }
     });
+
+    const navItems = Array.from(nav.querySelectorAll('.nav-item'));
+    sectionList.forEach((section) => {
+        const item = navItems.find((el) => el.getAttribute('data-section') === section.id);
+        if (item) nav.appendChild(item);
+    });
+    const sectionEls = Array.from(content.querySelectorAll('.view-section'));
+    sectionList.forEach((section) => {
+        const el = sectionEls.find((item) => item.dataset.section === section.id);
+        if (el) content.appendChild(el);
+    });
 }
 
 function getSectionType(sectionId) {
-    if (BASE_SECTIONS.some((section) => section.id === sectionId)) return sectionId;
-    const custom = getCustomSections().find((section) => section.id === sectionId);
-    return custom?.type || sectionId;
+    const match = getSectionsMeta().find((section) => section.id === sectionId);
+    return match?.type || sectionId;
 }
 
 async function bootstrap() {
@@ -355,6 +363,8 @@ function render() {
     ensureDynamicSections(locale);
     updateNavigationLabels(locale);
     updatePageMeta(locale);
+    updateBrandName(locale);
+    updateUiLabels(locale);
 
     const sectionList = getSectionMetaList();
     sectionList.forEach((section) => {
@@ -404,6 +414,39 @@ function updatePageMeta(locale) {
     if (appleIcon) {
         const appleTag = document.getElementById('apple-touch-icon');
         if (appleTag) appleTag.setAttribute('href', appleIcon);
+    }
+}
+
+function updateBrandName(locale) {
+    const brandEl = document.getElementById('brand-trigger');
+    const statusEl = document.querySelector('.brand-status');
+    if (!brandEl) return;
+    const overview = locale?.overview || locale?.[getSectionType('overview')] || {};
+    const name = cvData?.profile?.name || overview?.name;
+    if (name) {
+        brandEl.textContent = name;
+    }
+    const sidebarPhoto = document.getElementById('sidebar-photo');
+    if (sidebarPhoto && name) {
+        sidebarPhoto.alt = name;
+    }
+    if (statusEl) {
+        const role = cvData?.profile?.role || overview?.headline;
+        if (role) statusEl.textContent = role;
+    }
+}
+
+function updateUiLabels(locale) {
+    const ui = locale?.ui || {};
+    const menuBtn = document.getElementById('sidebar-mobile-toggle');
+    if (menuBtn && ui.menu_label) {
+        menuBtn.textContent = ui.menu_label;
+    }
+    const langSelect = document.getElementById('lang-switcher');
+    const langMobile = document.getElementById('lang-switcher-mobile');
+    if (ui.language_label) {
+        if (langSelect) langSelect.setAttribute('aria-label', ui.language_label);
+        if (langMobile) langMobile.setAttribute('aria-label', ui.language_label);
     }
 }
 
@@ -863,11 +906,11 @@ function renderContact(data, locale, container, sectionId = 'contact') {
             <div style="margin-top:6rem; display:flex; justify-content:center; gap:3rem;">
                 <a href="${profile.social.linkedin}" target="_blank" class="social-icon-link" style="color:var(--primary); font-weight:700; font-size: 1.1rem; display:flex; align-items:center; gap:8px;">
                     <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    LinkedIn
+                    ${data.linkedin_label || 'LinkedIn'}
                 </a>
                 <a href="${profile.social.github}" target="_blank" class="social-icon-link" style="color:var(--primary); font-weight:700; font-size: 1.1rem; display:flex; align-items:center; gap:8px;">
                     <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.362.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.298 24 12c0-6.627-5.373-12-12-12"/></svg>
-                    GitHub
+                    ${data.github_label || 'GitHub'}
                 </a>
             </div>
         </div>

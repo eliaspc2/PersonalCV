@@ -88,7 +88,6 @@ const NAV_DEFAULT_ICONS = {
 
 const SECTION_FIELD_ORDER = {
     overview: [
-        'name',
         'headline',
         'location',
         'intro_text',
@@ -142,7 +141,8 @@ const SECTION_FIELD_ORDER = {
     ],
     now: [
         'title',
-        'description',
+        'summary',
+        'details',
         'image',
         'image_alt',
         'image_position',
@@ -158,7 +158,9 @@ const SECTION_FIELD_ORDER = {
         'cta_link',
         'download_groups',
         'downloads_title',
-        'certifications_title'
+        'certifications_title',
+        'linkedin_label',
+        'github_label'
     ]
 };
 
@@ -170,17 +172,17 @@ const STORY_FIELD_ORDER = {
         'duration_hours',
         'context_text',
         'background',
+        'resource',
         'competencies',
-        'technologies',
-        'resource'
+        'technologies'
     ],
     experience: [
         'company_name',
         'role_title',
         'timeframe',
         'summary_text',
-        'details_text',
         'intro_quote',
+        'details_text',
         'challenge_text',
         'key_learning_text',
         'present_link',
@@ -188,8 +190,8 @@ const STORY_FIELD_ORDER = {
     ],
     mindset: [
         'id',
-        'title',
         'icon',
+        'title',
         'image',
         'image_position',
         'image_zoom',
@@ -225,16 +227,39 @@ function deepClone(value) {
     return JSON.parse(JSON.stringify(value || {}));
 }
 
-function getCustomSections() {
+function getSectionsMeta() {
     if (!currentCV?.meta) return [];
-    if (!Array.isArray(currentCV.meta.custom_sections)) currentCV.meta.custom_sections = [];
-    return currentCV.meta.custom_sections;
+    if (!Array.isArray(currentCV.meta.sections)) {
+        const legacyCustom = Array.isArray(currentCV.meta.custom_sections)
+            ? currentCV.meta.custom_sections
+            : [];
+        if (Array.isArray(currentCV.meta.section_order) && currentCV.meta.section_order.length) {
+            const types = currentCV.meta.section_types || {};
+            currentCV.meta.sections = currentCV.meta.section_order.map((id) => ({
+                id,
+                type: types[id] || id
+            }));
+        } else if (currentCV.meta.section_types && typeof currentCV.meta.section_types === 'object') {
+            currentCV.meta.sections = Object.entries(currentCV.meta.section_types).map(([id, type]) => ({ id, type }));
+        } else {
+            currentCV.meta.sections = [
+                ...BASE_SECTIONS.map((id) => ({ id, type: id })),
+                ...legacyCustom.map((section) => ({ id: section.id, type: section.type }))
+            ];
+        }
+    }
+    return currentCV.meta.sections;
+}
+
+function getCustomSections() {
+    const sections = getSectionsMeta();
+    return sections.filter((section) => !BASE_SECTIONS.includes(section.id));
 }
 
 function getSectionType(sectionKey) {
-    if (BASE_SECTIONS.includes(sectionKey)) return sectionKey;
-    const custom = getCustomSections().find((section) => section.id === sectionKey);
-    return custom?.type || null;
+    const sections = getSectionsMeta();
+    const match = sections.find((section) => section.id === sectionKey);
+    return match?.type || null;
 }
 
 function normalizeBasePath(value, fallback) {
@@ -276,6 +301,10 @@ function normalizeAssetPaths() {
         if (currentCV.meta.apple_icon) currentCV.meta.apple_icon = stripAssetBase('icons', currentCV.meta.apple_icon);
     }
     if (currentCV.profile) {
+        if (currentCV.profile.photo_position === undefined) currentCV.profile.photo_position = 'center 20%';
+        if (currentCV.profile.photo_zoom === undefined) currentCV.profile.photo_zoom = 1;
+        if (currentCV.profile.contact_photo_position === undefined) currentCV.profile.contact_photo_position = 'center 20%';
+        if (currentCV.profile.contact_photo_zoom === undefined) currentCV.profile.contact_photo_zoom = 1;
         Object.keys(currentCV.profile).forEach((key) => {
             if (typeof currentCV.profile[key] !== 'string') return;
             if (key.endsWith('photo') || key.endsWith('_photo') || key === 'photo' || key === 'work_photo') {
@@ -308,6 +337,8 @@ function normalizeAssetPaths() {
                         }
                     }
                 });
+                if (section.image_position === undefined) section.image_position = 'center 20%';
+                if (section.image_zoom === undefined) section.image_zoom = 1;
                 if (Array.isArray(section.skills)) {
                     section.skills.forEach((item) => {
                         if (item?.resource?.href) item.resource.href = stripAssetBase('downloads', item.resource.href);
@@ -331,15 +362,45 @@ function normalizeAssetPaths() {
     }
 }
 
-function removeCustomSection(sectionId) {
-    if (!sectionId || BASE_SECTIONS.includes(sectionId) || !currentCV?.meta) return;
-    if (Array.isArray(currentCV.meta.section_order)) {
-        currentCV.meta.section_order = currentCV.meta.section_order.filter((id) => id !== sectionId);
-    }
-    const custom = getCustomSections();
-    const index = custom.findIndex((section) => section.id === sectionId);
+function ensureSectionDefinitions() {
+    if (!currentCV?.localized) return;
+    const sections = getSectionsMeta();
+    currentCV.meta.custom_sections = sections.filter((section) => !BASE_SECTIONS.includes(section.id));
+    currentCV.meta.section_types = sections.reduce((acc, section) => {
+        acc[section.id] = section.type;
+        return acc;
+    }, {});
+    LANGS.forEach((lang) => {
+        if (!currentCV.localized[lang]) currentCV.localized[lang] = {};
+        const locale = currentCV.localized[lang];
+        const { nav, icons } = ensureNavigationConfig(locale);
+        sections.forEach((section) => {
+            if (!Object.prototype.hasOwnProperty.call(nav, section.id)) {
+                nav[section.id] = SECTION_LABELS[section.type]?.[lang] || section.id;
+            }
+            if (!Object.prototype.hasOwnProperty.call(icons, section.id)) {
+                icons[section.id] = '';
+            }
+            if (!locale[section.id]) {
+                locale[section.id] = createEmptySection(section.type);
+            }
+        });
+    });
+}
+
+function removeSection(sectionId) {
+    if (!sectionId || !currentCV?.meta) return;
+    const sections = getSectionsMeta();
+    if (sections.length <= 1) return;
+    const index = sections.findIndex((section) => section.id === sectionId);
     if (index === -1) return;
-    custom.splice(index, 1);
+    sections.splice(index, 1);
+    if (Array.isArray(currentCV.meta.custom_sections)) {
+        currentCV.meta.custom_sections = currentCV.meta.custom_sections.filter((section) => section.id !== sectionId);
+    }
+    if (currentCV.meta.section_types && currentCV.meta.section_types[sectionId]) {
+        delete currentCV.meta.section_types[sectionId];
+    }
 
     if (currentCV.localized) {
         Object.values(currentCV.localized).forEach((locale) => {
@@ -358,7 +419,7 @@ function removeCustomSection(sectionId) {
 
     if (currentSection === sectionId) {
         const nextList = getSectionList();
-        currentSection = nextList.length ? nextList[0].id : 'overview';
+        currentSection = nextList.length ? nextList[0].id : sections[0]?.id;
     }
 
     renderSidebar();
@@ -368,14 +429,14 @@ function removeCustomSection(sectionId) {
 
 function moveSection(sectionId, direction) {
     if (!currentCV?.meta) return;
-    const order = getSectionOrder();
-    const index = order.indexOf(sectionId);
+    const sections = getSectionsMeta();
+    const index = sections.findIndex((section) => section.id === sectionId);
     if (index === -1) return;
     const target = index + direction;
-    if (target < 0 || target >= order.length) return;
-    const updated = [...order];
+    if (target < 0 || target >= sections.length) return;
+    const updated = [...sections];
     [updated[index], updated[target]] = [updated[target], updated[index]];
-    currentCV.meta.section_order = updated;
+    currentCV.meta.sections = updated;
     renderSidebar();
     renderPreview();
 }
@@ -417,47 +478,57 @@ function getStoryOrderedKeys(type, item) {
     return keys;
 }
 
+function getStoryFieldLabel(type, key) {
+    const skillMap = {
+        title: 'Título do cartão',
+        focus_area: 'Área de foco',
+        progress_status: 'Estado',
+        duration_hours: 'Duração',
+        context_text: 'Contexto',
+        background: 'Histórico',
+        resource: 'Recurso',
+        competencies: 'Competências (pop-up)',
+        technologies: 'Tecnologias'
+    };
+    const expMap = {
+        company_name: 'Empresa',
+        role_title: 'Função',
+        timeframe: 'Período',
+        summary_text: 'Resumo curto',
+        intro_quote: 'Citação',
+        details_text: 'Descrição',
+        challenge_text: 'Desafio',
+        key_learning_text: 'Aprendizagem',
+        present_link: 'Link',
+        technologies: 'Tecnologias'
+    };
+    const mindsetMap = {
+        id: 'ID',
+        icon: 'Ícone',
+        title: 'Título',
+        image: 'Imagem',
+        image_position: 'Recorte (posição)',
+        image_zoom: 'Zoom da imagem',
+        principle_title: 'Princípio',
+        story_text: 'História',
+        engineering_note: 'Nota de engenharia'
+    };
+    if (type === 'skills') return skillMap[key] || key;
+    if (type === 'experience') return expMap[key] || key;
+    if (type === 'mindset') return mindsetMap[key] || key;
+    return key;
+}
+
 function getSectionList() {
     const locale = currentCV?.localized?.[currentLang] || {};
     const { nav } = ensureNavigationConfig(locale);
-    const order = getSectionOrder();
-    const customMap = new Map(getCustomSections().map((section) => [section.id, section.type]));
-    return order.map((id) => {
-        const isCustom = customMap.has(id);
-        const type = isCustom ? customMap.get(id) : id;
-        return {
-            id,
-            type,
-            label: nav[id] || SECTION_LABELS[id]?.[currentLang] || id,
-            isCustom
-        };
-    });
-}
-
-function getSectionOrder() {
-    if (!currentCV?.meta) return [...BASE_SECTIONS];
-    if (!Array.isArray(currentCV.meta.section_order)) {
-        currentCV.meta.section_order = [...BASE_SECTIONS];
-    }
-    const order = currentCV.meta.section_order;
-    const customIds = getCustomSections().map((section) => section.id);
-    const expected = [...BASE_SECTIONS, ...customIds];
-    const seen = new Set();
-    const normalized = [];
-    order.forEach((id) => {
-        if (expected.includes(id) && !seen.has(id)) {
-            normalized.push(id);
-            seen.add(id);
-        }
-    });
-    expected.forEach((id) => {
-        if (!seen.has(id)) {
-            normalized.push(id);
-            seen.add(id);
-        }
-    });
-    currentCV.meta.section_order = normalized;
-    return normalized;
+    const sections = getSectionsMeta();
+    return sections.map((section) => ({
+        id: section.id,
+        type: section.type,
+        label: nav[section.id] || SECTION_LABELS[section.type]?.[currentLang] || section.id,
+        isCustom: !BASE_SECTIONS.includes(section.id)
+    }));
 }
 
 function getDefaultCtaLink() {
@@ -476,6 +547,44 @@ function getImagePositionKey(key) {
     if (key.endsWith('_image')) return `${key}_position`;
     if (key.endsWith('photo')) return `${key}_position`;
     return null;
+}
+
+function getFieldLabel(key) {
+    const map = {
+        headline: 'Título principal',
+        location: 'Localização',
+        intro_text: 'Introdução',
+        bio: 'Texto principal',
+        marketing_note: 'Nota de marketing',
+        languages_label: 'Etiqueta de idiomas',
+        languages: 'Idiomas',
+        education_label: 'Etiqueta de formação',
+        education: 'Formação',
+        next_label: 'Etiqueta de transição',
+        next_text: 'Texto de transição',
+        title: 'Título',
+        subtitle: 'Subtítulo',
+        description: 'Descrição',
+        summary: 'Resumo',
+        details: 'Detalhes',
+        philosophy: 'Filosofia',
+        email_label: 'Etiqueta do email',
+        linkedin_label: 'Etiqueta do LinkedIn',
+        github_label: 'Etiqueta do GitHub',
+        downloads_title: 'Título do grupo Downloads',
+        certifications_title: 'Título do grupo Certificações',
+        download_groups: 'Grupos de downloads',
+        cta_label: 'Texto do CTA',
+        cta_link: 'Link do CTA',
+        image: 'Imagem',
+        image_alt: 'Legenda da imagem',
+        image_position: 'Recorte (posição)',
+        image_zoom: 'Zoom da imagem',
+        photo: 'Foto',
+        contact_photo: 'Foto',
+        work_photo: 'Foto'
+    };
+    return map[key] || key;
 }
 
 function getImageZoomKey(key) {
@@ -665,36 +774,128 @@ function closeSectionTemplatePicker() {
     }
 }
 
+function createEmptySection(type) {
+    if (type === 'overview') {
+        return {
+            name: '',
+            headline: '',
+            location: '',
+            intro_text: '',
+            bio: '',
+            marketing_note: '',
+            languages_label: '',
+            languages: [],
+            education_label: '',
+            education: [],
+            next_label: '',
+            next_text: '',
+            cta_label: '',
+            cta_link: '',
+            photo_position: 'center 20%',
+            photo_zoom: 1
+        };
+    }
+    if (type === 'development') {
+        return {
+            title: '',
+            description: '',
+            image: '',
+            image_alt: '',
+            image_position: 'center 20%',
+            image_zoom: 1,
+            skills: [],
+            next_label: '',
+            next_text: '',
+            cta_label: '',
+            cta_link: ''
+        };
+    }
+    if (type === 'foundation') {
+        return {
+            title: '',
+            description: '',
+            image: '',
+            image_alt: '',
+            image_position: 'center 20%',
+            image_zoom: 1,
+            experience: [],
+            next_label: '',
+            next_text: '',
+            cta_label: '',
+            cta_link: ''
+        };
+    }
+    if (type === 'mindset') {
+        return {
+            title: '',
+            subtitle: '',
+            philosophy: '',
+            adoption: null,
+            blocks: [],
+            next_label: '',
+            next_text: '',
+            cta_label: '',
+            cta_link: ''
+        };
+    }
+    if (type === 'now') {
+        return {
+            title: '',
+            summary: '',
+            details: '',
+            image: '',
+            image_alt: '',
+            image_position: 'center 20%',
+            image_zoom: 1,
+            cta_label: '',
+            cta_link: ''
+        };
+    }
+    if (type === 'contact') {
+        return {
+            email_label: '',
+            linkedin_label: '',
+            github_label: '',
+            title: '',
+            description: '',
+            downloads_title: '',
+            certifications_title: '',
+            download_groups: [],
+            cta_label: '',
+            cta_link: '',
+            contact_photo_position: 'center 20%',
+            contact_photo_zoom: 1
+        };
+    }
+    return {};
+}
+
 function createCustomSection({ label, type }) {
     if (!currentCV) return;
-    const customSections = getCustomSections();
     const baseSlug = slugifyLabel(label);
-    const existing = new Set([...BASE_SECTIONS, ...customSections.map((s) => s.id)]);
+    const existing = new Set(getSectionsMeta().map((s) => s.id));
     let id = baseSlug;
     let counter = 2;
     while (existing.has(id)) {
         id = `${baseSlug}-${counter}`;
         counter += 1;
     }
-    customSections.push({ id, type });
-    if (!currentCV.meta.section_order) {
-        currentCV.meta.section_order = [...BASE_SECTIONS];
+    if (!currentCV.meta.sections) currentCV.meta.sections = [];
+    currentCV.meta.sections.push({ id, type });
+    if (Array.isArray(currentCV.meta.custom_sections)) {
+        currentCV.meta.custom_sections.push({ id, type });
     }
-    if (!currentCV.meta.section_order.includes(id)) {
-        currentCV.meta.section_order.push(id);
-    }
+    if (!currentCV.meta.section_types) currentCV.meta.section_types = {};
+    currentCV.meta.section_types[id] = type;
 
     LANGS.forEach((lang) => {
         if (!currentCV.localized[lang]) currentCV.localized[lang] = {};
         const locale = currentCV.localized[lang];
         const { nav, icons } = ensureNavigationConfig(locale);
-        nav[id] = nav[id] || label;
+        nav[id] = nav[id] || (lang === currentLang ? label : '');
         icons[id] = icons[id] || '';
         if (!locale[id]) {
-            const template = locale[type] ? deepClone(locale[type]) : {};
-            if (Object.prototype.hasOwnProperty.call(template, 'title')) template.title = label;
-            if (Object.prototype.hasOwnProperty.call(template, 'headline')) template.headline = label;
-            locale[id] = template;
+            locale[id] = createEmptySection(type);
         }
     });
 
@@ -706,11 +907,12 @@ function createCustomSection({ label, type }) {
 
 function appendNavigationFields(sectionKey) {
     if (!currentCV?.localized?.[currentLang]) return;
-    const isNavSection = NAV_SECTIONS.has(sectionKey) || Boolean(getCustomSections().find((s) => s.id === sectionKey));
+    const isNavSection = Boolean(getSectionsMeta().find((s) => s.id === sectionKey));
     if (!isNavSection) return;
+    const sectionType = getSectionType(sectionKey) || sectionKey;
     const { nav, icons } = ensureNavigationConfig(currentCV.localized[currentLang]);
     if (!nav[sectionKey]) {
-        nav[sectionKey] = SECTION_LABELS[sectionKey]?.[currentLang] || sectionKey;
+        nav[sectionKey] = SECTION_LABELS[sectionType]?.[currentLang] || sectionKey;
     }
     const fieldset = document.createElement('fieldset');
     const legend = document.createElement('legend');
@@ -723,7 +925,7 @@ function appendNavigationFields(sectionKey) {
     labelLabel.textContent = 'Nome no menu';
     const labelInput = document.createElement('input');
     labelInput.type = 'text';
-    labelInput.placeholder = SECTION_LABELS[sectionKey]?.[currentLang] || sectionKey;
+    labelInput.placeholder = SECTION_LABELS[sectionType]?.[currentLang] || sectionKey;
     labelInput.value = nav[sectionKey] || '';
     labelInput.oninput = (event) => {
         nav[sectionKey] = event.target.value;
@@ -733,11 +935,49 @@ function appendNavigationFields(sectionKey) {
     labelWrapper.appendChild(labelInput);
     fieldset.appendChild(labelWrapper);
 
+    const typeWrapper = document.createElement('div');
+    typeWrapper.className = 'form-group';
+    const typeLabel = document.createElement('label');
+    typeLabel.textContent = 'Tipo de página';
+    const typeSelect = document.createElement('select');
+    SECTION_TEMPLATES.forEach((template) => {
+        const option = document.createElement('option');
+        option.value = template.type;
+        option.textContent = template.name[currentLang] || template.type;
+        if (template.type === sectionType) option.selected = true;
+        typeSelect.appendChild(option);
+    });
+    typeSelect.onchange = (event) => {
+        const newType = event.target.value;
+        const sections = getSectionsMeta();
+        const target = sections.find((section) => section.id === sectionKey);
+        if (target) {
+            target.type = newType;
+        }
+        if (currentCV.meta.section_types) {
+            currentCV.meta.section_types[sectionKey] = newType;
+        }
+        if (currentCV?.localized?.[currentLang]?.[sectionKey]) {
+            // keep existing content; UI switches template by type
+        } else {
+            currentCV.localized[currentLang][sectionKey] = createEmptySection(newType);
+        }
+        renderSidebar();
+        renderSectionEditor();
+        renderPreview();
+    };
+    typeWrapper.appendChild(typeLabel);
+    typeWrapper.appendChild(typeSelect);
+    fieldset.appendChild(typeWrapper);
+
+    const iconFieldset = document.createElement('fieldset');
+    iconFieldset.className = 'inline-fieldset';
+    const iconLegend = document.createElement('legend');
+    iconLegend.textContent = 'Ícone do menu';
+    iconFieldset.appendChild(iconLegend);
+
     const iconWrapper = document.createElement('div');
     iconWrapper.className = 'form-group';
-    const iconLabel = document.createElement('label');
-    iconLabel.textContent = 'Ícone do menu';
-    iconWrapper.appendChild(iconLabel);
     const input = makeEmojiField(iconWrapper, icons, sectionKey, 'ex: 🧭');
     const hint = document.createElement('div');
     hint.className = 'nav-icon-hint';
@@ -746,7 +986,7 @@ function appendNavigationFields(sectionKey) {
     const hintText = document.createElement('span');
     hint.appendChild(preview);
     hint.appendChild(hintText);
-    const defaultIcon = NAV_DEFAULT_ICONS[sectionKey] || '';
+    const defaultIcon = NAV_DEFAULT_ICONS[sectionType] || '';
     const updateHint = () => {
         const value = String(input.value || '').trim();
         if (value) {
@@ -763,7 +1003,8 @@ function appendNavigationFields(sectionKey) {
     updateHint();
     input.addEventListener('input', updateHint);
     iconWrapper.appendChild(hint);
-    fieldset.appendChild(iconWrapper);
+    iconFieldset.appendChild(iconWrapper);
+    fieldset.appendChild(iconFieldset);
 
     uiNodes.editorForm.appendChild(fieldset);
 }
@@ -830,7 +1071,7 @@ function ensureCtaDefaults(content) {
 
 function makeImageField(wrapper, targetObj, key, sectionKey) {
     const row = document.createElement('div');
-    row.className = 'photo-row';
+    row.className = 'photo-row split';
     const input = document.createElement('input');
     input.type = 'text';
     const assetType = sectionKey === 'meta' ? 'icons' : 'photos';
@@ -852,12 +1093,6 @@ function makeImageField(wrapper, targetObj, key, sectionKey) {
         targetObj[key] = safeName;
         renderPreview();
     };
-    row.appendChild(input);
-    row.appendChild(fileInput);
-    wrapper.appendChild(row);
-
-    const adjustRow = document.createElement('div');
-    adjustRow.className = 'inline-input';
     const adjustBtn = document.createElement('button');
     adjustBtn.type = 'button';
     adjustBtn.className = 'toggle-visibility';
@@ -875,59 +1110,10 @@ function makeImageField(wrapper, targetObj, key, sectionKey) {
             frameType: getCropperFrameType(sectionKey, key)
         });
     };
-    adjustRow.appendChild(adjustBtn);
-    wrapper.appendChild(adjustRow);
-}
-
-function makePositionField(wrapper, targetObj, key, labelText) {
-    const label = document.createElement('label');
-    label.textContent = labelText;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = 'ex: center 20%';
-    input.value = targetObj[key] || '';
-    input.oninput = (event) => {
-        targetObj[key] = event.target.value;
-        renderPreview();
-    };
-    const presetRow = document.createElement('div');
-    presetRow.className = 'inline-input';
-    const presetSelect = document.createElement('select');
-    [
-        { label: 'Topo', value: 'center 10%' },
-        { label: 'Alto', value: 'center 20%' },
-        { label: 'Centro', value: 'center 50%' },
-        { label: 'Baixo', value: 'center 80%' }
-    ].forEach((preset) => {
-        const option = document.createElement('option');
-        option.value = preset.value;
-        option.textContent = preset.label;
-        presetSelect.appendChild(option);
-    });
-    const applyBtn = document.createElement('button');
-    applyBtn.type = 'button';
-    applyBtn.className = 'toggle-visibility';
-    applyBtn.textContent = 'Aplicar';
-    applyBtn.onclick = () => {
-        input.value = presetSelect.value;
-        targetObj[key] = presetSelect.value;
-        renderPreview();
-    };
-    const resetBtn = document.createElement('button');
-    resetBtn.type = 'button';
-    resetBtn.className = 'toggle-visibility';
-    resetBtn.textContent = 'Centro';
-    resetBtn.onclick = () => {
-        input.value = 'center 50%';
-        targetObj[key] = 'center 50%';
-        renderPreview();
-    };
-    presetRow.appendChild(presetSelect);
-    presetRow.appendChild(applyBtn);
-    presetRow.appendChild(resetBtn);
-    wrapper.appendChild(label);
-    wrapper.appendChild(input);
-    wrapper.appendChild(presetRow);
+    row.appendChild(input);
+    row.appendChild(adjustBtn);
+    wrapper.appendChild(row);
+    wrapper.appendChild(fileInput);
 }
 
 function makeArrayField(wrapper, targetObj, key, values = []) {
@@ -982,6 +1168,7 @@ function makeArrayField(wrapper, targetObj, key, values = []) {
 function makeResourceListField(wrapper, targetObj, key, values = []) {
     const list = document.createElement('div');
     list.className = 'story-list';
+    const downloadsBase = getPaths().downloads;
 
     const renderItems = () => {
         list.innerHTML = '';
@@ -1000,6 +1187,16 @@ function makeResourceListField(wrapper, targetObj, key, values = []) {
             hrefInput.type = 'text';
             hrefInput.placeholder = 'Link';
             hrefInput.value = stripAssetBase('downloads', entry.href || '');
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.pdf,.png,.jpg,.jpeg,.webp';
+            fileInput.onchange = (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                const safeName = normalizeFileName(file.name);
+                hrefInput.value = safeName;
+                hrefInput.dispatchEvent(new Event('input', { bubbles: true }));
+            };
 
             const sync = () => {
                 const normalizedHref = stripAssetBase('downloads', hrefInput.value);
@@ -1014,6 +1211,7 @@ function makeResourceListField(wrapper, targetObj, key, values = []) {
 
             inputs.appendChild(labelInput);
             inputs.appendChild(hrefInput);
+            inputs.appendChild(fileInput);
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -1222,10 +1420,56 @@ function appendProfilePhotoField({ key, label, sectionKey, positionKey, position
     labelEl.textContent = label;
     wrapper.appendChild(labelEl);
     makeImageField(wrapper, currentCV.profile, key, sectionKey);
-    if (positionKey) {
-        makePositionField(wrapper, currentCV.profile, positionKey, positionLabel);
-    }
     uiNodes.editorForm.appendChild(wrapper);
+}
+
+function appendSidebarIdentityFields() {
+    if (!uiNodes.editorForm) return;
+    if (!currentCV.profile) currentCV.profile = {};
+    const fieldset = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    legend.textContent = 'Identidade (Sidebar)';
+    fieldset.appendChild(legend);
+
+    const nameWrapper = document.createElement('div');
+    nameWrapper.className = 'form-group';
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = 'Nome';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = currentCV.profile.name || '';
+    nameInput.oninput = (event) => {
+        currentCV.profile.name = event.target.value;
+        renderPreview();
+    };
+    nameWrapper.appendChild(nameLabel);
+    nameWrapper.appendChild(nameInput);
+    fieldset.appendChild(nameWrapper);
+
+    const roleWrapper = document.createElement('div');
+    roleWrapper.className = 'form-group';
+    const roleLabel = document.createElement('label');
+    roleLabel.textContent = 'Cargo/posição';
+    const roleInput = document.createElement('input');
+    roleInput.type = 'text';
+    roleInput.value = currentCV.profile.role || '';
+    roleInput.oninput = (event) => {
+        currentCV.profile.role = event.target.value;
+        renderPreview();
+    };
+    roleWrapper.appendChild(roleLabel);
+    roleWrapper.appendChild(roleInput);
+    fieldset.appendChild(roleWrapper);
+
+    const photoWrapper = document.createElement('div');
+    photoWrapper.className = 'form-group';
+    const photoLabel = document.createElement('label');
+    photoLabel.textContent = 'Foto principal (sidebar / identidade)';
+    photoWrapper.appendChild(photoLabel);
+    makeImageField(photoWrapper, currentCV.profile, 'photo', 'overview');
+    fieldset.appendChild(photoWrapper);
+
+    uiNodes.editorForm.appendChild(fieldset);
 }
 
 function appendSectionImageFields(sectionKey) {
@@ -1238,14 +1482,9 @@ function appendSectionImageFields(sectionKey) {
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
         const label = document.createElement('label');
-        label.textContent = key;
+        label.textContent = getFieldLabel(key);
         wrapper.appendChild(label);
         makeImageField(wrapper, content, key, sectionKey);
-        const positionKey = getImagePositionKey(key);
-        if (positionKey) {
-            makePositionField(wrapper, content, positionKey, 'Recorte (object-position)');
-            handledKeys.add(positionKey);
-        }
         uiNodes.editorForm.appendChild(wrapper);
         handledKeys.add(key);
     });
@@ -1253,7 +1492,7 @@ function appendSectionImageFields(sectionKey) {
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
         const label = document.createElement('label');
-        label.textContent = 'image_alt';
+        label.textContent = 'Legenda da imagem';
         const input = document.createElement('input');
         input.type = 'text';
         input.value = content.image_alt || '';
@@ -1413,8 +1652,10 @@ async function loadCV(preferGitHub = false, lockOnFail = true) {
             showMessage('cv.json carregado localmente.', 'info');
         }
         normalizeAssetPaths();
+        ensureSectionDefinitions();
         currentLang = currentCV.meta?.defaultLanguage || 'pt';
-        currentSection = 'overview';
+        const sections = getSectionsMeta();
+        currentSection = sections.length ? sections[0].id : 'overview';
         renderSidebar();
         renderSectionEditor();
         renderPreview();
@@ -1500,20 +1741,20 @@ function renderSidebar() {
         actions.appendChild(upBtn);
         actions.appendChild(downBtn);
 
-        if (!BASE_SECTIONS.includes(section.id)) {
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.className = 'section-remove';
-            removeBtn.setAttribute('aria-label', `Remover ${label}`);
-            removeBtn.textContent = '×';
-            removeBtn.onclick = (event) => {
-                event.stopPropagation();
-                if (confirm(`Remover a secção “${label}”?`)) {
-                    removeCustomSection(section.id);
-                }
-            };
-            actions.appendChild(removeBtn);
-        }
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'section-remove';
+        removeBtn.setAttribute('aria-label', `Remover ${label}`);
+        removeBtn.textContent = '×';
+        removeBtn.disabled = sectionList.length <= 1;
+        removeBtn.onclick = (event) => {
+            event.stopPropagation();
+            if (removeBtn.disabled) return;
+            if (confirm(`Remover a secção “${label}”?`)) {
+                removeSection(section.id);
+            }
+        };
+        actions.appendChild(removeBtn);
 
         row.appendChild(actions);
         uiNodes.sectionButtons.appendChild(row);
@@ -1663,7 +1904,7 @@ function renderDownloadsEditor() {
             const labelGroup = document.createElement('div');
             labelGroup.className = 'form-group';
             const labelLabel = document.createElement('label');
-            labelLabel.textContent = 'Nome do link';
+            labelLabel.textContent = 'Nome do ficheiro';
             const labelInput = document.createElement('input');
             labelInput.type = 'text';
             labelInput.value = entry.label || '';
@@ -1679,7 +1920,7 @@ function renderDownloadsEditor() {
             const iconGroup = document.createElement('div');
             iconGroup.className = 'form-group';
             const iconLabel = document.createElement('label');
-            iconLabel.textContent = 'Ícone (emoji ou texto)';
+            iconLabel.textContent = 'Ícone (emoji)';
             iconGroup.appendChild(iconLabel);
             makeEmojiField(iconGroup, entry, 'icon', 'ex: 📁');
             fieldset.appendChild(iconGroup);
@@ -1687,7 +1928,7 @@ function renderDownloadsEditor() {
             const groupWrapper = document.createElement('div');
             groupWrapper.className = 'form-group';
             const groupLabel = document.createElement('label');
-            groupLabel.textContent = 'Grupo';
+            groupLabel.textContent = 'Grupo de downloads';
             const groupSelect = document.createElement('select');
             const groupOptions = downloadGroups.map((opt) => ({
                 value: opt.id,
@@ -1786,22 +2027,14 @@ function renderSectionEditor() {
     const pendingFieldsets = [];
 
     if (currentSection === 'overview') {
-        appendProfilePhotoField({
-            key: 'photo',
-            label: 'Foto principal (sidebar / identidade)',
-            sectionKey: 'overview',
-            positionKey: 'photo_position',
-            positionLabel: 'Recorte (object-position) foto principal'
-        });
+        appendSidebarIdentityFields();
     }
 
     if (currentSection === 'contact') {
         appendProfilePhotoField({
             key: 'contact_photo',
             label: 'Foto contacto',
-            sectionKey: 'contact',
-            positionKey: 'contact_photo_position',
-            positionLabel: 'Recorte (object-position) foto contacto'
+            sectionKey: 'contact'
         });
     }
 
@@ -1877,6 +2110,11 @@ function renderSectionEditor() {
 
         pendingFieldsets.push(() => addUiFieldset('Textos de Identidade', [
             { key: 'marketing_label', label: 'Etiqueta de marketing' }
+        ]));
+
+        pendingFieldsets.push(() => addUiFieldset('Interface global', [
+            { key: 'menu_label', label: 'Texto do botão Menu' },
+            { key: 'language_label', label: 'Etiqueta de idioma (ARIA)' }
         ]));
     }
 
@@ -2016,7 +2254,7 @@ function renderSectionEditor() {
         wrapper.className = 'form-group';
 
         const label = document.createElement('label');
-        label.textContent = key;
+        label.textContent = getFieldLabel(key);
         wrapper.appendChild(label);
 
         if (Array.isArray(value)) {
@@ -2178,6 +2416,21 @@ function renderStoryEditor(config, { append = false } = {}) {
         targetItem.competencies = [];
     }
 
+    const fieldsetTitle = document.createElement('div');
+    fieldsetTitle.className = 'form-group';
+    fieldsetTitle.innerHTML = `<label>Edição do cartão</label>`;
+    uiNodes.editorForm.appendChild(fieldsetTitle);
+
+    const cardFieldset = document.createElement('fieldset');
+    const cardLegend = document.createElement('legend');
+    cardLegend.textContent = 'Cartão (resumo)';
+    cardFieldset.appendChild(cardLegend);
+
+    const popupFieldset = document.createElement('fieldset');
+    const popupLegend = document.createElement('legend');
+    popupLegend.textContent = 'Pop-up (detalhes)';
+    popupFieldset.appendChild(popupLegend);
+
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.className = 'toggle-visibility';
@@ -2198,13 +2451,19 @@ function renderStoryEditor(config, { append = false } = {}) {
         renderPreview();
     };
 
+    const popupKeys = {
+        skills: new Set(['context_text', 'background', 'resource', 'competencies', 'technologies']),
+        experience: new Set(['summary_text', 'intro_quote', 'details_text', 'challenge_text', 'key_learning_text', 'present_link', 'technologies']),
+        mindset: new Set(['story_text', 'engineering_note'])
+    };
+
     getStoryOrderedKeys(config.type, targetItem).forEach((key) => {
         const value = targetItem[key];
         const wrapper = document.createElement('div');
         wrapper.className = 'form-group';
 
         const label = document.createElement('label');
-        label.textContent = key;
+        label.textContent = getStoryFieldLabel(config.type, key);
         wrapper.appendChild(label);
 
         if (Array.isArray(value)) {
@@ -2212,10 +2471,6 @@ function renderStoryEditor(config, { append = false } = {}) {
         } else if (typeof value === 'string') {
             if (key === 'image' || key.endsWith('_image') || key.endsWith('photo')) {
                 makeImageField(wrapper, targetItem, key, currentSection);
-                const positionKey = getImagePositionKey(key);
-                if (positionKey) {
-                    makePositionField(wrapper, targetItem, positionKey, 'Recorte (object-position)');
-                }
             } else if (key === 'icon') {
                 makeEmojiField(wrapper, targetItem, key, 'ex: ⭐');
             } else {
@@ -2258,8 +2513,16 @@ function renderStoryEditor(config, { append = false } = {}) {
             wrapper.appendChild(textarea);
         }
 
-        uiNodes.editorForm.appendChild(wrapper);
+        if (popupKeys[config.type]?.has(key)) {
+            popupFieldset.appendChild(wrapper);
+        } else {
+            cardFieldset.appendChild(wrapper);
+        }
     });
+
+    uiNodes.editorForm.appendChild(cardFieldset);
+    uiNodes.editorForm.appendChild(popupFieldset);
+    uiNodes.editorForm.appendChild(removeBtn);
 
     uiNodes.editorForm.appendChild(removeBtn);
 }
@@ -2693,6 +2956,9 @@ async function restoreFullCVJson(file) {
         currentSHA = null;
         pendingDownloadDeletes.clear();
         normalizeAssetPaths();
+        ensureSectionDefinitions();
+        const sections = getSectionsMeta();
+        currentSection = sections.length ? sections[0].id : 'overview';
         renderSidebar();
         renderSectionEditor();
         renderPreview();
