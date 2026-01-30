@@ -263,7 +263,14 @@
             "progress_status": "EM CURSO",
             "duration_hours": "1416h",
             "rh_value": "Contribuição sólida em desenvolvimento fullstack com foco em qualidade, manutenção e estabilidade operacional.",
-            "competencies": []
+            "competencies": [
+              "Fundamentos de programação",
+              "Desenvolvimento web frontend e backend",
+              "Bases de dados relacionais",
+              "Estruturas de aplicações web",
+              "Boas práticas de engenharia de software",
+              "Manutenção e evolução de aplicações"
+            ]
           },
           {
             "technologies": [
@@ -629,10 +636,25 @@
             "background": "Actualmente consolidando conocimientos en arquitecturas modernas, garantizando que la base técnica sólida se traduzca en aplicaciones web robustas y escalables.",
             "progress_status": "EN CURSO",
             "duration_hours": "1416h",
-            "rh_value": "Contribución sólida en desarrollo fullstack con enfoque en calidad, mantenimiento y estabilidad operacional."
+            "rh_value": "Contribución sólida en desarrollo fullstack con enfoque en calidad, mantenimiento y estabilidad operacional.",
+            "competencies": [
+              "Fundamentos de programación",
+              "Desarrollo web frontend y backend",
+              "Bases de datos relacionales",
+              "Estructuras de aplicaciones web",
+              "Buenas prácticas de ingeniería de software",
+              "Mantenimiento y evolución de aplicaciones"
+            ]
           },
           {
-            "technologies": [],
+            "technologies": [
+              "Seguridad de Sistemas",
+              "Gestión de Riesgo",
+              "Control de Accesos",
+              "Buenas Prácticas de Seguridad",
+              "Entornos Regulados",
+              "Operaciones y Continuidad"
+            ],
             "resource": {
               "label": "Entidad formadora",
               "href": "https://multiformactiva.pt/",
@@ -643,8 +665,15 @@
             "context_text": "Curso de especialización tecnológica de nivel 5, centrado en ciberseguridad, con fuerte componente práctica y prácticas extensas (485h), complementando la base de sistemas críticos e ingeniería de software. Inicio previsto: 04/02/2026.",
             "background": "Este CET refuerza la continuidad técnica en la trayectoria, profundizando competencias de seguridad y operaciones sin suponer un cambio de área.",
             "duration_hours": "1510h",
+            "rh_value": "Refuerzo formal en ciberseguridad y conformidad sobre una base probada en sistemas críticos.",
             "progress_status": "Seleccionado / Inicio confirmado",
-            "competencies": []
+            "competencies": [
+              "Análisis de riesgo e impacto en sistemas",
+              "Aplicación de principios de seguridad en entornos operativos",
+              "Comprensión de requisitos de conformidad y buenas prácticas",
+              "Protección de sistemas e información en contextos críticos",
+              "Integración de la seguridad en el ciclo operativo y de desarrollo"
+            ]
           }
         ],
         "next_label": "Continuidad Técnica",
@@ -981,10 +1010,25 @@
             "background": "Currently consolidating knowledge in modern architectures, ensuring that a solid technical foundation translates into robust and scalable web applications.",
             "progress_status": "IN PROGRESS",
             "duration_hours": "1416h",
-            "rh_value": "Solid contribution to fullstack development with a focus on quality, maintenance, and operational stability."
+            "rh_value": "Solid contribution to fullstack development with a focus on quality, maintenance, and operational stability.",
+            "competencies": [
+              "Programming fundamentals",
+              "Frontend and backend web development",
+              "Relational databases",
+              "Web application structures",
+              "Software engineering best practices",
+              "Application maintenance and evolution"
+            ]
           },
           {
-            "technologies": [],
+            "technologies": [
+              "Systems Security",
+              "Risk Management",
+              "Access Control",
+              "Security Best Practices",
+              "Regulated Environments",
+              "Operations and Continuity"
+            ],
             "resource": {
               "label": "Training provider",
               "href": "https://multiformactiva.pt/",
@@ -995,8 +1039,15 @@
             "context_text": "Level 5 technological specialization course focused on cybersecurity, with a strong practical component and an extensive internship (485h), complementing the base in critical systems and software engineering. Expected start: 2026-02-04.",
             "background": "This CET reinforces technical continuity in the trajectory, deepening security and operations skills without a change of area.",
             "duration_hours": "1510h",
+            "rh_value": "Formal reinforcement in cybersecurity and compliance on top of a proven base in critical systems.",
             "progress_status": "Selected / Start confirmed",
-            "competencies": []
+            "competencies": [
+              "Risk and impact analysis in systems",
+              "Applying security principles in operational environments",
+              "Understanding compliance requirements and best practices",
+              "Protecting systems and information in critical contexts",
+              "Integrating security into operational and development cycles"
+            ]
           }
         ],
         "next_label": "Technical Continuity",
