@@ -156,7 +156,7 @@
         "drawer_skill_default_history": "Consolidação activa através de formação contínua e aplicação prática.",
         "drawer_mindset_label": "Lógica Humana & Engenharia",
         "drawer_mindset_story_label": "A Experiência Pessoal",
-        "mindset_trace_text": "O que trago da minha vida pessoal para o trabalho é disciplina no processo, atenção ao detalhe e consistência. Isso mostra que valorizo o tempo certo, a prevenção e o cuidado contínuo — e aplico essa lógica todos os dias no software.",
+        "mindset_trace_text": "A minha vida familiar estruturada e estes hobbies reais alimentam a minha forma de trabalhar: disciplina no processo, atenção ao detalhe e consistência. Isso mostra que valorizo o tempo certo, a prevenção e o cuidado contínuo — e aplico essa lógica todos os dias no software.",
         "skill_tags": [
           "Algoritmos",
           "Robustez",
@@ -191,7 +191,7 @@
         "location": "Quintanilha, Bragança PT",
         "headline": "Software Developer focado em estabilidade, automação e sistemas existentes",
         "intro_text": "Desenvolvo software com foco em estabilidade, automação e redução de entropia técnica. Trabalho bem em sistemas já em produção, com histórico, dependências e necessidade de previsibilidade.",
-        "bio": "Trabalho com tecnologia desde o final dos anos 90, com forte base em sistemas críticos, automação e infraestrutura 24/7. Reentrei no desenvolvimento de software com foco em continuidade, previsibilidade e qualidade técnica. Trago para o código a disciplina de ambientes onde falhar não era opção.",
+        "bio": "Trabalho com tecnologia desde o final dos anos 90, com forte base em sistemas críticos, automação e infraestrutura 24/7. Reentrei no desenvolvimento de software com foco em continuidade, previsibilidade e qualidade técnica. Sou casado e tenho um filho de 13 anos; essa estabilidade familiar traduz-se em foco, previsibilidade e fiabilidade técnica no trabalho. Trago para o código a disciplina de ambientes onde falhar não era opção.",
         "marketing_note": "Para além da técnica, possuo formação em Marketing Digital. Esta consciência de produto ajuda-me a pensar no utilizador final, comunicar com clareza e entregar valor antes da tecnologia.",
         "next_label": "A seguir",
         "next_text": "Quem sou aparece na forma como construo. A próxima secção mostra a engenharia que pratico hoje.",
@@ -336,14 +336,14 @@
       "mindset": {
         "title": "Mentalidade & Lógica Humana",
         "subtitle": "A paciência do pão, a precisão do código",
-        "philosophy": "O meu raciocínio é determinístico. Acredito no processo, no tempo certo de cada etapa e na isolação absoluta das variáveis para resolver qualquer problema.",
+        "philosophy": "O meu raciocínio é determinístico. Acredito no processo, no tempo certo de cada etapa e na isolação absoluta das variáveis para resolver qualquer problema. Os exemplos abaixo são reais do meu dia a dia — hobbies e interesses pessoais que moldam a forma como penso e trabalho.",
         "adoption": {
           "id": "adocao",
           "title": "Responsabilidade Estrutural e Compromisso a Longo Prazo",
           "icon": "🧭",
           "image": "adoption-family.png",
           "principle_title": "Estabilidade e Processo",
-          "story_text": "O meu filho foi adotado há 4 anos. A adoção foi um processo longo, estruturado, exigente e regulado, que exige paciência, previsibilidade, estabilidade emocional e consistência de rotinas.",
+          "story_text": "Sou casado e tenho um filho de 13 anos. A adoção foi um processo longo, estruturado, exigente e regulado, que exige paciência, previsibilidade, estabilidade emocional e consistência de rotinas.",
           "engineering_note": "Este percurso reforçou competências críticas para projetos longos: consistência, previsibilidade e compromisso com processos."
         },
         "blocks": [
@@ -353,7 +353,7 @@
             "icon": "🍞",
             "image": "bread-making.png",
             "principle_title": "Fermentação Lenta",
-            "story_text": "No pão artesanal, saltar etapas é destruir o resultado. O tempo de fermentação é uma dependência que não pode ser apressada sem comprometer a estrutura.",
+            "story_text": "Fazer pão é um hobby regular meu. No pão artesanal, saltar etapas é destruir o resultado. O tempo de fermentação é uma dependência que não pode ser apressada sem comprometer a estrutura.",
             "engineering_note": "Em software, arquitecturas robustas requerem o tempo certo de design e validação. Respeitar as dependências e o tempo de maturação do código evita dívida técnica catastrófica."
           },
           {
@@ -363,7 +363,7 @@
             "image": "cooking.png",
             "image_position": "center 20%",
             "principle_title": "Feedback Incremental",
-            "story_text": "Uma pizza perfeita é o resultado de pequenos ajustes em cada fornada. Temperatura, hidratação, tempo — cada detalhe é afinado com base no resultado anterior.",
+            "story_text": "Fazer pizza em casa é um hobby meu. Uma pizza perfeita é o resultado de pequenos ajustes em cada fornada. Temperatura, hidratação, tempo — cada detalhe é afinado com base no resultado anterior.",
             "engineering_note": "Programar é iterar. Prefiro entregas pequenas e frequentes que permitam ajustar a rota rapidamente, garantindo que o produto final está alinhado com a realidade."
           },
           {
@@ -373,7 +373,7 @@
             "image": "nails-gel.png",
             "image_position": "center 55%",
             "principle_title": "Cuidado Preventivo",
-            "story_text": "A manutenção das unhas de gel ensinou-me que prevenir é mais barato do que reparar. Pequenos cuidados frequentes evitam falhas maiores e preservam a integridade — não é estética, é manutenção contínua.",
+            "story_text": "A manutenção de unhas de gel é um hobby manual meu. Ensinou-me que prevenir é mais barato do que reparar. Pequenos cuidados frequentes evitam falhas maiores e preservam a integridade.",
             "engineering_note": "Em software, prevenção é refactoring constante, testes regulares e atenção diária ao detalhe. A mesma lógica evita falhas silenciosas e mantém sistemas confiáveis ao longo dos anos."
           },
           {
@@ -391,7 +391,7 @@
             "icon": "🗳️",
             "image": "elections-icon.jpg",
             "principle_title": "Sistemas Determinísticos",
-            "story_text": "O meu interesse por leis e sistemas eleitorais não é político. É fascínio por regras explícitas, precisão processual e integridade de sistemas. Num processo eleitoral, cada passo é validado para garantir confiança no resultado.",
+            "story_text": "Acompanho leis e sistemas eleitorais como interesse pessoal e estrutural, não político. É fascínio por regras explícitas, precisão processual e integridade de sistemas. Num processo eleitoral, cada passo é validado para garantir confiança no resultado.",
             "engineering_note": "Vejo isto como um exercício cognitivo estruturado, semelhante a uma auditoria de sistemas: dados íntegros, transições auditáveis e regras claras em cada etapa."
           }
         ],
