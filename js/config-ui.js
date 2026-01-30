@@ -349,7 +349,14 @@ function normalizeAssetPaths() {
                     if (cert?.href) cert.href = stripAssetBase('downloads', cert.href);
                 });
             }
-            Object.values(locale).forEach((section) => {
+            Object.entries(locale).forEach(([sectionKey, section]) => {
+                if (!BASE_SECTIONS.includes(sectionKey)) {
+                    if (sectionKey === 'navigation' && section && typeof section === 'object') {
+                        delete section.image_position;
+                        delete section.image_zoom;
+                    }
+                    return;
+                }
                 if (!section || typeof section !== 'object') return;
                 Object.entries(section).forEach(([key, val]) => {
                     if (typeof val === 'string') {
@@ -396,7 +403,8 @@ function normalizeIconData() {
                 locale.navigation_icons[key] = isIconId(value) ? value : '';
             });
         }
-        Object.values(locale).forEach((section) => {
+        Object.entries(locale).forEach(([sectionKey, section]) => {
+            if (!BASE_SECTIONS.includes(sectionKey)) return;
             if (!section || typeof section !== 'object') return;
             Object.entries(section).forEach(([key, val]) => {
                 if (key === 'icon' && typeof val === 'string') {
