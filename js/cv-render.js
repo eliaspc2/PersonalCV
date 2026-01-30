@@ -920,12 +920,16 @@ function renderDevelopment(data, container, sectionId = 'development') {
     const aggregateCards = `
         <div class="aggregate-card">
             <div class="aggregate-title">${aggTechLabel}</div>
-            <div class="aggregate-text">${allTechnologies.join(', ')}</div>
+            <div class="chip-list">
+                ${allTechnologies.map((tech) => `<span class="chip">${tech}</span>`).join('')}
+            </div>
         </div>
         ${allCompetencies.length ? `
             <div class="aggregate-card">
                 <div class="aggregate-title">${aggCompLabel}</div>
-                <div class="aggregate-text">${allCompetencies.join(', ')}</div>
+                <div class="chip-list">
+                    ${allCompetencies.map((comp) => `<span class="chip">${comp}</span>`).join('')}
+                </div>
             </div>
         ` : ''}
     `;

@@ -812,10 +812,19 @@ h3,
     margin-bottom: 0.6rem;
 }
 
-.aggregate-text {
-    font-size: 0.9rem;
+.chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    font-size: 0.8rem;
     color: var(--text-muted);
-    line-height: 1.6;
+    background: #fff;
 }
 
 .development-image img {
