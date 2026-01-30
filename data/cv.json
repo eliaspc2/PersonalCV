@@ -14,15 +14,9 @@
       "foundation",
       "mindset",
       "now",
-      "contact",
-      "teste"
+      "contact"
     ],
-    "custom_sections": [
-      {
-        "id": "teste",
-        "type": "development"
-      }
-    ],
+    "custom_sections": [],
     "site_title": "CV Configuration",
     "site_description": "",
     "favicon": "favicon.ico",
@@ -99,8 +93,7 @@
         "foundation": "Fundação",
         "mindset": "Mentalidade",
         "now": "Agora",
-        "contact": "Contacto",
-        "teste": "Teste"
+        "contact": "Contacto"
       },
       "ui": {
         "marketing_label": "Estratégia de Produto",
@@ -387,53 +380,6 @@
       },
       "navigation_icons": {
         "teste": ""
-      },
-      "teste": {
-        "title": "Teste",
-        "description": "Foco em Python e na arte de simplificar o complexo. Para mim, o código é uma ferramenta de estabilidade.",
-        "image": "work-desk.png",
-        "image_alt": "Ambiente de trabalho",
-        "skills": [
-          {
-            "technologies": [
-              "Python",
-              "OOP",
-              "Algoritmos",
-              "Estruturas de Dados"
-            ],
-            "title": "Python Ecosystem (I & II)",
-            "focus_area": "Backend & Automação",
-            "context_text": "Formação estruturada e exigente pela Universidade de Helsínquia (Programming I & II). Domínio de algoritmos, estruturas de dados e OOP.",
-            "background": "Transitei do suporte técnico para a computação programática através de um percurso de 540h de formação intensiva. Onde outros vêm um script, eu vejo um sistema de automação resiliente.",
-            "competencies": []
-          },
-          {
-            "technologies": [
-              "C/C++",
-              "SQL",
-              "Java",
-              "C#",
-              "ASP.NET Core MVC",
-              "Python",
-              "Redes",
-              "Sistemas Operativos"
-            ],
-            "resource": {
-              "label": "Conteúdo Programático — Curso de Programação",
-              "href": "efa-program-content.pdf"
-            },
-            "title": "Formação EFA Programador",
-            "focus_area": "Desenvolvimento Fullstack",
-            "context_text": "Percurso de 1416h focado em tecnologias modernas e boas práticas de engenharia. Em curso.",
-            "background": "Actualmente a consolidar conhecimentos em arquitecturas modernas, garantindo que a base técnica sólida se traduz em aplicações web robustas e escaláveis.",
-            "progress_status": "EM CURSO",
-            "duration_hours": "1416h"
-          }
-        ],
-        "next_label": "Transição",
-        "next_text": "O que faço hoje assenta num rigor construído antes da programação. A seguir, a fundação técnica que moldou esse rigor.",
-        "cta_label": "Vamos Conversar?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
       }
     },
     "es": {
@@ -443,8 +389,7 @@
         "foundation": "Fundación",
         "mindset": "Mentalidad",
         "now": "Ahora",
-        "contact": "Contacto",
-        "teste": "Teste"
+        "contact": "Contacto"
       },
       "ui": {
         "marketing_label": "Estrategia de Producto",
@@ -731,52 +676,6 @@
       },
       "navigation_icons": {
         "teste": ""
-      },
-      "teste": {
-        "title": "Teste",
-        "description": "Foco en Python y en el arte de simplificar lo complejo. Para mí, el código es una herramienta de estabilidad.",
-        "image": "work-desk.png",
-        "image_alt": "Entorno de trabajo",
-        "skills": [
-          {
-            "technologies": [
-              "Python",
-              "OOP",
-              "Algoritmos",
-              "Estructuras de Datos"
-            ],
-            "title": "Python Ecosystem (I & II)",
-            "focus_area": "Backend & Automatización",
-            "context_text": "Formación estructurada y exigente por la Universidad de Helsinki (Programming I & II). Dominio de algoritmos, estructuras de datos y OOP.",
-            "background": "Transité del soporte técnico a la computación programática a través de un recorrido intensivo de 540h. Donde otros ven un script, yo veo un sistema de automatización resiliente."
-          },
-          {
-            "technologies": [
-              "C/C++",
-              "SQL",
-              "Java",
-              "C#",
-              "ASP.NET Core MVC",
-              "Python",
-              "Redes",
-              "Sistemas Operativos"
-            ],
-            "resource": {
-              "label": "Contenido Programático — Curso de Programación",
-              "href": "efa-program-content.pdf"
-            },
-            "title": "Formación EFA Programador",
-            "focus_area": "Desarrollo Fullstack",
-            "context_text": "Recorrido de 1416h enfocado en tecnologías modernas y buenas prácticas de ingeniería. En curso.",
-            "background": "Actualmente consolidando conocimientos en arquitecturas modernas, garantizando que la base técnica sólida se traduzca en aplicaciones web robustas y escalables.",
-            "progress_status": "EN CURSO",
-            "duration_hours": "1416h"
-          }
-        ],
-        "next_label": "Transición",
-        "next_text": "Lo que hago hoy se apoya en un rigor construido antes de la programación. A continuación, la base técnica que lo moldeó.",
-        "cta_label": "¿Conversamos?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
       }
     },
     "en": {
@@ -786,8 +685,7 @@
         "foundation": "Foundation",
         "mindset": "Mindset",
         "now": "Now",
-        "contact": "Contact",
-        "teste": "Teste"
+        "contact": "Contact"
       },
       "ui": {
         "marketing_label": "Product Strategy",
@@ -1074,52 +972,6 @@
       },
       "navigation_icons": {
         "teste": ""
-      },
-      "teste": {
-        "title": "Teste",
-        "description": "Focused on Python and on simplifying the complex. To me, code is a tool for stability.",
-        "image": "work-desk.png",
-        "image_alt": "Work environment",
-        "skills": [
-          {
-            "technologies": [
-              "Python",
-              "OOP",
-              "Algorithms",
-              "Data Structures"
-            ],
-            "title": "Python Ecosystem (I & II)",
-            "focus_area": "Backend & Automation",
-            "context_text": "Structured, demanding training from the University of Helsinki (Programming I & II). Solid grasp of algorithms, data structures, and OOP.",
-            "background": "I moved from technical support to programmatic computing through an intensive 540h training path. Where others see a script, I see a resilient automation system."
-          },
-          {
-            "technologies": [
-              "C/C++",
-              "SQL",
-              "Java",
-              "C#",
-              "ASP.NET Core MVC",
-              "Python",
-              "Networking",
-              "Operating Systems"
-            ],
-            "resource": {
-              "label": "Program Content — Programming Course",
-              "href": "efa-program-content.pdf"
-            },
-            "title": "EFA Programmer Program",
-            "focus_area": "Fullstack Development",
-            "context_text": "1416h program focused on modern technologies and engineering best practices. In progress.",
-            "background": "Currently consolidating knowledge in modern architectures, ensuring a solid technical base translates into robust, scalable web applications.",
-            "progress_status": "IN PROGRESS",
-            "duration_hours": "1416h"
-          }
-        ],
-        "next_label": "Transition",
-        "next_text": "What I do today rests on rigor built before programming. Next, the technical foundation that shaped it.",
-        "cta_label": "Let’s Talk?",
-        "cta_link": "mailto:eliaspc2@gmail.com"
       }
     }
   }
