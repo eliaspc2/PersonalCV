@@ -266,16 +266,33 @@
             "competencies": []
           },
           {
-            "title": "To change",
-            "focus_area": "",
-            "context_text": "",
-            "technologies": [],
-            "competencies": [],
-            "background": "",
-            "progress_status": "",
-            "duration_hours": "",
-            "rh_value": "",
-            "resource": null
+            "technologies": [
+              "Segurança de Sistemas",
+              "Gestão de Risco",
+              "Controlo de Acessos",
+              "Boas Práticas de Segurança",
+              "Ambientes Regulados",
+              "Operações e Continuidade"
+            ],
+            "resource": {
+              "label": "Entidade formadora",
+              "href": "https://multiformactiva.pt/",
+              "viewer": false
+            },
+            "title": "CET Técnico/a Especialista em Cibersegurança",
+            "focus_area": "Cibersegurança",
+            "context_text": "Curso de especialização tecnológica de nível 5, focado em cibersegurança, com forte componente prática e estágio extensivo (485h), complementando a base de sistemas críticos e engenharia de software. Início previsto: 04/02/2026.",
+            "background": "Este CET reforça a continuidade técnica na trajetória, aprofundando competências de segurança e operações sem representar mudança de área.",
+            "duration_hours": "1510h",
+            "rh_value": "Reforço formal em cibersegurança e conformidade sobre uma base comprovada em sistemas críticos.",
+            "progress_status": "Selecionado / Início confirmado",
+            "competencies": [
+              "Análise de risco e impacto em sistemas",
+              "Aplicação de princípios de segurança em ambientes operacionais",
+              "Compreensão de requisitos de conformidade e boas práticas",
+              "Proteção de sistemas e informação em contextos críticos",
+              "Integração da segurança no ciclo operacional e de desenvolvimento"
+            ]
           }
         ],
         "next_label": "Continuidade Técnica",
