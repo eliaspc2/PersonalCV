@@ -917,19 +917,17 @@ function renderDevelopment(data, container, sectionId = 'development') {
     const allCompetencies = aggregateItems(data.skills, 'competencies');
     const aggTechLabel = t('ui.technologies_label', ui.technologies_label || 'Tecnologias');
     const aggCompLabel = t('ui.drawer_skill_competencies_label', ui.drawer_skill_competencies_label || 'Competências');
-    const aggregateCard = `
+    const aggregateCards = `
         <div class="aggregate-card">
             <div class="aggregate-title">${aggTechLabel}</div>
-            <div class="chip-list">
-                ${allTechnologies.map((tech) => `<span class="chip">${tech}</span>`).join('')}
-            </div>
-            ${allCompetencies.length ? `
-                <div class="aggregate-title" style="margin-top:1rem;">${aggCompLabel}</div>
-                <div class="chip-list">
-                    ${allCompetencies.map((comp) => `<span class="chip">${comp}</span>`).join('')}
-                </div>
-            ` : ''}
+            <div class="aggregate-text">${allTechnologies.join(', ')}</div>
         </div>
+        ${allCompetencies.length ? `
+            <div class="aggregate-card">
+                <div class="aggregate-title">${aggCompLabel}</div>
+                <div class="aggregate-text">${allCompetencies.join(', ')}</div>
+            </div>
+        ` : ''}
     `;
     const skillsHtml = data.skills.map((skill, index) => `
         <div class="rich-card" onclick="app.showDetail('skill', ${index}, '${sectionId}')">
@@ -950,12 +948,14 @@ function renderDevelopment(data, container, sectionId = 'development') {
             <p class="section-desc">${description}</p>
             ${data.image ? `
                 <div class="development-layout">
-                    <div class="development-image">
-                        <img src="${resolveAssetPath('photos', data.image)}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
-                    </div>
-                    ${allTechnologies.length ? aggregateCard : ''}
                     <div class="development-cards">
                         ${skillsHtml}
+                    </div>
+                    <div class="development-aside">
+                        <div class="development-image">
+                            <img src="${resolveAssetPath('photos', data.image)}" alt="${data.image_alt || data.title}" loading="lazy" decoding="async" style="object-position:${data.image_position || 'center 20%'}; ${getImageTransform(data.image_zoom)}">
+                        </div>
+                        ${allTechnologies.length ? aggregateCards : ''}
                     </div>
                 </div>
             ${nextText ? `
