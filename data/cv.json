@@ -83,10 +83,10 @@
       "github": "https://github.com/eliaspc2",
       "email": "eliaspc2@gmail.com"
     },
-    "downloads": [
-      {
-        "label": "CV Standard",
-        "icon": "",
+      "downloads": [
+        {
+          "label": "CV Standard",
+          "icon": "",
         "href": "cv-andre-camara.pdf",
         "group": "downloads"
       },
@@ -96,12 +96,12 @@
         "href": "cv-extended-andre-camara.pdf",
         "group": "downloads"
       },
-      {
-        "label": "Conteúdo Programático (EFA)",
-        "icon": "",
-        "href": "efa-program-content.pdf",
-        "group": "downloads"
-      },
+        {
+          "label": "Conteúdo Programático (EFA)",
+          "icon": "spinner",
+          "href": "efa-program-content.pdf",
+          "group": "downloads"
+        },
       {
         "label": "Python I (Helsinki)",
         "icon": "",
@@ -180,7 +180,8 @@
         "languages": [
           "Português — nativo",
           "Espanhol — fluente",
-          "Inglês — fluente"
+          "Inglês — fluente",
+          "Francês — funcional (independente)"
         ],
         "education_label": "Formação escolar",
         "education": [
@@ -210,10 +211,16 @@
               "Algoritmos",
               "Estruturas de Dados"
             ],
+            "resource": {
+              "label": "Curso oficial",
+              "href": "https://programming-25.mooc.fi/",
+              "viewer": false
+            },
             "title": "Python Ecosystem (I & II)",
             "focus_area": "Backend & Automação",
             "context_text": "Formação estruturada e exigente pela Universidade de Helsínquia (Programming I & II). Domínio de algoritmos, estruturas de dados e OOP.",
             "background": "Transitei do suporte técnico para a computação programática através de um percurso de 540h de formação intensiva. Onde outros vêm um script, eu vejo um sistema de automação resiliente.",
+            "duration_hours": "270h (2x135h)",
             "rh_value": "Capaz de trabalhar de forma autónoma em backend e automação, com atenção a robustez e manutenção."
           },
           {
@@ -228,8 +235,9 @@
               "Sistemas Operativos"
             ],
             "resource": {
-              "label": "Conteúdo Programático — Curso de Programação",
-              "href": "efa-program-content.pdf"
+              "label": "Entidade formadora",
+              "href": "https://tecnisign.pt/",
+              "viewer": false
             },
             "title": "Formação EFA Programador",
             "focus_area": "Desenvolvimento Fullstack",
@@ -482,7 +490,8 @@
         "languages": [
           "Portugués — nativo",
           "Español — fluido",
-          "Inglés — fluido"
+          "Inglés — fluido",
+          "Francés — funcional (independiente)"
         ],
         "education_label": "Formación escolar",
         "education": [
@@ -512,6 +521,11 @@
               "Algoritmos",
               "Estructuras de Datos"
             ],
+            "resource": {
+              "label": "Curso oficial",
+              "href": "https://programming-25.mooc.fi/",
+              "viewer": false
+            },
             "title": "Python Ecosystem (I & II)",
             "focus_area": "Backend & Automatización",
             "context_text": "Formación estructurada y exigente por la Universidad de Helsinki (Programming I & II). Dominio de algoritmos, estructuras de datos y OOP.",
@@ -529,8 +543,9 @@
               "Sistemas Operativos"
             ],
             "resource": {
-              "label": "Contenido Programático — Curso de Programación",
-              "href": "efa-program-content.pdf"
+              "label": "Entidad formadora",
+              "href": "https://tecnisign.pt/",
+              "viewer": false
             },
             "title": "Formación EFA Programador",
             "focus_area": "Desarrollo Fullstack",
@@ -782,7 +797,8 @@
         "languages": [
           "Portuguese — native",
           "Spanish — fluent",
-          "English — fluent"
+          "English — fluent",
+          "French — functional (independent)"
         ],
         "education_label": "Education",
         "education": [
@@ -812,6 +828,11 @@
               "Algorithms",
               "Data Structures"
             ],
+            "resource": {
+              "label": "Official course",
+              "href": "https://programming-25.mooc.fi/",
+              "viewer": false
+            },
             "title": "Python Ecosystem (I & II)",
             "focus_area": "Backend & Automation",
             "context_text": "Structured, demanding training from the University of Helsinki (Programming I & II). Solid grasp of algorithms, data structures, and OOP.",
@@ -829,8 +850,9 @@
               "Operating Systems"
             ],
             "resource": {
-              "label": "Program Content — Programming Course",
-              "href": "efa-program-content.pdf"
+              "label": "Training provider",
+              "href": "https://tecnisign.pt/",
+              "viewer": false
             },
             "title": "EFA Programmer Program",
             "focus_area": "Fullstack Development",

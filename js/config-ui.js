@@ -14,6 +14,7 @@ const uiNodes = {
     previewPane: document.getElementById('preview-pane'),
     saveBtn: document.getElementById('save-btn'),
     backBtn: document.getElementById('back-btn'),
+    themeBtn: document.getElementById('theme-btn'),
     msgBox: document.getElementById('message-box'),
     loading: document.getElementById('loading-overlay'),
     langButtons: document.getElementById('lang-buttons'),
@@ -518,6 +519,103 @@ function applyAdminTheme() {
     root.style.setProperty('--text-dim', theme.text_dim);
     root.style.setProperty('--border', theme.border);
     document.body.classList.add('config-themed');
+}
+
+function renderThemeEditor(container) {
+    if (!container || !currentCV) return;
+    const theme = ensureThemeConfig();
+    container.innerHTML = '';
+
+    const presetRow = document.createElement('div');
+    presetRow.className = 'form-group';
+    const presetLabel = document.createElement('label');
+    presetLabel.textContent = 'Sugestões';
+    presetRow.appendChild(presetLabel);
+    const presetList = document.createElement('div');
+    presetList.className = 'preset-row';
+    THEME_PRESETS.forEach((preset) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'toggle-visibility';
+        btn.textContent = preset.name;
+        btn.onclick = () => {
+            const next = { ...theme, ...preset.theme };
+            next.accent_soft = hexToRgba(next.accent, 0.08);
+            currentCV.meta.theme = next;
+            renderThemeEditor(container);
+            renderPreview();
+            applyAdminTheme();
+        };
+        presetList.appendChild(btn);
+    });
+    presetRow.appendChild(presetList);
+    container.appendChild(presetRow);
+
+    const colorFields = [
+        { key: 'accent', label: 'Cor principal (accent)' },
+        { key: 'primary', label: 'Cor de destaque (primary)' },
+        { key: 'bg_app', label: 'Fundo da app' },
+        { key: 'bg_sidebar', label: 'Fundo do menu' },
+        { key: 'text_main', label: 'Texto principal' },
+        { key: 'text_muted', label: 'Texto secundário' },
+        { key: 'text_dim', label: 'Texto suave' },
+        { key: 'border', label: 'Bordas' }
+    ];
+
+    let softInput = null;
+    colorFields.forEach((field) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'form-group';
+        const label = document.createElement('label');
+        label.textContent = field.label;
+        const input = document.createElement('input');
+        input.type = 'color';
+        input.value = theme[field.key] || DEFAULT_THEME[field.key];
+        input.oninput = (event) => {
+            theme[field.key] = event.target.value;
+            if (field.key === 'accent') {
+                theme.accent_soft = hexToRgba(theme.accent, 0.08);
+                if (softInput) softInput.value = theme.accent_soft;
+            }
+            renderPreview();
+            applyAdminTheme();
+        };
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        container.appendChild(wrapper);
+    });
+
+    const softWrapper = document.createElement('div');
+    softWrapper.className = 'form-group';
+    const softLabel = document.createElement('label');
+    softLabel.textContent = 'Accent suave (auto)';
+    softInput = document.createElement('input');
+    softInput.type = 'text';
+    softInput.value = theme.accent_soft || hexToRgba(theme.accent, 0.08);
+    softInput.oninput = (event) => {
+        theme.accent_soft = event.target.value;
+        renderPreview();
+        applyAdminTheme();
+    };
+    softWrapper.appendChild(softLabel);
+    softWrapper.appendChild(softInput);
+    container.appendChild(softWrapper);
+}
+
+function openThemeModal() {
+    const overlay = document.getElementById('theme-overlay');
+    const body = document.getElementById('theme-editor-body');
+    if (!overlay || !body) return;
+    renderThemeEditor(body);
+    overlay.classList.remove('hidden');
+    overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeThemeModal() {
+    const overlay = document.getElementById('theme-overlay');
+    if (!overlay) return;
+    overlay.classList.add('hidden');
+    overlay.setAttribute('aria-hidden', 'true');
 }
 
 function ensureSectionDefinitions() {
@@ -1357,11 +1455,22 @@ function makeResourceListField(wrapper, targetObj, key, values = [], options = {
             labelInput.value = entry.label || '';
             const hrefInput = document.createElement('input');
             hrefInput.type = 'text';
-            hrefInput.placeholder = 'Link';
+            hrefInput.placeholder = 'Link ou ficheiro';
             hrefInput.value = stripAssetBase('downloads', entry.href || '');
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = '.pdf,.png,.jpg,.jpeg,.webp';
+            const typeSelect = document.createElement('select');
+            const fileOption = document.createElement('option');
+            fileOption.value = 'file';
+            fileOption.textContent = 'Ficheiro (leitor)';
+            const linkOption = document.createElement('option');
+            linkOption.value = 'link';
+            linkOption.textContent = 'Link externo';
+            typeSelect.appendChild(fileOption);
+            typeSelect.appendChild(linkOption);
+            const isExternal = /^(https?:|mailto:|tel:)/.test(entry.href || '');
+            typeSelect.value = isExternal ? 'link' : 'file';
             fileInput.onchange = (event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
@@ -1371,9 +1480,11 @@ function makeResourceListField(wrapper, targetObj, key, values = [], options = {
             };
 
             const sync = () => {
-                const normalizedHref = stripAssetBase('downloads', hrefInput.value);
+                const rawHref = hrefInput.value.trim();
+                const isLink = /^(https?:|mailto:|tel:)/.test(rawHref);
+                const normalizedHref = isLink ? rawHref : stripAssetBase('downloads', rawHref);
                 if (hrefInput.value !== normalizedHref) hrefInput.value = normalizedHref;
-                const viewer = withViewer ? entry.viewer !== false : undefined;
+                const viewer = withViewer ? (entry.viewer !== false) : undefined;
                 values[index] = withViewer
                     ? { ...entry, label: labelInput.value, href: normalizedHref, viewer }
                     : { ...entry, label: labelInput.value, href: normalizedHref };
@@ -1386,6 +1497,7 @@ function makeResourceListField(wrapper, targetObj, key, values = [], options = {
 
             inputs.appendChild(labelInput);
             inputs.appendChild(hrefInput);
+            inputs.appendChild(typeSelect);
             inputs.appendChild(fileInput);
 
             if (withViewer) {
@@ -1404,6 +1516,26 @@ function makeResourceListField(wrapper, targetObj, key, values = [], options = {
                 viewerWrap.appendChild(viewerInput);
                 inputs.appendChild(viewerWrap);
             }
+
+            typeSelect.onchange = () => {
+                const isLink = typeSelect.value === 'link';
+                if (isLink) {
+                    if (!/^(https?:|mailto:|tel:)/.test(hrefInput.value)) {
+                        hrefInput.value = '';
+                    }
+                    if (withViewer) {
+                        entry.viewer = false;
+                    }
+                } else {
+                    if (/^(https?:|mailto:|tel:)/.test(hrefInput.value)) {
+                        hrefInput.value = '';
+                    }
+                    if (withViewer) {
+                        entry.viewer = true;
+                    }
+                }
+                sync();
+            };
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -1450,16 +1582,40 @@ function makeResourceField(wrapper, targetObj, key, value = {}) {
     hrefRow.className = 'inline-input';
     const hrefInput = document.createElement('input');
     hrefInput.type = 'text';
-    hrefInput.placeholder = 'href';
+    hrefInput.placeholder = 'Link ou ficheiro';
     hrefInput.value = stripAssetBase('downloads', resource.href || '');
+    const typeSelect = document.createElement('select');
+    const fileOption = document.createElement('option');
+    fileOption.value = 'file';
+    fileOption.textContent = 'Ficheiro (leitor)';
+    const linkOption = document.createElement('option');
+    linkOption.value = 'link';
+    linkOption.textContent = 'Link externo';
+    typeSelect.appendChild(fileOption);
+    typeSelect.appendChild(linkOption);
+    const isExternal = /^(https?:|mailto:|tel:)/.test(resource.href || '');
+    typeSelect.value = isExternal ? 'link' : 'file';
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.png,.jpg,.jpeg,.webp';
+    fileInput.onchange = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const safeName = normalizeFileName(file.name);
+        hrefInput.value = safeName;
+        hrefInput.dispatchEvent(new Event('input', { bubbles: true }));
+    };
 
     const sync = () => {
-        const normalizedHref = stripAssetBase('downloads', hrefInput.value);
+        const rawHref = hrefInput.value.trim();
+        const isLink = /^(https?:|mailto:|tel:)/.test(rawHref);
+        const normalizedHref = isLink ? rawHref : stripAssetBase('downloads', rawHref);
         if (hrefInput.value !== normalizedHref) hrefInput.value = normalizedHref;
         targetObj[key] = {
             ...(resource || {}),
             label: labelInput.value,
-            href: normalizedHref
+            href: normalizedHref,
+            viewer: resource.viewer !== false
         };
         renderPreview();
     };
@@ -1469,6 +1625,8 @@ function makeResourceField(wrapper, targetObj, key, value = {}) {
 
     labelRow.appendChild(labelInput);
     hrefRow.appendChild(hrefInput);
+    hrefRow.appendChild(typeSelect);
+    hrefRow.appendChild(fileInput);
     wrapper.appendChild(labelRow);
     wrapper.appendChild(hrefRow);
 
@@ -1486,6 +1644,23 @@ function makeResourceField(wrapper, targetObj, key, value = {}) {
     viewerRow.appendChild(viewerLabel);
     viewerRow.appendChild(viewerInput);
     wrapper.appendChild(viewerRow);
+
+    typeSelect.onchange = () => {
+        const isLink = typeSelect.value === 'link';
+        if (isLink) {
+            if (!/^(https?:|mailto:|tel:)/.test(hrefInput.value)) {
+                hrefInput.value = '';
+            }
+            resource.viewer = false;
+        } else {
+            if (/^(https?:|mailto:|tel:)/.test(hrefInput.value)) {
+                hrefInput.value = '';
+            }
+            resource.viewer = true;
+        }
+        viewerInput.checked = resource.viewer !== false;
+        sync();
+    };
 }
 
 function makeFileField(wrapper, targetObj, key, labelText, baseFolder) {
@@ -1977,7 +2152,7 @@ function renderSidebar() {
 
 function isLongText(key, value) {
     if (!value) return false;
-    const longKeys = ['description', 'intro_text', 'bio', 'details', 'summary', 'philosophy', 'subtitle', 'marketing_note', 'next_text', 'context_text', 'background', 'summary_text', 'details_text', 'intro_quote', 'challenge_text', 'key_learning_text', 'present_link', 'story_text', 'engineering_note', 'principle_title', 'focus_area', 'transition'];
+    const longKeys = ['description', 'intro_text', 'bio', 'details', 'summary', 'philosophy', 'subtitle', 'marketing_note', 'next_text', 'context_text', 'background', 'summary_text', 'details_text', 'intro_quote', 'challenge_text', 'key_learning_text', 'present_link', 'story_text', 'engineering_note', 'principle_title', 'transition'];
     if (longKeys.some(k => key.toLowerCase().includes(k))) return true;
     return value.length > 120;
 }
@@ -2148,6 +2323,25 @@ function renderDownloadsEditor() {
             makeFileField(fileWrapper, entry, 'href', `Ficheiro (${downloadsBase})`, downloadsBase);
             fieldset.appendChild(fileWrapper);
 
+            const typeWrapper = document.createElement('div');
+            typeWrapper.className = 'form-group';
+            const typeLabel = document.createElement('label');
+            typeLabel.textContent = 'Tipo de link';
+            const typeSelect = document.createElement('select');
+            const fileOption = document.createElement('option');
+            fileOption.value = 'file';
+            fileOption.textContent = 'Ficheiro (leitor)';
+            const linkOption = document.createElement('option');
+            linkOption.value = 'link';
+            linkOption.textContent = 'Link externo';
+            typeSelect.appendChild(fileOption);
+            typeSelect.appendChild(linkOption);
+            const isExternal = /^(https?:|mailto:|tel:)/.test(entry.href || '');
+            typeSelect.value = isExternal ? 'link' : 'file';
+            typeWrapper.appendChild(typeLabel);
+            typeWrapper.appendChild(typeSelect);
+            fieldset.appendChild(typeWrapper);
+
             const viewerGroup = document.createElement('div');
             viewerGroup.className = 'form-group';
             const viewerLabel = document.createElement('label');
@@ -2162,6 +2356,30 @@ function renderDownloadsEditor() {
             viewerGroup.appendChild(viewerLabel);
             viewerGroup.appendChild(viewerInput);
             fieldset.appendChild(viewerGroup);
+
+            typeSelect.onchange = () => {
+                const isLink = typeSelect.value === 'link';
+                if (isLink) {
+                    if (!/^(https?:|mailto:|tel:)/.test(entry.href || '')) {
+                        entry.href = '';
+                    }
+                    entry.viewer = false;
+                    viewerInput.checked = false;
+                    viewerInput.disabled = true;
+                } else {
+                    if (/^(https?:|mailto:|tel:)/.test(entry.href || '')) {
+                        entry.href = '';
+                    }
+                    entry.viewer = true;
+                    viewerInput.checked = true;
+                    viewerInput.disabled = false;
+                }
+                renderAll();
+                renderPreview();
+            };
+            if (isExternal) {
+                viewerInput.disabled = true;
+            }
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -2309,91 +2527,6 @@ function renderSectionEditor() {
                 metaFieldset.appendChild(wrapper);
             });
             uiNodes.editorForm.appendChild(metaFieldset);
-        });
-
-        pendingFieldsets.push(() => {
-            const theme = ensureThemeConfig();
-            const themeFieldset = document.createElement('fieldset');
-            const themeLegend = document.createElement('legend');
-            themeLegend.textContent = 'Tema (cores)';
-            themeFieldset.appendChild(themeLegend);
-
-            const presetRow = document.createElement('div');
-            presetRow.className = 'form-group';
-            const presetLabel = document.createElement('label');
-            presetLabel.textContent = 'Sugestões';
-            presetRow.appendChild(presetLabel);
-            const presetList = document.createElement('div');
-            presetList.className = 'preset-row';
-            THEME_PRESETS.forEach((preset) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'toggle-visibility';
-                btn.textContent = preset.name;
-                btn.onclick = () => {
-                    const next = { ...theme, ...preset.theme };
-                    next.accent_soft = hexToRgba(next.accent, 0.08);
-                    currentCV.meta.theme = next;
-                    renderSectionEditor();
-                    renderPreview();
-                    applyAdminTheme();
-                };
-                presetList.appendChild(btn);
-            });
-            presetRow.appendChild(presetList);
-            themeFieldset.appendChild(presetRow);
-
-            const colorFields = [
-                { key: 'accent', label: 'Cor principal (accent)' },
-                { key: 'primary', label: 'Cor de destaque (primary)' },
-                { key: 'bg_app', label: 'Fundo da app' },
-                { key: 'bg_sidebar', label: 'Fundo do menu' },
-                { key: 'text_main', label: 'Texto principal' },
-                { key: 'text_muted', label: 'Texto secundário' },
-                { key: 'text_dim', label: 'Texto suave' },
-                { key: 'border', label: 'Bordas' }
-            ];
-
-            let softInput = null;
-            colorFields.forEach((field) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'form-group';
-                const label = document.createElement('label');
-                label.textContent = field.label;
-                const input = document.createElement('input');
-                input.type = 'color';
-                input.value = theme[field.key] || DEFAULT_THEME[field.key];
-                input.oninput = (event) => {
-                    theme[field.key] = event.target.value;
-                    if (field.key === 'accent') {
-                        theme.accent_soft = hexToRgba(theme.accent, 0.08);
-                        if (softInput) softInput.value = theme.accent_soft;
-                    }
-                    renderPreview();
-                    applyAdminTheme();
-                };
-                wrapper.appendChild(label);
-                wrapper.appendChild(input);
-                themeFieldset.appendChild(wrapper);
-            });
-
-            const softWrapper = document.createElement('div');
-            softWrapper.className = 'form-group';
-            const softLabel = document.createElement('label');
-            softLabel.textContent = 'Accent suave (auto)';
-            softInput = document.createElement('input');
-            softInput.type = 'text';
-            softInput.value = theme.accent_soft || hexToRgba(theme.accent, 0.08);
-            softInput.oninput = (event) => {
-                theme.accent_soft = event.target.value;
-                renderPreview();
-                applyAdminTheme();
-            };
-            softWrapper.appendChild(softLabel);
-            softWrapper.appendChild(softInput);
-            themeFieldset.appendChild(softWrapper);
-
-            uiNodes.editorForm.appendChild(themeFieldset);
         });
 
         pendingFieldsets.push(() => addUiFieldset('Textos de Identidade', [
@@ -2695,34 +2828,6 @@ function renderStoryEditor(config, { append = false } = {}) {
         renderSectionEditor();
         renderPreview();
     };
-    controls.appendChild(addBtn);
-    uiNodes.editorForm.appendChild(controls);
-
-    const targetEntry = items[currentStoryIndex];
-    if (!targetEntry) return;
-    const targetItem = config.type === 'mindset' ? targetEntry.item : targetEntry;
-    if (config.type === 'skills' && !Array.isArray(targetItem.competencies)) {
-        targetItem.competencies = [];
-    }
-    const skillsFallback = config.type === 'skills'
-        ? (currentCV?.localized?.[currentLang]?.ui?.skill_tags || [])
-        : [];
-
-    const fieldsetTitle = document.createElement('div');
-    fieldsetTitle.className = 'form-group';
-    fieldsetTitle.innerHTML = `<label>Edição do cartão</label>`;
-    uiNodes.editorForm.appendChild(fieldsetTitle);
-
-    const cardFieldset = document.createElement('fieldset');
-    const cardLegend = document.createElement('legend');
-    cardLegend.textContent = 'Cartão (resumo)';
-    cardFieldset.appendChild(cardLegend);
-
-    const popupFieldset = document.createElement('fieldset');
-    const popupLegend = document.createElement('legend');
-    popupLegend.textContent = 'Pop-up (detalhes)';
-    popupFieldset.appendChild(popupLegend);
-
     const removeBtn = document.createElement('button');
     removeBtn.type = 'button';
     removeBtn.className = 'toggle-visibility';
@@ -2742,6 +2847,54 @@ function renderStoryEditor(config, { append = false } = {}) {
         renderSectionEditor();
         renderPreview();
     };
+
+    controls.appendChild(addBtn);
+    controls.appendChild(removeBtn);
+    uiNodes.editorForm.appendChild(controls);
+
+    const targetEntry = items[currentStoryIndex];
+    if (!targetEntry) return;
+    const targetItem = config.type === 'mindset' ? targetEntry.item : targetEntry;
+    if (config.type === 'skills' && !Array.isArray(targetItem.competencies)) {
+        targetItem.competencies = [];
+    }
+    if (config.type === 'skills') {
+        const defaults = {
+            title: '',
+            focus_area: '',
+            progress_status: '',
+            duration_hours: '',
+            context_text: '',
+            background: '',
+            rh_value: '',
+            resource: null,
+            competencies: [],
+            technologies: []
+        };
+        Object.entries(defaults).forEach(([key, value]) => {
+            if (targetItem[key] === undefined) {
+                targetItem[key] = Array.isArray(value) ? [...value] : value;
+            }
+        });
+    }
+    const skillsFallback = config.type === 'skills'
+        ? (currentCV?.localized?.[currentLang]?.ui?.skill_tags || [])
+        : [];
+
+    const fieldsetTitle = document.createElement('div');
+    fieldsetTitle.className = 'form-group';
+    fieldsetTitle.innerHTML = `<label>Edição do cartão</label>`;
+    uiNodes.editorForm.appendChild(fieldsetTitle);
+
+    const cardFieldset = document.createElement('fieldset');
+    const cardLegend = document.createElement('legend');
+    cardLegend.textContent = 'Cartão (resumo)';
+    cardFieldset.appendChild(cardLegend);
+
+    const popupFieldset = document.createElement('fieldset');
+    const popupLegend = document.createElement('legend');
+    popupLegend.textContent = 'Pop-up (detalhes)';
+    popupFieldset.appendChild(popupLegend);
 
     const popupKeys = {
         skills: new Set(['context_text', 'background', 'resource', 'competencies', 'technologies']),
@@ -2819,9 +2972,7 @@ function renderStoryEditor(config, { append = false } = {}) {
 
     uiNodes.editorForm.appendChild(cardFieldset);
     uiNodes.editorForm.appendChild(popupFieldset);
-    uiNodes.editorForm.appendChild(removeBtn);
-
-    uiNodes.editorForm.appendChild(removeBtn);
+    // remove button now lives next to add button
 }
 
 function renderPreview() {
@@ -3197,6 +3348,19 @@ function bindEvents() {
     if (uiNodes.openaiKey) {
         uiNodes.openaiKey.addEventListener('change', persistSessionFields);
         uiNodes.openaiKey.addEventListener('input', persistSessionFields);
+    }
+    if (uiNodes.themeBtn) {
+        uiNodes.themeBtn.addEventListener('click', openThemeModal);
+    }
+    const themeClose = document.getElementById('theme-close');
+    if (themeClose) {
+        themeClose.addEventListener('click', closeThemeModal);
+    }
+    const themeOverlay = document.getElementById('theme-overlay');
+    if (themeOverlay) {
+        themeOverlay.addEventListener('click', (event) => {
+            if (event.target === themeOverlay) closeThemeModal();
+        });
     }
 }
 

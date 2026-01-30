@@ -132,6 +132,14 @@ function escapeAttr(value) {
 }
 
 function buildViewerAttrs({ href, label, viewer = true }) {
+    const text = String(href || '');
+    const isExternal = /^(https?:|mailto:|tel:)/.test(text);
+    if (isExternal) {
+        if (text.startsWith('mailto:') || text.startsWith('tel:')) {
+            return `href="${href}"`;
+        }
+        return `href="${href}" target="_blank" rel="noopener"`;
+    }
     if (!viewer) {
         return `href="${href}" download`;
     }

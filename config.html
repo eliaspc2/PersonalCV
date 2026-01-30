@@ -324,6 +324,42 @@
             background: #ffffff;
         }
 
+        .theme-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2100;
+        }
+
+        .theme-overlay.hidden {
+            display: none;
+        }
+
+        .theme-modal {
+            width: min(640px, 92vw);
+            background: white;
+            border-radius: 14px;
+            padding: 1.25rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .theme-body {
+            overflow: auto;
+            padding-right: 0.25rem;
+        }
+
+        .theme-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.75rem;
+        }
+
         .toggle-visibility {
             border: 1px solid #cbd5f5;
             background: #eef2ff;
@@ -916,6 +952,7 @@
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.35rem;">
                     <div style="display:flex; gap:0.75rem;">
+                        <button id="theme-btn" type="button" class="secondary">Tema</button>
                         <button id="back-btn" type="button" class="secondary">Voltar ao site</button>
                         <button id="save-btn" class="secondary">Guardar alterações</button>
                     </div>
@@ -1031,6 +1068,17 @@
                     <button id="section-template-close" type="button" class="panel-action">Fechar</button>
                     <button id="section-template-create" type="button" class="panel-action">Criar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div id="theme-overlay" class="theme-overlay hidden" aria-hidden="true">
+        <div class="theme-modal">
+            <div class="theme-header">
+                <h3 style="margin:0;">Tema (cores)</h3>
+            </div>
+            <div id="theme-editor-body" class="theme-body"></div>
+            <div class="theme-actions">
+                <button id="theme-close" type="button" class="panel-action">Fechar</button>
             </div>
         </div>
     </div>

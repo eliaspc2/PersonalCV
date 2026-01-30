@@ -36,6 +36,9 @@ export const ICON_SET = {
     shield: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/></svg>`,
     megaphone: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M3 11v2a3 3 0 0 0 3 3h3l5 4V4L9 8H6a3 3 0 0 0-3 3z"/><path d="M21 8v8"/><path d="M14 6h7"/></svg>`,
     hand: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M7 11V5a2 2 0 1 1 4 0v6"/><path d="M11 11V4a2 2 0 1 1 4 0v7"/><path d="M15 11V6a2 2 0 1 1 4 0v9a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-3a2 2 0 1 1 4 0v1"/></svg>`,
+    bread: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M4 12a6 6 0 0 1 12 0v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M10 10h0.01"/><path d="M14 10h0.01"/><path d="M8 15h8"/></svg>`,
+    pizza: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M12 3l9 18H3z"/><circle cx="9" cy="12" r="1.3"/><circle cx="13" cy="9" r="1.2"/><circle cx="15" cy="14" r="1"/></svg>`,
+    spinner: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="12" cy="12" r="9" stroke-dasharray="42 14"/><path d="M12 3a9 9 0 0 1 6.36 2.64"/></svg>`,
     utensils: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M4 3v7"/><path d="M8 3v7"/><path d="M4 10c0 1.7 4 1.7 4 0"/><path d="M15 3v18"/><path d="M20 3l-3 7h4"/></svg>`,
     checklist: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6l1.5 1.5L7 6"/><path d="M4 12l1.5 1.5L7 12"/><path d="M4 18l1.5 1.5L7 18"/></svg>`
 };
@@ -77,6 +80,9 @@ export const ICON_CHOICES = [
     { id: 'shield', label: { pt: 'Proteção', es: 'Protección', en: 'Shield' } },
     { id: 'megaphone', label: { pt: 'Anúncio', es: 'Anuncio', en: 'Announcement' } },
     { id: 'hand', label: { pt: 'Mãos', es: 'Manos', en: 'Hands' } },
+    { id: 'bread', label: { pt: 'Pão', es: 'Pan', en: 'Bread' } },
+    { id: 'pizza', label: { pt: 'Pizza', es: 'Pizza', en: 'Pizza' } },
+    { id: 'spinner', label: { pt: 'Em progresso', es: 'En progreso', en: 'In progress' } },
     { id: 'utensils', label: { pt: 'Cozinha', es: 'Cocina', en: 'Kitchen' } }
 ];
 
@@ -114,8 +120,8 @@ export const ICON_ALIAS = {
     '🏆': 'trophy',
     '🎓': 'graduation',
     '🧑‍🍳': 'utensils',
-    '🍞': 'utensils',
-    '🍕': 'utensils',
+    '🍞': 'bread',
+    '🍕': 'pizza',
     '🗳️': 'checklist',
     '🛡️': 'shield',
     '📣': 'megaphone',
