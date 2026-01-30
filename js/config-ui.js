@@ -996,34 +996,43 @@ function closeIconPicker() {
 function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', options = {}) {
     const config = typeof options === 'object' && options ? options : {};
     const row = document.createElement('div');
-    row.className = config.showPreview ? 'icon-input' : 'inline-input';
+    row.className = 'icon-input';
     let preview = null;
-    if (config.showPreview) {
-        preview = document.createElement('span');
-        preview.className = 'icon-input-preview';
-        row.appendChild(preview);
-    }
+    const nameHint = document.createElement('div');
+    nameHint.className = 'icon-input-name';
+    preview = document.createElement('span');
+    preview.className = 'icon-input-preview';
+    row.appendChild(preview);
     const input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = placeholder;
+    input.placeholder = config.defaultIconId || placeholder;
     const initialValue = normalizeIconValue(targetObj[key] || '');
     targetObj[key] = isIconId(initialValue) ? initialValue : '';
     input.value = targetObj[key] || '';
+
+    const updatePreview = () => {
+        const value = String(input.value || '').trim();
+        const iconId = value || config.defaultIconId || '';
+        if (value) {
+            preview.innerHTML = renderIcon(value, 'nav-icon');
+        } else if (config.defaultIcon) {
+            preview.innerHTML = config.defaultIcon;
+        } else {
+            preview.textContent = '';
+        }
+        if (iconId) {
+            nameHint.textContent = value ? `Ícone: ${iconId}` : `Ícone: ${iconId} (padrão)`;
+        } else {
+            nameHint.textContent = 'Ícone: (sem ícone)';
+        }
+    };
+
     input.oninput = (event) => {
         const normalized = normalizeIconValue(event.target.value);
         targetObj[key] = isIconId(normalized) ? normalized : '';
         input.value = targetObj[key];
         renderPreview();
-        if (preview) {
-            const value = String(input.value || '').trim();
-            if (value) {
-                preview.innerHTML = renderIcon(value, 'nav-icon');
-            } else if (config.defaultIcon) {
-                preview.innerHTML = config.defaultIcon;
-            } else {
-                preview.textContent = '';
-            }
-        }
+        updatePreview();
     };
     const pickBtn = document.createElement('button');
     pickBtn.type = 'button';
@@ -1036,26 +1045,11 @@ function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', option
             input.dispatchEvent(new Event('input', { bubbles: true }));
         });
     };
-    if (preview) {
-        const value = String(input.value || '').trim();
-        if (value) {
-            preview.innerHTML = renderIcon(value, 'nav-icon');
-        } else if (config.defaultIcon) {
-            preview.innerHTML = config.defaultIcon;
-        }
-    }
-    if (!preview) {
-        preview = document.createElement('span');
-        preview.className = 'icon-input-preview';
-        row.appendChild(preview);
-        const value = String(input.value || '').trim();
-        if (value) {
-            preview.innerHTML = renderIcon(value, 'nav-icon');
-        }
-    }
+    updatePreview();
     row.appendChild(input);
     row.appendChild(pickBtn);
     wrapper.appendChild(row);
+    wrapper.appendChild(nameHint);
     return input;
 }
 
@@ -1382,8 +1376,9 @@ function appendNavigationFields(sectionKey) {
     const iconLabel = document.createElement('label');
     iconLabel.textContent = 'Ícone do menu';
     iconWrapper.appendChild(iconLabel);
-    const defaultIcon = renderIcon(NAV_TYPE_ICON_IDS[sectionType] || NAV_TYPE_ICON_IDS.overview, 'nav-icon');
-    makeIconField(iconWrapper, icons, sectionKey, 'ex: home', { showPreview: true, defaultIcon });
+    const defaultIconId = NAV_TYPE_ICON_IDS[sectionType] || NAV_TYPE_ICON_IDS.overview;
+    const defaultIcon = renderIcon(defaultIconId, 'nav-icon');
+    makeIconField(iconWrapper, icons, sectionKey, 'ex: home', { showPreview: true, defaultIcon, defaultIconId });
     fieldset.appendChild(iconWrapper);
 
     uiNodes.editorForm.appendChild(fieldset);
