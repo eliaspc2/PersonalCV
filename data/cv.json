@@ -100,17 +100,13 @@
         "label": "Conteúdo Programático (EFA)",
         "icon": "spinner",
         "href": "efa-program-content.pdf",
-        "group": "certs",
-        "type": "programmatic_content",
-        "level": "EFA"
+        "group": "certs"
       },
       {
-        "label": "Conteúdo Programático (CET – Técnico/a Especialista em Cibersegurança)",
+        "label": "Conteúdo Programático (CET)",
         "icon": "spinner",
         "href": "q481ra057_referencial-competencias-tecnologica_cet.pdf",
-        "group": "certs",
-        "type": "programmatic_content",
-        "level": "CET"
+        "group": "certs"
       },
       {
         "label": "Python I (Helsinki)",
@@ -504,13 +500,11 @@
         "download_groups": [
           {
             "id": "downloads",
-            "label": "Recursos Profissionais",
-            "open_in_new_tab": false
+            "label": "Recursos Profissionais"
           },
           {
             "id": "certs",
-            "label": "Certificações Estruturadas",
-            "open_in_new_tab": true
+            "label": "Certificações Estruturadas"
           }
         ],
         "cta_label": "Vamos Conversar?",
