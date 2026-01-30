@@ -806,6 +806,7 @@ function getImagePositionKey(key) {
 
 function getFieldLabel(key) {
     const map = {
+        name: 'Nome',
         headline: 'Título principal',
         location: 'Localização',
         intro_text: 'Introdução',
@@ -940,6 +941,15 @@ function makeIconField(wrapper, targetObj, key, placeholder = 'ex: home', option
             preview.innerHTML = renderIcon(value, 'nav-icon');
         } else if (config.defaultIcon) {
             preview.innerHTML = config.defaultIcon;
+        }
+    }
+    if (!preview) {
+        preview = document.createElement('span');
+        preview.className = 'icon-input-preview';
+        row.insertBefore(preview, input);
+        const value = String(input.value || '').trim();
+        if (value) {
+            preview.innerHTML = renderIcon(value, 'nav-icon');
         }
     }
     row.appendChild(input);
@@ -2152,7 +2162,7 @@ function renderSidebar() {
 
 function isLongText(key, value) {
     if (!value) return false;
-    const longKeys = ['description', 'intro_text', 'bio', 'details', 'summary', 'philosophy', 'subtitle', 'marketing_note', 'next_text', 'context_text', 'background', 'summary_text', 'details_text', 'intro_quote', 'challenge_text', 'key_learning_text', 'present_link', 'story_text', 'engineering_note', 'principle_title', 'transition'];
+    const longKeys = ['description', 'intro_text', 'bio', 'details', 'summary', 'philosophy', 'subtitle', 'marketing_note', 'next_text', 'context_text', 'background', 'summary_text', 'details_text', 'intro_quote', 'challenge_text', 'key_learning_text', 'present_link', 'story_text', 'engineering_note', 'transition'];
     if (longKeys.some(k => key.toLowerCase().includes(k))) return true;
     return value.length > 120;
 }
@@ -2560,7 +2570,6 @@ function renderSectionEditor() {
             { key: 'explore_mindset_label', label: 'Texto “Explorar” dos cartões' },
             { key: 'drawer_mindset_label', label: 'Título do drawer' },
             { key: 'drawer_mindset_story_label', label: 'Etiqueta da experiência pessoal' },
-            { key: 'mindset_trace_label', label: 'Etiqueta do bloco final' },
             { key: 'mindset_trace_text', label: 'Texto do bloco final', multiline: true }
         ]));
     }
