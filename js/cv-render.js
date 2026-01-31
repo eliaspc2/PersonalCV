@@ -30,6 +30,7 @@ const BASE_SECTIONS = [
     { id: 'overview', type: 'overview' },
     { id: 'development', type: 'development' },
     { id: 'foundation', type: 'foundation' },
+    { id: 'highlights', type: 'highlights' },
     { id: 'mindset', type: 'mindset' },
     { id: 'now', type: 'now' },
     { id: 'contact', type: 'contact' }
@@ -594,6 +595,8 @@ function render() {
             renderDevelopment(data, container, section.id);
         } else if (section.type === 'foundation') {
             renderFoundation(data, container, section.id);
+        } else if (section.type === 'highlights') {
+            renderHighlights(data, container, section.id);
         } else if (section.type === 'mindset') {
             renderMindset(data, container, section.id);
         } else if (section.type === 'now') {
@@ -934,12 +937,14 @@ function renderDevelopment(data, container, sectionId = 'development') {
     const showAggComp = data.show_aggregated_competencies !== false;
     const aggTechLabel = t('ui.technologies_label', ui.technologies_label || 'Tecnologias');
     const aggCompLabel = t('ui.drawer_skill_competencies_label', ui.drawer_skill_competencies_label || 'Competências');
+    const aggTechIcon = renderIcon('code', 'chip-icon');
+    const aggCompIcon = renderIcon('sparkles', 'chip-icon');
     const aggregateCards = `
         ${showAggTech && allTechnologies.length ? `
             <div class="aggregate-card">
                 <div class="aggregate-title">${aggTechLabel}</div>
                 <div class="chip-list">
-                    ${allTechnologies.map((tech) => `<span class="chip">${tech}</span>`).join('')}
+                    ${allTechnologies.map((tech) => `<span class="chip">${aggTechIcon}${tech}</span>`).join('')}
                 </div>
             </div>
         ` : ''}
@@ -947,7 +952,7 @@ function renderDevelopment(data, container, sectionId = 'development') {
             <div class="aggregate-card">
                 <div class="aggregate-title">${aggCompLabel}</div>
                 <div class="chip-list">
-                    ${allCompetencies.map((comp) => `<span class="chip">${comp}</span>`).join('')}
+                    ${allCompetencies.map((comp) => `<span class="chip">${aggCompIcon}${comp}</span>`).join('')}
                 </div>
             </div>
         ` : ''}
@@ -1046,6 +1051,31 @@ function renderFoundation(data, container, sectionId = 'foundation') {
                     <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
                 </div>
             ` : ''}
+        </div>
+    `;
+}
+
+function renderHighlights(data, container, sectionId = 'highlights') {
+    const title = getText(sectionId, 'title', data.title);
+    const items = Array.isArray(data.items) ? data.items : [];
+    container.innerHTML = `
+        <div class="section-container">
+            <h2 class="section-title">${title}</h2>
+            <div class="highlight-list">
+                ${items.map((item) => `
+                    <details class="highlight-card">
+                        <summary>
+                            <span class="highlight-icon">${renderIcon(item.icon || 'star', 'highlight-icon-svg')}</span>
+                            <span class="highlight-text">
+                                <strong>${getItemText(sectionId, 'items', item, 'title', item.title || '')}</strong>
+                                <span>${getItemText(sectionId, 'items', item, 'subtitle', item.subtitle || '')}</span>
+                            </span>
+                            <span class="highlight-chevron">▾</span>
+                        </summary>
+                        ${item.details ? `<div class="highlight-details">${getItemText(sectionId, 'items', item, 'details', item.details)}</div>` : ''}
+                    </details>
+                `).join('')}
+            </div>
         </div>
     `;
 }
@@ -1238,6 +1268,12 @@ function renderNow(data, container, sectionId = 'now') {
     const details = getText(sectionId, 'details', data.details);
     const ctaLabel = getText(sectionId, 'cta_label', data.cta_label);
     const resources = Array.isArray(data.resources) ? data.resources : [];
+    const card = data.opportunity_card || {};
+    const cardEnabled = card.enabled !== false;
+    const cardTitle = getText(sectionId, 'opportunity_card.title', card.title || '');
+    const cardSubtitle = getText(sectionId, 'opportunity_card.subtitle', card.subtitle || '');
+    const cardTags = Array.isArray(card.tags) ? card.tags : [];
+    const cardIcon = renderIcon(card.icon || 'check', 'opportunity-icon');
     container.innerHTML = `
         <div class="section-container">
             <h2 class="section-title">${title}</h2>
@@ -1249,6 +1285,31 @@ function renderNow(data, container, sectionId = 'now') {
                     </div>
                 ` : ''}
                 <div class="now-card">
+                    ${cardEnabled && (cardTitle || cardSubtitle || cardTags.length) ? `
+                        <div class="opportunity-card">
+                            <div class="opportunity-head">
+                                <span class="opportunity-icon-wrap">${cardIcon}</span>
+                                <div>
+                                    ${cardTitle ? `<div class="opportunity-title">${cardTitle}</div>` : ''}
+                                    ${cardSubtitle ? `<div class="opportunity-subtitle">${cardSubtitle}</div>` : ''}
+                                </div>
+                            </div>
+                            ${cardTags.length ? `
+                                <div class="opportunity-tags">
+                                    ${cardTags.map((tag) => {
+                                        const label = typeof tag === 'string' ? tag : (tag.label || '');
+                                        const iconId = typeof tag === 'string' ? '' : (tag.icon || '');
+                                        return `
+                                            <span class="opportunity-tag">
+                                                ${iconId ? renderIcon(iconId, 'opportunity-tag-icon') : ''}
+                                                ${label}
+                                            </span>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : ''}
                     ${resources.length ? `
                         <div class="cert-badges" style="margin-top:0; margin-bottom:1.5rem;">
                             ${resources.map((item) => {

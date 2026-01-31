@@ -7,6 +7,7 @@ export const BASE_SECTIONS = [
     'overview',
     'development',
     'foundation',
+    'highlights',
     'mindset',
     'now',
     'contact'
@@ -89,6 +90,7 @@ export const NAV_TYPE_ICON_IDS = {
     overview: 'home',
     development: 'code',
     foundation: 'layers',
+    highlights: 'star',
     mindset: 'book',
     now: 'compass',
     contact: 'mail'

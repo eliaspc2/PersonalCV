@@ -45,7 +45,7 @@
       "minProperties": 1,
       "additionalProperties": {
         "type": "object",
-        "required": ["navigation", "overview", "development", "foundation", "mindset", "now", "contact"],
+        "required": ["navigation", "overview", "development", "foundation", "highlights", "mindset", "now", "contact"],
         "properties": {
           "navigation": {
             "type": "object",
@@ -74,6 +74,14 @@
             "required": ["experience"],
             "properties": {
               "experience": { "type": "array" }
+            },
+            "additionalProperties": true
+          },
+          "highlights": {
+            "type": "object",
+            "required": ["items"],
+            "properties": {
+              "items": { "type": "array" }
             },
             "additionalProperties": true
           },

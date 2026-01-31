@@ -45,6 +45,7 @@ const SECTION_LABELS = {
     overview: { pt: 'Identidade', es: 'Identidad', en: 'Identity' },
     development: { pt: 'Engenharia', es: 'Ingeniería', en: 'Engineering' },
     foundation: { pt: 'Fundação', es: 'Fundación', en: 'Foundation' },
+    highlights: { pt: 'Destaques', es: 'Destacados', en: 'Highlights' },
     mindset: { pt: 'Mentalidade', es: 'Mentalidad', en: 'Mindset' },
     now: { pt: 'Agora', es: 'Ahora', en: 'Now' },
     contact: { pt: 'Contacto', es: 'Contacto', en: 'Contact' }
@@ -66,6 +67,7 @@ let currentSection = 'overview';
 let repoInfo = { owner: '', repo: '', path: CV_PATH };
 let currentSource = 'local';
 let currentStoryIndex = 0;
+let currentHighlightIndex = 0;
 let currentDownloadGroupIndex = 0;
 let cropperState = null;
 const pendingDownloadDeletes = new Set();
@@ -114,6 +116,10 @@ const SECTION_FIELD_ORDER = {
         'cta_label',
         'cta_link'
     ],
+    highlights: [
+        'title',
+        'items'
+    ],
     mindset: [
         'title',
         'subtitle',
@@ -128,6 +134,7 @@ const SECTION_FIELD_ORDER = {
     now: [
         'title',
         'summary',
+        'opportunity_card',
         'resources',
         'details',
         'image',
@@ -195,6 +202,7 @@ const SECTION_TEMPLATES = [
     { type: 'overview', name: { pt: 'Hero & Identidade', es: 'Hero & Identidad', en: 'Hero & Identity' } },
     { type: 'development', name: { pt: 'Grelha de Competências', es: 'Malla de Competencias', en: 'Skill Grid' } },
     { type: 'foundation', name: { pt: 'Timeline Técnica', es: 'Timeline Técnica', en: 'Technical Timeline' } },
+    { type: 'highlights', name: { pt: 'Destaques Profissionais', es: 'Destacados Profesionales', en: 'Professional Highlights' } },
     { type: 'mindset', name: { pt: 'Cards & Filosofia', es: 'Cards & Filosofía', en: 'Cards & Philosophy' } },
     { type: 'now', name: { pt: 'Imagem + Call-to-Action', es: 'Imagen + CTA', en: 'Image + Call-to-Action' } },
     { type: 'contact', name: { pt: 'Contacto Central', es: 'Contacto Central', en: 'Centered Contact' } }
@@ -952,7 +960,7 @@ function getFieldLabel(key) {
 }
 
 function isHiddenFieldKey(key) {
-    return typeof key === 'string' && (key.endsWith('_position') || key.endsWith('_zoom'));
+    return typeof key === 'string' && (key === 'availability_badge' || key.endsWith('_position') || key.endsWith('_zoom'));
 }
 
 function getImageZoomKey(key) {
@@ -1074,6 +1082,14 @@ function buildTemplateSketch(type) {
         sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-circle' }));
         sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
         sketch.appendChild(Object.assign(document.createElement('div'), { className: 'sketch-line' }));
+    } else if (type === 'highlights') {
+        sketch.style.gridTemplateColumns = '1fr';
+        for (let i = 0; i < 3; i += 1) {
+            const row = document.createElement('div');
+            row.className = 'sketch-card';
+            row.style.height = '18px';
+            sketch.appendChild(row);
+        }
     } else if (type === 'mindset') {
         sketch.style.gridTemplateColumns = 'repeat(2, 1fr)';
         for (let i = 0; i < 2; i += 1) {
@@ -1218,6 +1234,12 @@ function createEmptySection(type) {
             cta_link: ''
         };
     }
+    if (type === 'highlights') {
+        return {
+            title: '',
+            items: []
+        };
+    }
     if (type === 'mindset') {
         return {
             title: '',
@@ -1240,6 +1262,13 @@ function createEmptySection(type) {
             image_alt: '',
             image_position: 'center 20%',
             image_zoom: 1,
+            opportunity_card: {
+                enabled: true,
+                icon: 'check',
+                title: '',
+                subtitle: '',
+                tags: []
+            },
             cta_label: '',
             cta_link: ''
         };
@@ -1533,6 +1562,61 @@ function makeArrayField(wrapper, targetObj, key, values = []) {
     renderItems();
     wrapper.appendChild(list);
     wrapper.appendChild(addBtn);
+}
+
+function makeTagListField(wrapper, targetObj, key, values = []) {
+    const list = document.createElement('div');
+    list.className = 'story-list';
+
+    const renderItems = () => {
+        list.innerHTML = '';
+        values.forEach((tag, index) => {
+            const row = document.createElement('div');
+            row.className = 'array-card';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = tag.label || '';
+            input.oninput = (event) => {
+                values[index] = { ...tag, label: event.target.value };
+                targetObj[key] = values;
+                renderPreview();
+            };
+            const iconWrap = document.createElement('div');
+            iconWrap.className = 'form-group';
+            makeIconField(iconWrap, values[index], 'icon', 'ex: globe');
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'toggle-visibility';
+            removeBtn.textContent = '−';
+            removeBtn.onclick = () => {
+                values.splice(index, 1);
+                targetObj[key] = values;
+                renderItems();
+                renderPreview();
+            };
+            row.appendChild(input);
+            row.appendChild(iconWrap);
+            row.appendChild(removeBtn);
+            list.appendChild(row);
+        });
+    };
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'toggle-visibility';
+    addBtn.textContent = '+ Adicionar';
+    addBtn.onclick = () => {
+        values.push({ label: '', icon: 'globe' });
+        targetObj[key] = values;
+        renderItems();
+        renderPreview();
+    };
+
+    renderItems();
+    wrapper.appendChild(list);
+    wrapper.appendChild(addBtn);
+    targetObj[key] = values;
 }
 
 function makeResourceListField(wrapper, targetObj, key, values = [], options = {}) {
@@ -2628,6 +2712,66 @@ function renderSectionEditor() {
 
     if (currentSection === 'overview') {
         appendSidebarIdentityFields();
+        if (sectionContent) {
+            const fieldset = document.createElement('fieldset');
+            const legend = document.createElement('legend');
+            legend.textContent = 'Disponibilidade';
+            fieldset.appendChild(legend);
+
+            if (!sectionContent.availability_badge) {
+                sectionContent.availability_badge = { enabled: true, status: '', label: '' };
+            }
+            if (sectionContent.availability_badge.enabled === undefined) {
+                sectionContent.availability_badge.enabled = true;
+            }
+
+            const enabledWrap = document.createElement('div');
+            enabledWrap.className = 'inline-input';
+            const enabledLabel = document.createElement('label');
+            enabledLabel.textContent = 'Mostrar badge';
+            const enabledInput = document.createElement('input');
+            enabledInput.type = 'checkbox';
+            enabledInput.checked = Boolean(sectionContent.availability_badge.enabled);
+            enabledInput.onchange = (event) => {
+                sectionContent.availability_badge.enabled = event.target.checked;
+                renderPreview();
+            };
+            enabledWrap.appendChild(enabledLabel);
+            enabledWrap.appendChild(enabledInput);
+            fieldset.appendChild(enabledWrap);
+
+            const statusWrap = document.createElement('div');
+            statusWrap.className = 'form-group';
+            const statusLabel = document.createElement('label');
+            statusLabel.textContent = 'Texto superior';
+            const statusInput = document.createElement('input');
+            statusInput.type = 'text';
+            statusInput.value = sectionContent.availability_badge.status || '';
+            statusInput.oninput = (event) => {
+                sectionContent.availability_badge.status = event.target.value;
+                renderPreview();
+            };
+            statusWrap.appendChild(statusLabel);
+            statusWrap.appendChild(statusInput);
+            fieldset.appendChild(statusWrap);
+
+            const labelWrap = document.createElement('div');
+            labelWrap.className = 'form-group';
+            const labelLabel = document.createElement('label');
+            labelLabel.textContent = 'Texto principal';
+            const labelInput = document.createElement('input');
+            labelInput.type = 'text';
+            labelInput.value = sectionContent.availability_badge.label || '';
+            labelInput.oninput = (event) => {
+                sectionContent.availability_badge.label = event.target.value;
+                renderPreview();
+            };
+            labelWrap.appendChild(labelLabel);
+            labelWrap.appendChild(labelInput);
+            fieldset.appendChild(labelWrap);
+
+            uiNodes.editorForm.appendChild(fieldset);
+        }
     }
 
     if (currentSection === 'contact') {
@@ -2887,6 +3031,13 @@ function renderSectionEditor() {
             uiNodes.editorForm.appendChild(fieldset);
             return;
         }
+        if (currentSection === 'now' && key === 'opportunity_card') {
+            return;
+        }
+        if (sectionType === 'highlights' && key === 'items') {
+            renderHighlightsEditor(content);
+            return;
+        }
         if ((sectionType === 'development' && key === 'skills')
             || (sectionType === 'foundation' && key === 'experience')
             || (sectionType === 'mindset' && (key === 'blocks' || key === 'adoption'))) {
@@ -2894,6 +3045,9 @@ function renderSectionEditor() {
                 renderStoryEditor(storyConfig, { append: true });
                 storyRendered = true;
             }
+            return;
+        }
+        if (key === 'availability_badge') {
             return;
         }
         if (key === 'cta_label') {
@@ -2954,73 +3108,84 @@ function renderSectionEditor() {
         renderCertificationsFieldset();
     }
 
-    if (sectionType === 'overview') {
-        const fieldset = document.createElement('fieldset');
-        const legend = document.createElement('legend');
-        legend.textContent = 'Disponibilidade';
-        fieldset.appendChild(legend);
-
-        if (!content.availability_badge) {
-            content.availability_badge = { enabled: true, status: '', label: '' };
-        }
-        if (content.availability_badge.enabled === undefined) {
-            content.availability_badge.enabled = true;
-        }
-
-        const enabledWrap = document.createElement('div');
-        enabledWrap.className = 'inline-input';
-        const enabledLabel = document.createElement('label');
-        enabledLabel.textContent = 'Mostrar badge';
-        const enabledInput = document.createElement('input');
-        enabledInput.type = 'checkbox';
-        enabledInput.checked = Boolean(content.availability_badge.enabled);
-        enabledInput.onchange = (event) => {
-            content.availability_badge.enabled = event.target.checked;
-            renderPreview();
-        };
-        enabledWrap.appendChild(enabledLabel);
-        enabledWrap.appendChild(enabledInput);
-        fieldset.appendChild(enabledWrap);
-
-        const statusWrap = document.createElement('div');
-        statusWrap.className = 'form-group';
-        const statusLabel = document.createElement('label');
-        statusLabel.textContent = 'Texto superior';
-        const statusInput = document.createElement('input');
-        statusInput.type = 'text';
-        statusInput.value = content.availability_badge.status || '';
-        statusInput.oninput = (event) => {
-            content.availability_badge.status = event.target.value;
-            renderPreview();
-        };
-        statusWrap.appendChild(statusLabel);
-        statusWrap.appendChild(statusInput);
-        fieldset.appendChild(statusWrap);
-
-        const labelWrap = document.createElement('div');
-        labelWrap.className = 'form-group';
-        const labelLabel = document.createElement('label');
-        labelLabel.textContent = 'Texto principal';
-        const labelInput = document.createElement('input');
-        labelInput.type = 'text';
-        labelInput.value = content.availability_badge.label || '';
-        labelInput.oninput = (event) => {
-            content.availability_badge.label = event.target.value;
-            renderPreview();
-        };
-        labelWrap.appendChild(labelLabel);
-        labelWrap.appendChild(labelInput);
-        fieldset.appendChild(labelWrap);
-
-        uiNodes.editorForm.appendChild(fieldset);
-    }
-
     if (storyConfig && !storyRendered) {
         renderStoryEditor(storyConfig, { append: true });
     }
 
     if (currentSection === 'contact') {
         renderContactLinks();
+    }
+
+    if (sectionType === 'now') {
+        const card = content.opportunity_card || (content.opportunity_card = { enabled: true, icon: 'check', title: '', subtitle: '', tags: [] });
+        if (!Array.isArray(card.tags)) card.tags = [];
+        const fieldset = document.createElement('fieldset');
+        const legend = document.createElement('legend');
+        legend.textContent = 'Cartão de disponibilidade';
+        fieldset.appendChild(legend);
+
+        const enabledWrap = document.createElement('div');
+        enabledWrap.className = 'inline-input';
+        const enabledLabel = document.createElement('label');
+        enabledLabel.textContent = 'Mostrar cartão';
+        const enabledInput = document.createElement('input');
+        enabledInput.type = 'checkbox';
+        enabledInput.checked = card.enabled !== false;
+        enabledInput.onchange = (event) => {
+            card.enabled = event.target.checked;
+            renderPreview();
+        };
+        enabledWrap.appendChild(enabledLabel);
+        enabledWrap.appendChild(enabledInput);
+        fieldset.appendChild(enabledWrap);
+
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'form-group';
+        const iconLabel = document.createElement('label');
+        iconLabel.textContent = 'Ícone';
+        iconWrap.appendChild(iconLabel);
+        makeIconField(iconWrap, card, 'icon', 'ex: check');
+        fieldset.appendChild(iconWrap);
+
+        const titleWrap = document.createElement('div');
+        titleWrap.className = 'form-group';
+        const titleLabel = document.createElement('label');
+        titleLabel.textContent = 'Título';
+        const titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.value = card.title || '';
+        titleInput.oninput = (event) => {
+            card.title = event.target.value;
+            renderPreview();
+        };
+        titleWrap.appendChild(titleLabel);
+        titleWrap.appendChild(titleInput);
+        fieldset.appendChild(titleWrap);
+
+        const subtitleWrap = document.createElement('div');
+        subtitleWrap.className = 'form-group';
+        const subtitleLabel = document.createElement('label');
+        subtitleLabel.textContent = 'Subtítulo';
+        const subtitleInput = document.createElement('input');
+        subtitleInput.type = 'text';
+        subtitleInput.value = card.subtitle || '';
+        subtitleInput.oninput = (event) => {
+            card.subtitle = event.target.value;
+            renderPreview();
+        };
+        subtitleWrap.appendChild(subtitleLabel);
+        subtitleWrap.appendChild(subtitleInput);
+        fieldset.appendChild(subtitleWrap);
+
+        const tagsWrap = document.createElement('div');
+        tagsWrap.className = 'form-group';
+        const tagsLabel = document.createElement('label');
+        tagsLabel.textContent = 'Tags';
+        tagsWrap.appendChild(tagsLabel);
+        makeTagListField(tagsWrap, card, 'tags', [...card.tags]);
+        fieldset.appendChild(tagsWrap);
+
+        uiNodes.editorForm.appendChild(fieldset);
     }
 
     pendingFieldsets.forEach((fn) => fn());
@@ -3268,6 +3433,125 @@ function renderStoryEditor(config, { append = false } = {}) {
     uiNodes.editorForm.appendChild(cardFieldset);
     uiNodes.editorForm.appendChild(popupFieldset);
     // remove button now lives next to add button
+}
+
+function renderHighlightsEditor(content) {
+    if (!content) return;
+    if (!Array.isArray(content.items)) content.items = [];
+    if (currentHighlightIndex >= content.items.length) currentHighlightIndex = 0;
+
+    const list = document.createElement('div');
+    list.className = 'story-list';
+
+    content.items.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `story-item ${index === currentHighlightIndex ? 'active' : ''}`;
+        btn.innerHTML = `
+            <div class="story-item-title">${item.title || 'Sem título'}</div>
+            <div class="story-item-subtitle">${item.subtitle || ''}</div>
+        `;
+        btn.onclick = () => {
+            currentHighlightIndex = index;
+            renderSectionEditor();
+        };
+        list.appendChild(btn);
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'story-actions';
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'panel-action';
+    addBtn.textContent = '+ Adicionar destaque';
+    addBtn.onclick = () => {
+        content.items.push({
+            icon: 'star',
+            title: '',
+            subtitle: '',
+            details: ''
+        });
+        currentHighlightIndex = content.items.length - 1;
+        renderSectionEditor();
+    };
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'panel-action';
+    removeBtn.textContent = 'Remover destaque';
+    removeBtn.onclick = () => {
+        if (!content.items.length) return;
+        content.items.splice(currentHighlightIndex, 1);
+        currentHighlightIndex = Math.max(0, currentHighlightIndex - 1);
+        renderSectionEditor();
+        renderPreview();
+    };
+    actions.appendChild(addBtn);
+    actions.appendChild(removeBtn);
+
+    uiNodes.editorForm.appendChild(list);
+    uiNodes.editorForm.appendChild(actions);
+
+    const currentItem = content.items[currentHighlightIndex];
+    if (!currentItem) return;
+
+    const fieldset = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    legend.textContent = 'Destaque';
+    fieldset.appendChild(legend);
+
+    const iconWrap = document.createElement('div');
+    iconWrap.className = 'form-group';
+    const iconLabel = document.createElement('label');
+    iconLabel.textContent = 'Ícone';
+    iconWrap.appendChild(iconLabel);
+    makeIconField(iconWrap, currentItem, 'icon', 'ex: star');
+    fieldset.appendChild(iconWrap);
+
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'form-group';
+    const titleLabel = document.createElement('label');
+    titleLabel.textContent = 'Título';
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.value = currentItem.title || '';
+    titleInput.oninput = (event) => {
+        currentItem.title = event.target.value;
+        renderPreview();
+    };
+    titleWrap.appendChild(titleLabel);
+    titleWrap.appendChild(titleInput);
+    fieldset.appendChild(titleWrap);
+
+    const subtitleWrap = document.createElement('div');
+    subtitleWrap.className = 'form-group';
+    const subtitleLabel = document.createElement('label');
+    subtitleLabel.textContent = 'Subtítulo';
+    const subtitleInput = document.createElement('input');
+    subtitleInput.type = 'text';
+    subtitleInput.value = currentItem.subtitle || '';
+    subtitleInput.oninput = (event) => {
+        currentItem.subtitle = event.target.value;
+        renderPreview();
+    };
+    subtitleWrap.appendChild(subtitleLabel);
+    subtitleWrap.appendChild(subtitleInput);
+    fieldset.appendChild(subtitleWrap);
+
+    const detailsWrap = document.createElement('div');
+    detailsWrap.className = 'form-group';
+    const detailsLabel = document.createElement('label');
+    detailsLabel.textContent = 'Detalhes';
+    const detailsInput = document.createElement('textarea');
+    detailsInput.value = currentItem.details || '';
+    detailsInput.oninput = (event) => {
+        currentItem.details = event.target.value;
+        renderPreview();
+    };
+    detailsWrap.appendChild(detailsLabel);
+    detailsWrap.appendChild(detailsInput);
+    fieldset.appendChild(detailsWrap);
+
+    uiNodes.editorForm.appendChild(fieldset);
 }
 
 function renderPreview() {

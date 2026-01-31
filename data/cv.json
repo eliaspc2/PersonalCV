@@ -12,6 +12,7 @@
       "overview",
       "development",
       "foundation",
+      "highlights",
       "mindset",
       "now",
       "contact"
@@ -31,6 +32,10 @@
         "type": "foundation"
       },
       {
+        "id": "highlights",
+        "type": "highlights"
+      },
+      {
         "id": "mindset",
         "type": "mindset"
       },
@@ -47,6 +52,7 @@
       "overview": "overview",
       "development": "development",
       "foundation": "foundation",
+      "highlights": "highlights",
       "mindset": "mindset",
       "now": "now",
       "contact": "contact"
@@ -148,6 +154,7 @@
         "overview": "Identidade",
         "development": "Engenharia",
         "foundation": "Fundação",
+        "highlights": "Destaques",
         "mindset": "Mentalidade",
         "now": "Agora",
         "contact": "Contacto"
@@ -402,6 +409,47 @@
         "image_position": "center 20%",
         "image_zoom": 1
       },
+      "highlights": {
+        "title": "Destaques Profissionais",
+        "items": [
+          {
+            "icon": "layers",
+            "title": "10+ Anos em Sistemas Críticos",
+            "subtitle": "Infraestrutura 24/7 com tolerância zero a falhas",
+            "details": "BNP Paribas, CEPSA, Telefónica — ambientes onde a estabilidade era absoluta."
+          },
+          {
+            "icon": "code",
+            "title": "Transição para Programação",
+            "subtitle": "540h de formação intensiva em Python e desenvolvimento",
+            "details": "University of Helsinki (Programming I & II), EFA Programador/a de Informática, CET Cibersegurança."
+          },
+          {
+            "icon": "shield",
+            "title": "Zero Downtime Mindset",
+            "subtitle": "Rigor absoluto e estabilidade como processo contínuo",
+            "details": "A mentalidade construída em ambientes críticos aplica-se agora ao desenvolvimento de software."
+          },
+          {
+            "icon": "globe",
+            "title": "Multilingue",
+            "subtitle": "PT (nativo), ES, EN (fluente), FR (funcional)",
+            "details": "Capacidade de trabalhar em equipas internacionais e comunicar com stakeholders globais."
+          },
+          {
+            "icon": "user",
+            "title": "Estabilidade Pessoal",
+            "subtitle": "Casado, pai de um filho de 13 anos — foco e previsibilidade",
+            "details": "Essa estabilidade familiar traduz-se em fiabilidade técnica e compromisso de longo prazo."
+          },
+          {
+            "icon": "lightbulb",
+            "title": "Marketing Digital",
+            "subtitle": "Consciência de produto — valor antes da tecnologia",
+            "details": "Formação complementar que ajuda a pensar no utilizador final e comunicar com clareza."
+          }
+        ]
+      },
       "mindset": {
         "title": "Mentalidade & Lógica Humana",
         "subtitle": "A paciência do pão, a precisão do código",
@@ -477,6 +525,26 @@
         "image": "now-portrait.png",
         "image_alt": "Perfil profissional",
         "summary": "Disponível para estágio curricular (210h) em contexto real de desenvolvimento ou sistemas, com capacidade de contributo efetivo desde o início.",
+        "opportunity_card": {
+          "enabled": true,
+          "icon": "check",
+          "title": "Disponível para oportunidades",
+          "subtitle": "Estágio curricular ou posição júnior",
+          "tags": [
+            {
+              "icon": "globe",
+              "label": "Remoto"
+            },
+            {
+              "icon": "mapPin",
+              "label": "Bragança (híbrido)"
+            },
+            {
+              "icon": "compass",
+              "label": "A partir de Junho 2026"
+            }
+          ]
+        },
         "resources": [
           {
             "label": "Conteúdo Programático (Curso Programação)",
@@ -524,6 +592,7 @@
         "overview": "",
         "development": "",
         "foundation": "",
+        "highlights": "",
         "mindset": "",
         "now": "",
         "contact": ""
@@ -534,6 +603,7 @@
         "overview": "Identidad",
         "development": "Ingeniería",
         "foundation": "Fundación",
+        "highlights": "Destacados",
         "mindset": "Mentalidad",
         "now": "Ahora",
         "contact": "Contacto"
@@ -786,6 +856,47 @@
         "image_position": "center 20%",
         "image_zoom": 1
       },
+      "highlights": {
+        "title": "Destacados Profesionales",
+        "items": [
+          {
+            "icon": "layers",
+            "title": "10+ Años en Sistemas Críticos",
+            "subtitle": "Infraestructura 24/7 con tolerancia cero a fallos",
+            "details": "BNP Paribas, CEPSA, Telefónica — entornos donde la estabilidad era absoluta."
+          },
+          {
+            "icon": "code",
+            "title": "Transición a Programación",
+            "subtitle": "540h de formación intensiva en Python y desarrollo",
+            "details": "University of Helsinki (Programming I & II), EFA Programador/a de Informática, CET Ciberseguridad."
+          },
+          {
+            "icon": "shield",
+            "title": "Zero Downtime Mindset",
+            "subtitle": "Rigor absoluto y estabilidad como proceso continuo",
+            "details": "La mentalidad construida en entornos críticos se aplica ahora al desarrollo de software."
+          },
+          {
+            "icon": "globe",
+            "title": "Multilingüe",
+            "subtitle": "PT (nativo), ES, EN (fluente), FR (funcional)",
+            "details": "Capacidad de trabajar en equipos internacionales y comunicar con stakeholders globales."
+          },
+          {
+            "icon": "user",
+            "title": "Estabilidad Personal",
+            "subtitle": "Casado, padre de un hijo de 13 años — foco y previsibilidad",
+            "details": "Esa estabilidad familiar se traduce en fiabilidad técnica y compromiso de largo plazo."
+          },
+          {
+            "icon": "lightbulb",
+            "title": "Marketing Digital",
+            "subtitle": "Conciencia de producto — valor antes de la tecnología",
+            "details": "Formación complementaria que ayuda a pensar en el usuario final y comunicar con claridad."
+          }
+        ]
+      },
       "mindset": {
         "title": "Mentalidad & Lógica Humana",
         "subtitle": "La paciencia del pan, la precisión del código",
@@ -861,6 +972,26 @@
         "image": "now-portrait.png",
         "image_alt": "Perfil profesional",
         "summary": "Busco una entidad acogedora para las prácticas curriculares obligatorias (210h) del EFA – Programador Informático.",
+        "opportunity_card": {
+          "enabled": true,
+          "icon": "check",
+          "title": "Disponible para oportunidades",
+          "subtitle": "Prácticas curriculares o posición junior",
+          "tags": [
+            {
+              "icon": "globe",
+              "label": "Remoto"
+            },
+            {
+              "icon": "mapPin",
+              "label": "Bragança (híbrido)"
+            },
+            {
+              "icon": "compass",
+              "label": "A partir de Junio 2026"
+            }
+          ]
+        },
         "resources": [
           {
             "label": "Contenido Programático (Curso de Programación)",
@@ -910,6 +1041,7 @@
         "overview": "",
         "development": "",
         "foundation": "",
+        "highlights": "",
         "mindset": "",
         "now": "",
         "contact": ""
@@ -920,6 +1052,7 @@
         "overview": "Identity",
         "development": "Engineering",
         "foundation": "Foundation",
+        "highlights": "Highlights",
         "mindset": "Mindset",
         "now": "Now",
         "contact": "Contact"
@@ -1172,6 +1305,47 @@
         "image_position": "center 20%",
         "image_zoom": 1
       },
+      "highlights": {
+        "title": "Professional Highlights",
+        "items": [
+          {
+            "icon": "layers",
+            "title": "10+ Years in Critical Systems",
+            "subtitle": "24/7 infrastructure with zero tolerance for failures",
+            "details": "BNP Paribas, CEPSA, Telefónica — environments where stability was absolute."
+          },
+          {
+            "icon": "code",
+            "title": "Transition to Programming",
+            "subtitle": "540h of intensive training in Python and development",
+            "details": "University of Helsinki (Programming I & II), EFA IT Programmer, CET Cybersecurity."
+          },
+          {
+            "icon": "shield",
+            "title": "Zero Downtime Mindset",
+            "subtitle": "Absolute rigor and stability as a continuous process",
+            "details": "The mindset built in critical environments now applies to software development."
+          },
+          {
+            "icon": "globe",
+            "title": "Multilingual",
+            "subtitle": "PT (native), ES, EN (fluent), FR (functional)",
+            "details": "Ability to work in international teams and communicate with global stakeholders."
+          },
+          {
+            "icon": "user",
+            "title": "Personal Stability",
+            "subtitle": "Married, father of a 13-year-old — focus and predictability",
+            "details": "That family stability translates into technical reliability and long-term commitment."
+          },
+          {
+            "icon": "lightbulb",
+            "title": "Digital Marketing",
+            "subtitle": "Product awareness — value before technology",
+            "details": "Complementary training that helps me think about the end user and communicate clearly."
+          }
+        ]
+      },
       "mindset": {
         "title": "Mindset & Human Logic",
         "subtitle": "The patience of bread, the precision of code",
@@ -1247,6 +1421,26 @@
         "image": "now-portrait.png",
         "image_alt": "Professional portrait",
         "summary": "I’m looking for a host organization for the mandatory 210-hour curricular internship in the EFA – Programmer program.",
+        "opportunity_card": {
+          "enabled": true,
+          "icon": "check",
+          "title": "Open to opportunities",
+          "subtitle": "Curricular internship or junior position",
+          "tags": [
+            {
+              "icon": "globe",
+              "label": "Remote"
+            },
+            {
+              "icon": "mapPin",
+              "label": "Bragança (hybrid)"
+            },
+            {
+              "icon": "compass",
+              "label": "From June 2026"
+            }
+          ]
+        },
         "resources": [
           {
             "label": "Program Content (Programming Course)",
@@ -1296,6 +1490,7 @@
         "overview": "",
         "development": "",
         "foundation": "",
+        "highlights": "",
         "mindset": "",
         "now": "",
         "contact": ""
