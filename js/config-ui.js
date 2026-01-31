@@ -2954,6 +2954,67 @@ function renderSectionEditor() {
         renderCertificationsFieldset();
     }
 
+    if (sectionType === 'overview') {
+        const fieldset = document.createElement('fieldset');
+        const legend = document.createElement('legend');
+        legend.textContent = 'Disponibilidade';
+        fieldset.appendChild(legend);
+
+        if (!content.availability_badge) {
+            content.availability_badge = { enabled: true, status: '', label: '' };
+        }
+        if (content.availability_badge.enabled === undefined) {
+            content.availability_badge.enabled = true;
+        }
+
+        const enabledWrap = document.createElement('div');
+        enabledWrap.className = 'inline-input';
+        const enabledLabel = document.createElement('label');
+        enabledLabel.textContent = 'Mostrar badge';
+        const enabledInput = document.createElement('input');
+        enabledInput.type = 'checkbox';
+        enabledInput.checked = Boolean(content.availability_badge.enabled);
+        enabledInput.onchange = (event) => {
+            content.availability_badge.enabled = event.target.checked;
+            renderPreview();
+        };
+        enabledWrap.appendChild(enabledLabel);
+        enabledWrap.appendChild(enabledInput);
+        fieldset.appendChild(enabledWrap);
+
+        const statusWrap = document.createElement('div');
+        statusWrap.className = 'form-group';
+        const statusLabel = document.createElement('label');
+        statusLabel.textContent = 'Texto superior';
+        const statusInput = document.createElement('input');
+        statusInput.type = 'text';
+        statusInput.value = content.availability_badge.status || '';
+        statusInput.oninput = (event) => {
+            content.availability_badge.status = event.target.value;
+            renderPreview();
+        };
+        statusWrap.appendChild(statusLabel);
+        statusWrap.appendChild(statusInput);
+        fieldset.appendChild(statusWrap);
+
+        const labelWrap = document.createElement('div');
+        labelWrap.className = 'form-group';
+        const labelLabel = document.createElement('label');
+        labelLabel.textContent = 'Texto principal';
+        const labelInput = document.createElement('input');
+        labelInput.type = 'text';
+        labelInput.value = content.availability_badge.label || '';
+        labelInput.oninput = (event) => {
+            content.availability_badge.label = event.target.value;
+            renderPreview();
+        };
+        labelWrap.appendChild(labelLabel);
+        labelWrap.appendChild(labelInput);
+        fieldset.appendChild(labelWrap);
+
+        uiNodes.editorForm.appendChild(fieldset);
+    }
+
     if (storyConfig && !storyRendered) {
         renderStoryEditor(storyConfig, { append: true });
     }

@@ -824,12 +824,27 @@ function renderOverview(data, container, sectionId = 'overview') {
     const educationLabel = getText(sectionId, 'education_label', data.education_label || '');
     const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
     const nextText = getText(sectionId, 'next_text', data.next_text || '');
+    const availability = data.availability_badge || {};
+    const availabilityEnabled = availability.enabled !== false;
+    const availabilityStatus = getText(sectionId, 'availability_badge.status', availability.status || '');
+    const availabilityLabel = getText(sectionId, 'availability_badge.label', availability.label || '');
     container.innerHTML = `
         <div class="hero-section">
             <div class="hero-header-flex" style="display:flex; align-items:center; gap:2.5rem; margin-bottom:4rem; flex-wrap:wrap;">
                 <div class="profile-group" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
-                    <div class="profile-circle large" style="width:140px; height:140px; border-width:3px; box-shadow: var(--shadow-md);">
-                        <img src="${resolveAssetPath('photos', profile.photo)}" alt="André Câmara" loading="lazy" decoding="async" style="object-position:${profile.photo_position || 'center 20%'}; ${getImageTransform(profile.photo_zoom)}">
+                    <div class="profile-badge-wrap">
+                        <div class="profile-circle large" style="width:140px; height:140px; border-width:3px; box-shadow: var(--shadow-md);">
+                            <img src="${resolveAssetPath('photos', profile.photo)}" alt="André Câmara" loading="lazy" decoding="async" style="object-position:${profile.photo_position || 'center 20%'}; ${getImageTransform(profile.photo_zoom)}">
+                        </div>
+                        ${availabilityEnabled && (availabilityStatus || availabilityLabel) ? `
+                            <div class="availability-badge">
+                                <span class="availability-dot"></span>
+                                <div>
+                                    ${availabilityStatus ? `<div class="availability-status">${availabilityStatus}</div>` : ''}
+                                    ${availabilityLabel ? `<div class="availability-label">${availabilityLabel}</div>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
                 <div style="flex:1; min-width:300px;">

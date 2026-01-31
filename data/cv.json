@@ -197,6 +197,11 @@
           "12.º ano concluído",
           "EFA – Programador Informático (Nível 4, 1416h, em curso)"
         ],
+        "availability_badge": {
+          "enabled": true,
+          "status": "Disponível",
+          "label": "Para Estágio"
+        },
         "cta_label": "Vamos Conversar?",
         "location": "Quintanilha, Bragança PT",
         "headline": "Software Developer focado em estabilidade, automação e sistemas existentes",
@@ -578,6 +583,11 @@
           "12.º año finalizado",
           "EFA – Programador Informático (Nivel 4, 1416h, en curso)"
         ],
+        "availability_badge": {
+          "enabled": true,
+          "status": "Disponible",
+          "label": "Para Prácticas"
+        },
         "cta_label": "¿Conversamos?",
         "location": "Quintanilha, Bragança PT",
         "headline": "Software Developer & Systems Architect",
@@ -959,6 +969,11 @@
           "12th grade completed",
           "EFA – Programmer (Level 4, 1416h, in progress)"
         ],
+        "availability_badge": {
+          "enabled": true,
+          "status": "Available",
+          "label": "For Internship"
+        },
         "cta_label": "Let’s Talk?",
         "location": "Quintanilha, Bragança PT",
         "headline": "Software Developer & Systems Architect",

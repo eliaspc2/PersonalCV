@@ -112,6 +112,52 @@ h3,
     object-position: center 20%;
 }
 
+.profile-badge-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.availability-badge {
+    position: absolute;
+    right: -24px;
+    bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.availability-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.12);
+    flex: 0 0 auto;
+}
+
+.availability-status {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.availability-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
 .social-overlay {
     position: absolute;
     bottom: -15px;
