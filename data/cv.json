@@ -21,7 +21,8 @@
     "sections": [
       {
         "id": "overview",
-        "type": "overview"
+        "type": "overview",
+        "hidden": false
       },
       {
         "id": "development",
@@ -33,7 +34,8 @@
       },
       {
         "id": "highlights",
-        "type": "highlights"
+        "type": "highlights",
+        "hidden": true
       },
       {
         "id": "mindset",
@@ -448,7 +450,11 @@
             "subtitle": "Consciência de produto — valor antes da tecnologia",
             "details": "Formação complementar que ajuda a pensar no utilizador final e comunicar com clareza."
           }
-        ]
+        ],
+        "image_position": "center 20%",
+        "image_zoom": 1,
+        "cta_label": "Vamos Conversar?",
+        "cta_link": "mailto:eliaspc2@gmail.com"
       },
       "mindset": {
         "title": "Mentalidade & Lógica Humana",
@@ -895,7 +901,9 @@
             "subtitle": "Conciencia de producto — valor antes de la tecnología",
             "details": "Formación complementaria que ayuda a pensar en el usuario final y comunicar con claridad."
           }
-        ]
+        ],
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "mindset": {
         "title": "Mentalidad & Lógica Humana",
@@ -1344,7 +1352,9 @@
             "subtitle": "Product awareness — value before technology",
             "details": "Complementary training that helps me think about the end user and communicate clearly."
           }
-        ]
+        ],
+        "image_position": "center 20%",
+        "image_zoom": 1
       },
       "mindset": {
         "title": "Mindset & Human Logic",
