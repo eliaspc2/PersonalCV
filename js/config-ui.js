@@ -413,7 +413,12 @@ function buildDefaultConfigFromCV() {
             favicon: meta.favicon || 'favicon.ico',
             apple_icon: meta.apple_icon || 'apple-touch-icon.png'
         },
-        theme
+        theme,
+        layout: {
+            section_padding_top: 8,
+            section_padding_bottom: 0,
+            snap: 'proximity'
+        }
     };
 }
 
@@ -429,6 +434,13 @@ function ensureConfig() {
     if (!currentConfig.theme) currentConfig.theme = { ...DEFAULT_THEME };
     if (!currentConfig.theme.accent_soft && currentConfig.theme.accent) {
         currentConfig.theme.accent_soft = hexToRgba(currentConfig.theme.accent, 0.08);
+    }
+    if (!currentConfig.layout) {
+        currentConfig.layout = {
+            section_padding_top: 8,
+            section_padding_bottom: 0,
+            snap: 'proximity'
+        };
     }
     return currentConfig;
 }
@@ -2901,6 +2913,75 @@ function renderSectionEditor() {
             { key: 'menu_label', label: 'Texto do botão Menu' },
             { key: 'language_label', label: 'Etiqueta de idioma (ARIA)' }
         ]));
+
+        pendingFieldsets.push(() => {
+            const config = ensureConfig();
+            if (!config.layout) {
+                config.layout = { section_padding_top: 8, section_padding_bottom: 0, snap: 'proximity' };
+            }
+            const fieldset = document.createElement('fieldset');
+            const legend = document.createElement('legend');
+            legend.textContent = 'Layout (scroll)';
+            fieldset.appendChild(legend);
+
+            const topWrap = document.createElement('div');
+            topWrap.className = 'form-group';
+            const topLabel = document.createElement('label');
+            topLabel.textContent = 'Padding topo (px)';
+            const topInput = document.createElement('input');
+            topInput.type = 'number';
+            topInput.min = '0';
+            topInput.value = config.layout.section_padding_top ?? 8;
+            topInput.oninput = (event) => {
+                config.layout.section_padding_top = Number(event.target.value || 0);
+                renderPreview();
+            };
+            topWrap.appendChild(topLabel);
+            topWrap.appendChild(topInput);
+            fieldset.appendChild(topWrap);
+
+            const bottomWrap = document.createElement('div');
+            bottomWrap.className = 'form-group';
+            const bottomLabel = document.createElement('label');
+            bottomLabel.textContent = 'Padding base (px)';
+            const bottomInput = document.createElement('input');
+            bottomInput.type = 'number';
+            bottomInput.min = '0';
+            bottomInput.value = config.layout.section_padding_bottom ?? 0;
+            bottomInput.oninput = (event) => {
+                config.layout.section_padding_bottom = Number(event.target.value || 0);
+                renderPreview();
+            };
+            bottomWrap.appendChild(bottomLabel);
+            bottomWrap.appendChild(bottomInput);
+            fieldset.appendChild(bottomWrap);
+
+            const snapWrap = document.createElement('div');
+            snapWrap.className = 'form-group';
+            const snapLabel = document.createElement('label');
+            snapLabel.textContent = 'Scroll snap';
+            const snapSelect = document.createElement('select');
+            [
+                { value: 'proximity', label: 'Suave (proximity)' },
+                { value: 'mandatory', label: 'Forte (mandatory)' },
+                { value: 'none', label: 'Desligado' }
+            ].forEach((optionDef) => {
+                const option = document.createElement('option');
+                option.value = optionDef.value;
+                option.textContent = optionDef.label;
+                if ((config.layout.snap || 'proximity') === optionDef.value) option.selected = true;
+                snapSelect.appendChild(option);
+            });
+            snapSelect.onchange = (event) => {
+                config.layout.snap = event.target.value;
+                renderPreview();
+            };
+            snapWrap.appendChild(snapLabel);
+            snapWrap.appendChild(snapSelect);
+            fieldset.appendChild(snapWrap);
+
+            uiNodes.editorForm.appendChild(fieldset);
+        });
     }
 
     if (currentSection === 'development') {

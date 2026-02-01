@@ -107,6 +107,20 @@ function applyTheme(theme) {
     root.style.setProperty('--border', payload.border);
 }
 
+function applyLayout(layout) {
+    const root = document.documentElement;
+    const payload = layout || {};
+    const padTop = Number.isFinite(payload.section_padding_top) ? payload.section_padding_top : 8;
+    const padBottom = Number.isFinite(payload.section_padding_bottom) ? payload.section_padding_bottom : 0;
+    const snapMode = (payload.snap || 'proximity').toLowerCase();
+    let snapValue = 'y proximity';
+    if (snapMode === 'mandatory') snapValue = 'y mandatory';
+    if (snapMode === 'none') snapValue = 'none';
+    root.style.setProperty('--section-pad-top', `${padTop}px`);
+    root.style.setProperty('--section-pad-bottom', `${padBottom}px`);
+    root.style.setProperty('--snap-type', snapValue);
+}
+
 function showValidationBanner(messages = [], type = 'warning') {
     if (!messages.length) return;
     const container = document.querySelector('.app-content');
@@ -577,6 +591,7 @@ function navigateTo(sectionId) {
 function render() {
     if (!cvData) return;
     applyTheme(configData?.theme || cvData.meta?.theme || cvData.theme || {});
+    applyLayout(configData?.layout || cvData.meta?.layout || {});
     const locale = cvData.localized[currentLang];
     ensureDynamicSections(locale);
     updateNavigationLabels(locale);

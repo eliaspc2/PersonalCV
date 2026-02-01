@@ -21,5 +21,10 @@
     "text_muted": "#64748b",
     "text_dim": "#94a3b8",
     "border": "#f1f5f9"
+  },
+  "layout": {
+    "section_padding_top": 8,
+    "section_padding_bottom": 0,
+    "snap": "proximity"
   }
 }

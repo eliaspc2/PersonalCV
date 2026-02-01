@@ -12,6 +12,9 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --sidebar-width: 260px;
     --header-height: 60px;
+    --section-pad-top: 8px;
+    --section-pad-bottom: 0px;
+    --snap-type: y proximity;
     --radius-lg: 16px;
     --radius-md: 12px;
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -19,8 +22,8 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-snap-type: y proximity;
-    scroll-padding-top: calc(var(--header-height) - 20px);
+    scroll-snap-type: var(--snap-type, y proximity);
+    scroll-padding-top: calc(var(--header-height) + var(--section-pad-top));
 }
 
 body {
@@ -1471,10 +1474,10 @@ h3,
 /* Utilities */
 .view-section {
     display: block;
-    padding: calc(var(--header-height) + 8px) 0 0 0;
-    min-height: calc(100vh - var(--header-height) - 8px);
+    padding: calc(var(--header-height) + var(--section-pad-top)) 0 var(--section-pad-bottom) 0;
+    min-height: calc(100vh - var(--header-height) - var(--section-pad-top) - var(--section-pad-bottom));
     scroll-snap-align: start;
-    scroll-margin-top: calc(var(--header-height) + 8px);
+    scroll-margin-top: calc(var(--header-height) + var(--section-pad-top));
 }
 
 .view-section.active {
