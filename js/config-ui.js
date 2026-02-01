@@ -118,7 +118,9 @@ const SECTION_FIELD_ORDER = {
     ],
     highlights: [
         'title',
-        'items'
+        'items',
+        'cta_label',
+        'cta_link'
     ],
     mindset: [
         'title',
@@ -1572,7 +1574,7 @@ function makeTagListField(wrapper, targetObj, key, values = []) {
         list.innerHTML = '';
         values.forEach((tag, index) => {
             const row = document.createElement('div');
-            row.className = 'array-card';
+            row.className = 'array-card tag-row';
             const input = document.createElement('input');
             input.type = 'text';
             input.value = tag.label || '';
@@ -1595,9 +1597,12 @@ function makeTagListField(wrapper, targetObj, key, values = []) {
                 renderItems();
                 renderPreview();
             };
+            const removeRow = document.createElement('div');
+            removeRow.className = 'tag-remove';
+            removeRow.appendChild(removeBtn);
             row.appendChild(input);
             row.appendChild(iconWrap);
-            row.appendChild(removeBtn);
+            row.appendChild(removeRow);
             list.appendChild(row);
         });
     };
@@ -3073,6 +3078,22 @@ function renderSectionEditor() {
 
         if (Array.isArray(value)) {
             makeArrayField(wrapper, content, key, [...value]);
+        } else if (typeof value === 'boolean') {
+            const inline = document.createElement('div');
+            inline.className = 'inline-input';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = Boolean(value);
+            checkbox.onchange = (event) => {
+                content[key] = event.target.checked;
+                renderPreview();
+            };
+            inline.appendChild(label);
+            inline.appendChild(checkbox);
+            wrapper.appendChild(inline);
+            wrapper.classList.add('form-group-inline');
+            uiNodes.editorForm.appendChild(wrapper);
+            return;
         } else if (typeof value === 'string') {
             if (key === 'image' || key.endsWith('_image') || key.endsWith('photo')) {
                 makeImageField(wrapper, content, key, currentSection);

@@ -7,6 +7,13 @@ export const ICON_SET = {
     puzzle: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M9 3h6v4a2 2 0 1 1-4 0H9z"/><path d="M3 9h4a2 2 0 1 0 0-4H3z"/><path d="M9 9h6v6H9z"/><path d="M21 9h-4a2 2 0 1 1 0-4h4z"/><path d="M9 21v-4a2 2 0 1 1 4 0v4z"/><path d="M15 15h6v6h-6z"/></svg>`,
     layers: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><polygon points="12 2 22 7 12 12 2 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/></svg>`,
     code: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    git: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M8 6h8"/><path d="M12 8v8"/><path d="M12 18l-4-4"/><path d="M12 18l4-4"/></svg>`,
+    vscode: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M4 9l4-4 10 8-10 8-4-4 6-5z"/><path d="M14 4l6 3v10l-6 3"/></svg>`,
+    terminal: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8l3 3-3 3"/><path d="M12 14h5"/></svg>`,
+    database: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v6c0 1.7 3.1 3 7 3s7-1.3 7-3V5"/><path d="M5 11v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>`,
+    network: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="5" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="19" r="2"/><path d="M7 12h10"/><path d="M12 7v10"/><path d="M6.5 10.5l4-4"/><path d="M17.5 10.5l-4-4"/><path d="M6.5 13.5l4 4"/><path d="M17.5 13.5l-4 4"/></svg>`,
+    linux: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M8 4h8a4 4 0 0 1 4 4v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8a4 4 0 0 1 4-4z"/><path d="M9 9h.01"/><path d="M15 9h.01"/><path d="M9 13h6"/></svg>`,
+    lock: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`,
     settings: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.08a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.08a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01A1.65 1.65 0 0 0 9 3.08V3a2 2 0 1 1 4 0v.08a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01A1.65 1.65 0 0 0 20.92 11H21a2 2 0 1 1 0 4h-.08a1.65 1.65 0 0 0-1.52 1z"/></svg>`,
     tools: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M14.7 6.3a4 4 0 0 0-5.66 5.66l-6.36 6.36a2 2 0 1 0 2.83 2.83l6.36-6.36a4 4 0 0 0 5.66-5.66l-2 2-2.83-2.83 2-2z"/></svg>`,
     flask: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M10 2v6l-5 9a3 3 0 0 0 2.6 4.5h8.8A3 3 0 0 0 19 17l-5-9V2"/><path d="M8 8h8"/></svg>`,
@@ -41,10 +48,19 @@ export const ICON_SET = {
     spinner: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><circle cx="12" cy="12" r="9" stroke-dasharray="42 14"/><path d="M12 3a9 9 0 0 1 6.36 2.64"/></svg>`,
     utensils: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M4 3v7"/><path d="M8 3v7"/><path d="M4 10c0 1.7 4 1.7 4 0"/><path d="M15 3v18"/><path d="M20 3l-3 7h4"/></svg>`,
     checklist: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6l1.5 1.5L7 6"/><path d="M4 12l1.5 1.5L7 12"/><path d="M4 18l1.5 1.5L7 18"/></svg>`
+    ,
+    checkbox: `<svg class="icon" viewBox="0 0 24 24" ${BASE_SVG_ATTRS}><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7 12l3 3 7-7"/></svg>`
 };
 
 export const ICON_CHOICES = [
     { id: 'home', label: { pt: 'Casa', es: 'Casa', en: 'Home' } },
+    { id: 'git', label: { pt: 'Git', es: 'Git', en: 'Git' } },
+    { id: 'vscode', label: { pt: 'VS Code', es: 'VS Code', en: 'VS Code' } },
+    { id: 'linux', label: { pt: 'Linux', es: 'Linux', en: 'Linux' } },
+    { id: 'network', label: { pt: 'Redes', es: 'Redes', en: 'Networks' } },
+    { id: 'database', label: { pt: 'Bases de dados', es: 'Bases de datos', en: 'Databases' } },
+    { id: 'terminal', label: { pt: 'Terminal', es: 'Terminal', en: 'Terminal' } },
+    { id: 'lock', label: { pt: 'Acessos', es: 'Accesos', en: 'Access' } },
     { id: 'compass', label: { pt: 'Direção', es: 'Dirección', en: 'Compass' } },
     { id: 'brain', label: { pt: 'Mentalidade', es: 'Mentalidad', en: 'Mindset' } },
     { id: 'puzzle', label: { pt: 'Padrões', es: 'Patrones', en: 'Patterns' } },
@@ -73,6 +89,7 @@ export const ICON_CHOICES = [
     { id: 'phone', label: { pt: 'Telefone', es: 'Teléfono', en: 'Phone' } },
     { id: 'mail', label: { pt: 'Email', es: 'Email', en: 'Mail' } },
     { id: 'link', label: { pt: 'Ligação', es: 'Enlace', en: 'Link' } },
+    { id: 'checkbox', label: { pt: 'Check', es: 'Check', en: 'Check' } },
     { id: 'trophy', label: { pt: 'Conquista', es: 'Logro', en: 'Trophy' } },
     { id: 'graduation', label: { pt: 'Formação', es: 'Formación', en: 'Graduation' } },
     { id: 'user', label: { pt: 'Pessoa', es: 'Persona', en: 'User' } },

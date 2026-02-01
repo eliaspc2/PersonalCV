@@ -937,14 +937,36 @@ function renderDevelopment(data, container, sectionId = 'development') {
     const showAggComp = data.show_aggregated_competencies !== false;
     const aggTechLabel = t('ui.technologies_label', ui.technologies_label || 'Tecnologias');
     const aggCompLabel = t('ui.drawer_skill_competencies_label', ui.drawer_skill_competencies_label || 'Competências');
-    const aggTechIcon = renderIcon('code', 'chip-icon');
-    const aggCompIcon = renderIcon('sparkles', 'chip-icon');
+    const getTechIconId = (value = '') => {
+        const raw = String(value).toLowerCase();
+        if (raw.includes('git')) return 'git';
+        if (raw.includes('vs code') || raw.includes('vscode')) return 'vscode';
+        if (raw.includes('linux')) return 'linux';
+        if (raw.includes('power')) return 'terminal';
+        if (raw.includes('sql') || raw.includes('database') || raw.includes('base de dados') || raw.includes('bases de dados')) return 'database';
+        if (raw.includes('rede') || raw.includes('network')) return 'network';
+        if (raw.includes('seguran') || raw.includes('security') || raw.includes('ciber')) return 'shield';
+        if (raw.includes('acesso') || raw.includes('access')) return 'lock';
+        return 'code';
+    };
+    const getCompetencyIconId = (value = '') => {
+        const raw = String(value).toLowerCase();
+        if (raw.includes('seguran') || raw.includes('security') || raw.includes('ciber')) return 'shield';
+        if (raw.includes('risco') || raw.includes('risk')) return 'shield';
+        if (raw.includes('acesso') || raw.includes('access')) return 'lock';
+        if (raw.includes('bases de dados') || raw.includes('database')) return 'database';
+        if (raw.includes('frontend') || raw.includes('backend') || raw.includes('web')) return 'code';
+        return 'sparkles';
+    };
     const aggregateCards = `
         ${showAggTech && allTechnologies.length ? `
             <div class="aggregate-card">
                 <div class="aggregate-title">${aggTechLabel}</div>
                 <div class="chip-list">
-                    ${allTechnologies.map((tech) => `<span class="chip">${aggTechIcon}${tech}</span>`).join('')}
+                    ${allTechnologies.map((tech) => {
+                        const icon = renderIcon(getTechIconId(tech), 'chip-icon');
+                        return `<span class="chip">${icon}${tech}</span>`;
+                    }).join('')}
                 </div>
             </div>
         ` : ''}
@@ -952,7 +974,10 @@ function renderDevelopment(data, container, sectionId = 'development') {
             <div class="aggregate-card">
                 <div class="aggregate-title">${aggCompLabel}</div>
                 <div class="chip-list">
-                    ${allCompetencies.map((comp) => `<span class="chip">${aggCompIcon}${comp}</span>`).join('')}
+                    ${allCompetencies.map((comp) => {
+                        const icon = renderIcon(getCompetencyIconId(comp), 'chip-icon');
+                        return `<span class="chip">${icon}${comp}</span>`;
+                    }).join('')}
                 </div>
             </div>
         ` : ''}
@@ -1056,7 +1081,10 @@ function renderFoundation(data, container, sectionId = 'foundation') {
 }
 
 function renderHighlights(data, container, sectionId = 'highlights') {
+    const ui = cvData.localized[currentLang].ui || {};
     const title = getText(sectionId, 'title', data.title);
+    const ctaLabel = getText(sectionId, 'cta_label', data.cta_label || ui.cta_contact_label);
+    const ctaHref = data.cta_link || getContactHref(cvData.profile);
     const items = Array.isArray(data.items) ? data.items : [];
     container.innerHTML = `
         <div class="section-container">
@@ -1076,6 +1104,11 @@ function renderHighlights(data, container, sectionId = 'highlights') {
                     </details>
                 `).join('')}
             </div>
+            ${ctaLabel ? `
+                <div style="margin-top:3rem;">
+                    <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
+                </div>
+            ` : ''}
         </div>
     `;
 }
@@ -1310,7 +1343,7 @@ function renderNow(data, container, sectionId = 'now') {
                             ` : ''}
                         </div>
                     ` : ''}
-                    ${resources.length ? `
+            ${resources.length ? `
                         <div class="cert-badges" style="margin-top:0; margin-bottom:1.5rem;">
                             ${resources.map((item) => {
                                 if (!item?.href) return '';
@@ -1326,10 +1359,12 @@ function renderNow(data, container, sectionId = 'now') {
                         </div>
                     ` : ''}
                     <p>${details}</p>
-                    <div style="margin-top:2rem;">
+                </div>
+                ${ctaLabel ? `
+                    <div style="margin-top:2.5rem;">
                         <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
                     </div>
-                </div>
+                ` : ''}
             </div>
         </div>
     `;
