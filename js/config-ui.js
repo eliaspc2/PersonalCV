@@ -119,6 +119,8 @@ const SECTION_FIELD_ORDER = {
     highlights: [
         'title',
         'items',
+        'next_label',
+        'next_text',
         'cta_label',
         'cta_link'
     ],
@@ -141,6 +143,8 @@ const SECTION_FIELD_ORDER = {
         'details',
         'image',
         'image_alt',
+        'next_label',
+        'next_text',
         'cta_label',
         'cta_link'
     ],
@@ -148,6 +152,8 @@ const SECTION_FIELD_ORDER = {
         'email_label',
         'title',
         'description',
+        'next_label',
+        'next_text',
         'cta_label',
         'cta_link',
         'downloads_title',
@@ -1239,7 +1245,11 @@ function createEmptySection(type) {
     if (type === 'highlights') {
         return {
             title: '',
-            items: []
+            items: [],
+            next_label: '',
+            next_text: '',
+            cta_label: '',
+            cta_link: ''
         };
     }
     if (type === 'mindset') {
@@ -1271,6 +1281,8 @@ function createEmptySection(type) {
                 subtitle: '',
                 tags: []
             },
+            next_label: '',
+            next_text: '',
             cta_label: '',
             cta_link: ''
         };
@@ -1285,6 +1297,8 @@ function createEmptySection(type) {
             downloads_title: '',
             certifications_title: '',
             download_groups: [],
+            next_label: '',
+            next_text: '',
             cta_label: '',
             cta_link: '',
             contact_photo_position: 'center 20%',
@@ -1403,6 +1417,27 @@ function appendNavigationFields(sectionKey) {
     const defaultIcon = renderIcon(defaultIconId, 'nav-icon');
     makeIconField(iconWrapper, icons, sectionKey, 'ex: home', { showPreview: true, defaultIcon, defaultIconId });
     fieldset.appendChild(iconWrapper);
+
+    const sectionsMeta = getSectionsMeta();
+    const sectionMeta = sectionsMeta.find((section) => section.id === sectionKey);
+    if (sectionMeta) {
+        if (sectionMeta.hidden === undefined) sectionMeta.hidden = false;
+        const hiddenWrap = document.createElement('div');
+        hiddenWrap.className = 'inline-input';
+        const hiddenLabel = document.createElement('label');
+        hiddenLabel.textContent = 'Ocultar página';
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'checkbox';
+        hiddenInput.checked = Boolean(sectionMeta.hidden);
+        hiddenInput.onchange = (event) => {
+            sectionMeta.hidden = event.target.checked;
+            renderSidebar();
+            renderPreview();
+        };
+        hiddenWrap.appendChild(hiddenLabel);
+        hiddenWrap.appendChild(hiddenInput);
+        fieldset.appendChild(hiddenWrap);
+    }
 
     uiNodes.editorForm.appendChild(fieldset);
 }

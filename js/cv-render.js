@@ -229,7 +229,7 @@ function getSectionsMeta() {
 }
 
 function getSectionMetaList() {
-    return getSectionsMeta();
+    return getSectionsMeta().filter((section) => !section?.hidden);
 }
 
 function ensureDynamicSections(locale) {
@@ -1085,6 +1085,8 @@ function renderHighlights(data, container, sectionId = 'highlights') {
     const title = getText(sectionId, 'title', data.title);
     const ctaLabel = getText(sectionId, 'cta_label', data.cta_label || ui.cta_contact_label);
     const ctaHref = data.cta_link || getContactHref(cvData.profile);
+    const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
+    const nextText = getText(sectionId, 'next_text', data.next_text || '');
     const items = Array.isArray(data.items) ? data.items : [];
     container.innerHTML = `
         <div class="section-container">
@@ -1104,6 +1106,12 @@ function renderHighlights(data, container, sectionId = 'highlights') {
                     </details>
                 `).join('')}
             </div>
+            ${nextText ? `
+                <div class="section-transition">
+                    ${nextLabel ? `<span>${nextLabel}</span>` : ''}
+                    ${nextText}
+                </div>
+            ` : ''}
             ${ctaLabel ? `
                 <div style="margin-top:3rem;">
                     <a class="cta-btn" href="${ctaHref}">${ctaLabel}</a>
@@ -1182,6 +1190,8 @@ function renderContact(data, locale, container, sectionId = 'contact') {
     const ctaHref = data.cta_link || `mailto:${profile.social.email}`;
     const title = getText(sectionId, 'title', data.title);
     const description = getText(sectionId, 'description', data.description);
+    const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
+    const nextText = getText(sectionId, 'next_text', data.next_text || '');
     const emailLabel = getText(sectionId, 'email_label', data.email_label || '');
     const linkedinLabel = getText(sectionId, 'linkedin_label', data.linkedin_label || 'LinkedIn');
     const githubLabel = getText(sectionId, 'github_label', data.github_label || 'GitHub');
@@ -1289,6 +1299,12 @@ function renderContact(data, locale, container, sectionId = 'contact') {
                     ${githubLabel}
                 </a>
             </div>
+            ${nextText ? `
+                <div class="section-transition" style="margin-top:2.5rem;">
+                    ${nextLabel ? `<span>${nextLabel}</span>` : ''}
+                    ${nextText}
+                </div>
+            ` : ''}
         </div>
     `;
 }
@@ -1300,6 +1316,8 @@ function renderNow(data, container, sectionId = 'now') {
     const summary = getText(sectionId, 'summary', data.summary);
     const details = getText(sectionId, 'details', data.details);
     const ctaLabel = getText(sectionId, 'cta_label', data.cta_label);
+    const nextLabel = getText(sectionId, 'next_label', data.next_label || '');
+    const nextText = getText(sectionId, 'next_text', data.next_text || '');
     const resources = Array.isArray(data.resources) ? data.resources : [];
     const card = data.opportunity_card || {};
     const cardEnabled = card.enabled !== false;
@@ -1366,6 +1384,12 @@ function renderNow(data, container, sectionId = 'now') {
                     </div>
                 ` : ''}
             </div>
+            ${nextText ? `
+                <div class="section-transition">
+                    ${nextLabel ? `<span>${nextLabel}</span>` : ''}
+                    ${nextText}
+                </div>
+            ` : ''}
         </div>
     `;
 }
