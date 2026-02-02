@@ -980,7 +980,12 @@ function getFieldLabel(key) {
 }
 
 function isHiddenFieldKey(key) {
-    return typeof key === 'string' && (key === 'availability_badge' || key.endsWith('_position') || key.endsWith('_zoom'));
+    return typeof key === 'string'
+        && (key === 'availability_badge'
+            || key === 'show_aggregated_technologies'
+            || key === 'show_aggregated_competencies'
+            || key.endsWith('_position')
+            || key.endsWith('_zoom'));
 }
 
 function getImageZoomKey(key) {
