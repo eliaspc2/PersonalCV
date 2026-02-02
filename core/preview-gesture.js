@@ -9,6 +9,22 @@ export function initPreviewGesture({ pageId, data, container, lang, ui, assets, 
 
     const resolveValue = (value) => (typeof value === 'function' ? value() : value);
 
+    const ensurePreviewBadge = () => {
+        if (header.classList.contains('is-preview')) return;
+        header.classList.add('is-preview');
+        const existing = header.querySelector('.preview-flag');
+        if (existing) return;
+        const badge = document.createElement('span');
+        badge.className = 'preview-flag';
+        badge.textContent = 'Preview';
+        const anchor = header.querySelector('#active-breadcrumb');
+        if (anchor && anchor.parentNode) {
+            anchor.insertAdjacentElement('afterend', badge);
+        } else {
+            header.appendChild(badge);
+        }
+    };
+
     const triggerPreview = () => {
         const resolvedPageId = resolveValue(pageId);
         if (!resolvedPageId) return;
@@ -23,6 +39,7 @@ export function initPreviewGesture({ pageId, data, container, lang, ui, assets, 
             meta: resolveValue(meta)
         };
         if (!context.container || !context.data) return;
+        ensurePreviewBadge();
         renderPageShadow(context).catch((err) => {
             console.warn('Preview shadow render failed.', err);
         });

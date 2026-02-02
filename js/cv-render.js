@@ -1578,3 +1578,13 @@ window.app = {
 };
 
 document.addEventListener('DOMContentLoaded', bootstrap);
+
+export {
+    renderOverview,
+    renderDevelopment,
+    renderFoundation,
+    renderHighlights,
+    renderMindset,
+    renderNow,
+    renderContact
+};
