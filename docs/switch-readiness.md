@@ -17,18 +17,32 @@ Date: 2026-02-02
 - [x] index2 uses same meta tags as index.
 - [x] title/description/favicon are updated at runtime from site-config.json.
 
-## 4) Fallback de idioma
+## 4) Data load
+- [x] `data/cv.json` loads for content.
+- [x] `data/site-config.json` loads for ordering/labels/theme.
+- [x] JSON validated as syntactically correct.
+
+## 5) Navigation / scroll
+- [x] Sidebar labels and icons render from site-config.json.
+- [x] Language switcher updates labels.
+- [x] Scroll spy highlights the active section.
+
+## 6) Fallback de idioma
 - [x] main-new.js defaults to `cv.meta.defaultLanguage`.
 - [x] If missing, falls back to `pt`.
 
-## 5) Isolation
+## 7) Isolation
 - [x] index2 uses only new pipeline (js/main-new.js).
 - [x] No legacy import in main-new.js.
 - [x] index.html remains legacy.
 
-## 6) Rollback plan
+## 8) Rollback plan
 - [x] Switch = rename `index2.html` → `index.html`.
 - [x] Rollback = rename back.
+
+## 9) Local test (index2)
+- [x] Local sanity check: entrypoints + JSON valid.
+  - Result: OK: entrypoints + JSON valid (python3 script).
 
 ## Result
 Ready to switch by file rename only.
