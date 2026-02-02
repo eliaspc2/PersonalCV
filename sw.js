@@ -3,6 +3,7 @@ let cachedCacheName = null;
 const PRECACHE_URLS = [
   '.',
   'index.html',
+  'index2.html',
   'config.html',
   'css/styles.css',
   'js/cv-render.js',
@@ -29,6 +30,7 @@ const PRECACHE_URLS = [
   'validators/error-messages.js',
   'schema/cv.schema.json',
   'data/cv.json',
+  'data/site-config.json',
   'data/config.json',
   'assets/icons/favicon.ico',
   'assets/icons/apple-touch-icon.png',

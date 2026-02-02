@@ -25,6 +25,9 @@ let currentSection = null;
 let sectionObserver = null;
 let scrollTicking = false;
 const isPreviewMode = new URLSearchParams(window.location.search).get('preview') === '1';
+const isIndex2 = window.location.pathname.endsWith('/index2.html') || window.location.pathname.endsWith('index2.html');
+const usePageModules = isIndex2;
+const CONFIG_PATH_OVERRIDE = isIndex2 ? 'data/site-config.json' : CONFIG_PATH;
 let previewSection = null;
 
 const BASE_SECTIONS = [
@@ -226,6 +229,24 @@ function normalizeDownloads(profile, locale) {
 }
 
 function getSectionsMeta() {
+    const configPages = configData?.pages;
+    if (Array.isArray(configPages?.items) && configPages.items.length) {
+        const itemsById = new Map(configPages.items.map((item) => [item.id, item]));
+        const orderedIds = Array.isArray(configPages.order) && configPages.order.length
+            ? configPages.order
+            : configPages.items.map((item) => item.id);
+        return orderedIds.map((id) => {
+            const item = itemsById.get(id);
+            if (!item) return null;
+            return {
+                id: item.id,
+                type: item.type || item.id,
+                hidden: !!item.hidden,
+                labels: item.labels || {},
+                icons: item.icons || {}
+            };
+        }).filter(Boolean);
+    }
     if (Array.isArray(cvData?.meta?.sections)) {
         return cvData.meta.sections;
     }
@@ -245,6 +266,12 @@ function getSectionsMeta() {
 
 function getSectionMetaList() {
     return getSectionsMeta().filter((section) => !section?.hidden);
+}
+
+function getConfigPageItem(sectionId) {
+    const items = configData?.pages?.items;
+    if (!Array.isArray(items)) return null;
+    return items.find((item) => item.id === sectionId) || null;
 }
 
 function ensureDynamicSections(locale) {
@@ -361,7 +388,7 @@ async function bootstrap() {
         }
         if (!configData) {
             try {
-                const configResponse = await fetch(CONFIG_PATH, { cache: 'no-store' });
+            const configResponse = await fetch(CONFIG_PATH_OVERRIDE, { cache: 'no-store' });
                 if (configResponse.ok) {
                     configData = await configResponse.json();
                 } else {
@@ -403,19 +430,21 @@ async function bootstrap() {
         setupGlobalEvents();
         render();
         setupScrollNarrative();
-        initPreviewGesture({
-            pageId: () => currentSection,
-            data: () => {
-                const locale = cvData?.localized?.[currentLang];
-                if (!locale || !currentSection) return null;
-                const sectionMeta = getSectionsMeta().find((section) => section.id === currentSection);
-                const sectionType = sectionMeta?.type || currentSection;
-                return locale[currentSection] || locale[sectionType] || null;
-            },
-            container: () => (currentSection ? document.getElementById(`section-${currentSection}`) : null),
-            lang: () => currentLang,
-            ui: () => cvData?.localized?.[currentLang]?.ui
-        });
+        if (!usePageModules) {
+            initPreviewGesture({
+                pageId: () => currentSection,
+                data: () => {
+                    const locale = cvData?.localized?.[currentLang];
+                    if (!locale || !currentSection) return null;
+                    const sectionMeta = getSectionsMeta().find((section) => section.id === currentSection);
+                    const sectionType = sectionMeta?.type || currentSection;
+                    return locale[currentSection] || locale[sectionType] || null;
+                },
+                container: () => (currentSection ? document.getElementById(`section-${currentSection}`) : null),
+                lang: () => currentLang,
+                ui: () => cvData?.localized?.[currentLang]?.ui
+            });
+        }
     } catch (err) {
         console.error("Critical error loading CV data:", err);
     }
@@ -604,8 +633,8 @@ function navigateTo(sectionId) {
 
 function render() {
     if (!cvData) return;
-    applyTheme(configData?.theme || cvData.meta?.theme || cvData.theme || {});
-    applyLayout(configData?.layout || cvData.meta?.layout || {});
+    applyTheme(configData?.theme || configData?.globals?.theme || cvData.meta?.theme || cvData.theme || {});
+    applyLayout(configData?.layout || configData?.globals?.layout || cvData.meta?.layout || {});
     const locale = cvData.localized[currentLang];
     ensureDynamicSections(locale);
     updateNavigationLabels(locale);
@@ -614,29 +643,63 @@ function render() {
     updateUiLabels(locale);
 
     const sectionList = getSectionMetaList();
-    sectionList.forEach((section) => {
-        const container = document.getElementById(`section-${section.id}`);
-        const data = locale[section.id] || locale[section.type];
-        if (!container || !data) return;
-        if (section.type === 'overview') {
-            renderOverview(data, container, section.id);
-        } else if (section.type === 'development') {
-            renderDevelopment(data, container, section.id);
-        } else if (section.type === 'foundation') {
-            renderFoundation(data, container, section.id);
-        } else if (section.type === 'highlights') {
-            renderHighlights(data, container, section.id);
-        } else if (section.type === 'mindset') {
-            renderMindset(data, container, section.id);
-        } else if (section.type === 'now') {
-            renderNow(data, container, section.id);
-        } else if (section.type === 'contact') {
-            renderContact(data, locale, container, section.id);
-        }
-    });
+    if (usePageModules) {
+        renderWithPageModules(sectionList, locale);
+    } else {
+        sectionList.forEach((section) => {
+            const container = document.getElementById(`section-${section.id}`);
+            const data = locale[section.id] || locale[section.type];
+            if (!container || !data) return;
+            if (section.type === 'overview') {
+                renderOverview(data, container, section.id);
+            } else if (section.type === 'development') {
+                renderDevelopment(data, container, section.id);
+            } else if (section.type === 'foundation') {
+                renderFoundation(data, container, section.id);
+            } else if (section.type === 'highlights') {
+                renderHighlights(data, container, section.id);
+            } else if (section.type === 'mindset') {
+                renderMindset(data, container, section.id);
+            } else if (section.type === 'now') {
+                renderNow(data, container, section.id);
+            } else if (section.type === 'contact') {
+                renderContact(data, locale, container, section.id);
+            }
+        });
+    }
 
     if (isPreviewMode) {
         applyPreviewSection(previewSection);
+    }
+}
+
+async function renderWithPageModules(sectionList, locale) {
+    try {
+        const [{ pagesRegistry }, { buildPageContext }, { renderFullPage }] = await Promise.all([
+            import('../pages/pages-registry.js'),
+            import('../core/page-context.js'),
+            import('../core/page-orchestrator.js')
+        ]);
+
+        sectionList.forEach((section) => {
+            const pageModule = pagesRegistry[section.id];
+            if (!pageModule) return;
+            const container = document.getElementById(`section-${section.id}`);
+            const data = locale[section.id] || locale[section.type];
+            if (!container || !data) return;
+            container.innerHTML = '';
+            const context = buildPageContext({
+                pageId: section.id,
+                data,
+                container,
+                lang: currentLang,
+                ui: locale.ui,
+                meta: cvData.meta
+            });
+            renderFullPage(pageModule, context);
+        });
+    } catch (err) {
+        console.warn('Page-module render failed, falling back to legacy render.', err);
     }
 }
 
@@ -705,12 +768,15 @@ function updateUiLabels(locale) {
 function updateNavigationLabels(locale) {
     document.querySelectorAll('[data-nav]').forEach(label => {
         const key = label.getAttribute('data-nav');
-        const labelText = t(`navigation.${key}`, (locale.navigation && locale.navigation[key]) || label.textContent || key);
+        const configItem = getConfigPageItem(key);
+        const configLabel = configItem?.labels?.[currentLang];
+        const labelText = t(`navigation.${key}`, configLabel || (locale.navigation && locale.navigation[key]) || label.textContent || key);
         if (labelText) {
             label.textContent = labelText;
         }
         const navItem = label.closest('.nav-item');
-        const iconValue = normalizeIconValue(locale.navigation_icons && locale.navigation_icons[key]);
+        const configIcon = configItem?.icons?.[currentLang];
+        const iconValue = normalizeIconValue(configIcon || (locale.navigation_icons && locale.navigation_icons[key]));
         if (navItem) {
             const svgIcon = navItem.querySelector('.nav-icon');
             let customIcon = navItem.querySelector('.nav-custom-icon');
@@ -733,7 +799,8 @@ function updateNavigationLabels(locale) {
 
 function updateBreadcrumb(sectionId, locale) {
     if (!dom.breadcrumb || !sectionId) return;
-    const label = (locale && locale.navigation && locale.navigation[sectionId]) || sectionId;
+    const configItem = getConfigPageItem(sectionId);
+    const label = configItem?.labels?.[currentLang] || (locale && locale.navigation && locale.navigation[sectionId]) || sectionId;
     dom.breadcrumb.textContent = t(`navigation.${sectionId}`, label);
 }
 
