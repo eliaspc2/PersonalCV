@@ -23,7 +23,9 @@ export function initPreviewGesture({ pageId, data, container, lang, ui, assets, 
             meta: resolveValue(meta)
         };
         if (!context.container || !context.data) return;
-        renderPageShadow(context);
+        renderPageShadow(context).catch((err) => {
+            console.warn('Preview shadow render failed.', err);
+        });
     };
 
     const onClick = () => {

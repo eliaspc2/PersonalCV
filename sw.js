@@ -11,6 +11,19 @@ const PRECACHE_URLS = [
   'js/crypto-utils.js',
   'js/constants.js',
   'js/icon-set.js',
+  'core/page-orchestrator.js',
+  'core/page-context.js',
+  'core/shadow-render.js',
+  'core/preview-gesture.js',
+  'pages/pages-registry.js',
+  'pages/example.page.js',
+  'pages/highlights.page.js',
+  'pages/overview.page.js',
+  'pages/foundation.page.js',
+  'pages/development.page.js',
+  'pages/mindset.page.js',
+  'pages/now.page.js',
+  'pages/contact.page.js',
   'validators/schema-validate.js',
   'validators/cv-consistency.js',
   'validators/error-messages.js',
@@ -108,7 +121,7 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
-  if (url.pathname.includes('/js/')) {
+  if (url.pathname.includes('/js/') || url.pathname.includes('/core/') || url.pathname.includes('/pages/')) {
     event.respondWith(
       fetch(event.request).then((response) => {
         const responseClone = response.clone();
