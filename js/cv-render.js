@@ -43,6 +43,12 @@ const BASE_SECTIONS = [
 const NAV_TYPE_ICONS = Object.fromEntries(
     Object.entries(NAV_TYPE_ICON_IDS).map(([key, iconId]) => [key, renderIcon(iconId, 'nav-icon')])
 );
+
+export function setRenderState({ cv, config, lang } = {}) {
+    if (cv) cvData = cv;
+    if (config) configData = config;
+    if (lang) currentLang = lang;
+}
 function t(_key, fallback = '') {
     return fallback;
 }

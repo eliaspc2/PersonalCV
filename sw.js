@@ -12,6 +12,7 @@ const PRECACHE_URLS = [
   'js/crypto-utils.js',
   'js/constants.js',
   'js/icon-set.js',
+  'js/main-new.js',
   'core/page-orchestrator.js',
   'core/page-context.js',
   'core/shadow-render.js',
