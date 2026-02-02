@@ -121,7 +121,19 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
-  if (url.pathname.includes('/js/') || url.pathname.includes('/core/') || url.pathname.includes('/pages/')) {
+  if (url.pathname.includes('/pages/')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' })
+    );
+    return;
+  }
+  if (url.pathname.includes('/core/')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+  if (url.pathname.includes('/js/')) {
     event.respondWith(
       fetch(event.request).then((response) => {
         const responseClone = response.clone();
