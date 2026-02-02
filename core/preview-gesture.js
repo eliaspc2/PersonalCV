@@ -25,7 +25,7 @@ export function initPreviewGesture({ pageId, data, container, lang, ui, assets, 
         }
     };
 
-    const triggerPreview = () => {
+    const triggerPreview = async () => {
         const resolvedPageId = resolveValue(pageId);
         if (!resolvedPageId) return;
         const context = {
@@ -39,10 +39,14 @@ export function initPreviewGesture({ pageId, data, container, lang, ui, assets, 
             meta: resolveValue(meta)
         };
         if (!context.container || !context.data) return;
-        ensurePreviewBadge();
-        renderPageShadow(context).catch((err) => {
+        try {
+            const rendered = await renderPageShadow(context);
+            if (rendered !== false) {
+                ensurePreviewBadge();
+            }
+        } catch (err) {
             console.warn('Preview shadow render failed.', err);
-        });
+        }
     };
 
     const onClick = () => {
