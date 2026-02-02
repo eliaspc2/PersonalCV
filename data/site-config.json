@@ -1,0 +1,91 @@
+{
+  "version": "4.3.0",
+  "globals": {
+    "layout": {
+      "section_padding_top": 8,
+      "section_padding_bottom": 0,
+      "snap": "proximity"
+    },
+    "theme": {
+      "bg_app": "#fcfcfd",
+      "bg_sidebar": "#ffffff",
+      "primary": "#020617",
+      "accent": "#3b82f6",
+      "accent_soft": "rgba(59, 130, 246, 0.08)",
+      "text_main": "#0f172a",
+      "text_muted": "#64748b",
+      "text_dim": "#94a3b8",
+      "border": "#f1f5f9"
+    },
+    "cta": {
+      "default_label": {
+        "pt": "Vamos Conversar?",
+        "es": "¿Conversamos?",
+        "en": "Let’s Talk?"
+      },
+      "default_link": "mailto:eliaspc2@gmail.com"
+    }
+  },
+  "pages": {
+    "order": [
+      "overview",
+      "development",
+      "foundation",
+      "highlights",
+      "mindset",
+      "now",
+      "contact"
+    ],
+    "items": [
+      {
+        "id": "overview",
+        "type": "overview",
+        "hidden": false,
+        "labels": { "pt": "Identidade", "es": "Identidad", "en": "Identity" },
+        "icons": { "pt": "", "es": "", "en": "" }
+      },
+      {
+        "id": "development",
+        "type": "development",
+        "hidden": false,
+        "labels": { "pt": "Engenharia", "es": "Ingeniería", "en": "Engineering" },
+        "icons": { "pt": "", "es": "", "en": "" }
+      },
+      {
+        "id": "foundation",
+        "type": "foundation",
+        "hidden": false,
+        "labels": { "pt": "Fundação", "es": "Fundación", "en": "Foundation" },
+        "icons": { "pt": "", "es": "", "en": "" }
+      },
+      {
+        "id": "highlights",
+        "type": "highlights",
+        "hidden": false,
+        "labels": { "pt": "Destaques", "es": "Destacados", "en": "Highlights" },
+        "icons": { "pt": "", "es": "", "en": "" }
+      },
+      {
+        "id": "mindset",
+        "type": "mindset",
+        "hidden": false,
+        "labels": { "pt": "Mentalidade", "es": "Mentalidad", "en": "Mindset" },
+        "icons": { "pt": "", "es": "", "en": "" }
+      },
+      {
+        "id": "now",
+        "type": "now",
+        "hidden": false,
+        "labels": { "pt": "Agora", "es": "Ahora", "en": "Now" },
+        "icons": { "pt": "", "es": "", "en": "" }
+      },
+      {
+        "id": "contact",
+        "type": "contact",
+        "hidden": false,
+        "labels": { "pt": "Contacto", "es": "Contacto", "en": "Contact" },
+        "icons": { "pt": "", "es": "", "en": "" }
+      }
+    ]
+  }
+}

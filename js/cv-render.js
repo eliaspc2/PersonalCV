@@ -1,6 +1,7 @@
 import { getSecureItem } from './crypto-utils.js';
 import { renderIcon, normalizeIconValue, isIconId } from './icon-set.js';
 import { CONFIG_PATH, CV_PATH, DEFAULT_PATHS, DEFAULT_THEME, NAV_TYPE_ICON_IDS } from './constants.js';
+import { initPreviewGesture } from '../core/preview-gesture.js';
 import { validateCVSchema } from '../validators/schema-validate.js';
 import { validateConsistency } from '../validators/cv-consistency.js';
 import { formatErrorMessages } from '../validators/error-messages.js';
@@ -402,6 +403,19 @@ async function bootstrap() {
         setupGlobalEvents();
         render();
         setupScrollNarrative();
+        initPreviewGesture({
+            pageId: () => currentSection,
+            data: () => {
+                const locale = cvData?.localized?.[currentLang];
+                if (!locale || !currentSection) return null;
+                const sectionMeta = getSectionsMeta().find((section) => section.id === currentSection);
+                const sectionType = sectionMeta?.type || currentSection;
+                return locale[currentSection] || locale[sectionType] || null;
+            },
+            container: () => (currentSection ? document.getElementById(`section-${currentSection}`) : null),
+            lang: () => currentLang,
+            ui: () => cvData?.localized?.[currentLang]?.ui
+        });
     } catch (err) {
         console.error("Critical error loading CV data:", err);
     }
