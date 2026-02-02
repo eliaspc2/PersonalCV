@@ -3,7 +3,6 @@ import { renderIcon, normalizeIconValue, isIconId } from './icon-set.js';
 import { buildPageContext } from '../core/page-context.js';
 import { renderFullPage } from '../core/page-orchestrator.js';
 import { pagesRegistry } from '../pages/pages-registry.js';
-import { setRenderState } from './cv-render.js';
 
 const CV_PATH = 'data/cv.json';
 const SITE_CONFIG_PATH = 'data/site-config.json';
@@ -268,7 +267,6 @@ async function bootstrap() {
     siteConfig = await configResp.json();
     currentLang = cvData?.meta?.defaultLanguage || 'pt';
 
-    setRenderState({ cv: cvData, config: { ...siteConfig?.globals, layout: siteConfig?.globals?.layout, theme: siteConfig?.globals?.theme }, lang: currentLang });
     applyTheme(siteConfig?.globals?.theme || cvData?.meta?.theme || {});
     applyLayout(siteConfig?.globals?.layout || cvData?.meta?.layout || {});
 
