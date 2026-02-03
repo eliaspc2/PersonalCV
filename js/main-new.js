@@ -44,17 +44,59 @@ function applyTheme(theme) {
     });
 }
 
+function resolveLayoutValue(layout, legacyKey, newKey) {
+    if (!layout) return undefined;
+    if (layout[newKey] !== undefined) return layout[newKey];
+    if (layout[legacyKey] !== undefined) return layout[legacyKey];
+    return undefined;
+}
+
 function applyLayout(layout) {
     const root = document.documentElement;
     if (!layout) return;
-    if (layout.section_padding_top !== undefined) {
-        root.style.setProperty('--section-pad-top', `${layout.section_padding_top}px`);
+    const padTop = resolveLayoutValue(layout, 'section_padding_top', 'padding_top');
+    const padBottom = resolveLayoutValue(layout, 'section_padding_bottom', 'padding_bottom');
+    if (padTop !== undefined) {
+        root.style.setProperty('--section-pad-top', `${padTop}px`);
     }
-    if (layout.section_padding_bottom !== undefined) {
-        root.style.setProperty('--section-pad-bottom', `${layout.section_padding_bottom}px`);
+    if (padBottom !== undefined) {
+        root.style.setProperty('--section-pad-bottom', `${padBottom}px`);
     }
     if (layout.snap) {
         root.style.setProperty('--snap-type', layout.snap);
+    }
+}
+
+function applyPageLayout(sectionEl, pageLayout, globalLayout) {
+    if (!sectionEl) return;
+    const resolved = {
+        padding_top: resolveLayoutValue(pageLayout, 'section_padding_top', 'padding_top'),
+        padding_bottom: resolveLayoutValue(pageLayout, 'section_padding_bottom', 'padding_bottom'),
+        snap: pageLayout?.snap
+    };
+    const fallback = {
+        padding_top: resolveLayoutValue(globalLayout, 'section_padding_top', 'padding_top'),
+        padding_bottom: resolveLayoutValue(globalLayout, 'section_padding_bottom', 'padding_bottom'),
+        snap: globalLayout?.snap
+    };
+    const padTop = resolved.padding_top !== undefined ? resolved.padding_top : fallback.padding_top;
+    const padBottom = resolved.padding_bottom !== undefined ? resolved.padding_bottom : fallback.padding_bottom;
+    const snapAlign = resolved.snap !== undefined ? resolved.snap : fallback.snap;
+
+    if (padTop !== undefined) {
+        sectionEl.style.paddingTop = `calc(var(--header-height) + ${padTop}px)`;
+        sectionEl.style.scrollMarginTop = `calc(var(--header-height) + ${padTop}px)`;
+    }
+    if (padBottom !== undefined) {
+        sectionEl.style.paddingBottom = `${padBottom}px`;
+    }
+    if (padTop !== undefined || padBottom !== undefined) {
+        const topVal = padTop !== undefined ? `${padTop}px` : 'var(--section-pad-top)';
+        const bottomVal = padBottom !== undefined ? `${padBottom}px` : 'var(--section-pad-bottom)';
+        sectionEl.style.minHeight = `calc(100vh - var(--header-height) - ${topVal} - ${bottomVal})`;
+    }
+    if (snapAlign) {
+        sectionEl.style.scrollSnapAlign = snapAlign;
     }
 }
 
@@ -146,12 +188,14 @@ function ensureSections() {
 function renderPages() {
     const pages = getOrderedPages().filter((item) => !item.hidden);
     const locale = cvData?.localized?.[currentLang] || {};
+    const globalLayout = siteConfig?.globals?.layout || cvData?.meta?.layout || {};
 
     pages.forEach((page) => {
         const module = pagesRegistry[page.id];
         if (!module) return;
         const container = document.getElementById(`section-${page.id}`);
         if (!container) return;
+        applyPageLayout(container, page.layout, globalLayout);
         const data = locale[page.id] || locale[page.type];
         if (!data) return;
         container.innerHTML = '';

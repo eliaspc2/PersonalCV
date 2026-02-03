@@ -2,9 +2,9 @@
   "version": "4.3.0",
   "globals": {
     "layout": {
-      "section_padding_top": 8,
-      "section_padding_bottom": 0,
-      "snap": "proximity"
+      "snap": "proximity",
+      "padding_top": 8,
+      "padding_bottom": 0
     },
     "theme": {
       "bg_app": "#fcfcfd",
@@ -41,50 +41,113 @@
         "id": "overview",
         "type": "overview",
         "hidden": false,
-        "labels": { "pt": "Identidade", "es": "Identidad", "en": "Identity" },
-        "icons": { "pt": "", "es": "", "en": "" }
+        "labels": {
+          "pt": "Identidade",
+          "es": "Identidad",
+          "en": "Identity"
+        },
+        "icons": {
+          "pt": "",
+          "es": "",
+          "en": ""
+        },
+        "layout": {}
       },
       {
         "id": "development",
         "type": "development",
         "hidden": false,
-        "labels": { "pt": "Engenharia", "es": "Ingeniería", "en": "Engineering" },
-        "icons": { "pt": "", "es": "", "en": "" }
+        "labels": {
+          "pt": "Engenharia",
+          "es": "Ingeniería",
+          "en": "Engineering"
+        },
+        "icons": {
+          "pt": "",
+          "es": "",
+          "en": ""
+        },
+        "layout": {}
       },
       {
         "id": "foundation",
         "type": "foundation",
         "hidden": false,
-        "labels": { "pt": "Fundação", "es": "Fundación", "en": "Foundation" },
-        "icons": { "pt": "", "es": "", "en": "" }
+        "labels": {
+          "pt": "Fundação",
+          "es": "Fundación",
+          "en": "Foundation"
+        },
+        "icons": {
+          "pt": "",
+          "es": "",
+          "en": ""
+        },
+        "layout": {}
       },
       {
         "id": "highlights",
         "type": "highlights",
         "hidden": false,
-        "labels": { "pt": "Destaques", "es": "Destacados", "en": "Highlights" },
-        "icons": { "pt": "", "es": "", "en": "" }
+        "labels": {
+          "pt": "Destaques",
+          "es": "Destacados",
+          "en": "Highlights"
+        },
+        "icons": {
+          "pt": "",
+          "es": "",
+          "en": ""
+        },
+        "layout": {}
       },
       {
         "id": "mindset",
         "type": "mindset",
         "hidden": false,
-        "labels": { "pt": "Mentalidade", "es": "Mentalidad", "en": "Mindset" },
-        "icons": { "pt": "", "es": "", "en": "" }
+        "labels": {
+          "pt": "Mentalidade",
+          "es": "Mentalidad",
+          "en": "Mindset"
+        },
+        "icons": {
+          "pt": "",
+          "es": "",
+          "en": ""
+        },
+        "layout": {}
       },
       {
         "id": "now",
         "type": "now",
         "hidden": false,
-        "labels": { "pt": "Agora", "es": "Ahora", "en": "Now" },
-        "icons": { "pt": "", "es": "", "en": "" }
+        "labels": {
+          "pt": "Agora",
+          "es": "Ahora",
+          "en": "Now"
+        },
+        "icons": {
+          "pt": "",
+          "es": "",
+          "en": ""
+        },
+        "layout": {}
       },
       {
         "id": "contact",
         "type": "contact",
         "hidden": false,
-        "labels": { "pt": "Contacto", "es": "Contacto", "en": "Contact" },
-        "icons": { "pt": "", "es": "", "en": "" }
+        "labels": {
+          "pt": "Contacto",
+          "es": "Contacto",
+          "en": "Contact"
+        },
+        "icons": {
+          "pt": "",
+          "es": "",
+          "en": ""
+        },
+        "layout": {}
       }
     ]
   }
